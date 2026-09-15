@@ -1,0 +1,94 @@
+#!/bin/bash
+# Проверка что весь стэк работает
+# Запуск: cd ~/stack && bash check-all.sh
+
+export PATH="$HOME/.juliaup/bin:$PATH"
+
+echo "=== Проверка стека ==="
+echo ""
+
+# Wolfram
+echo -n "Wolfram: "
+if wolframscript -version >/dev/null 2>&1; then
+    echo "✅ $(wolframscript -version 2>/dev/null)"
+else
+    echo "❌ не найден"
+fi
+
+# ParaView
+echo -n "ParaView: "
+PVAPP=$(ls -d /Applications/ParaView-*.app 2>/dev/null | head -1)
+if [ -n "$PVAPP" ] && "$PVAPP/Contents/bin/pvpython" --version >/dev/null 2>&1; then
+    echo "✅ $("$PVAPP/Contents/bin/pvpython" --version 2>/dev/null)"
+else
+    echo "❌ не найден"
+fi
+
+# Julia
+echo -n "Julia: "
+if julia --version >/dev/null 2>&1; then
+    echo "✅ $(julia --version 2>/dev/null)"
+else
+    echo "❌ не найден"
+fi
+
+# LaTeX
+echo -n "LaTeX: "
+if pdflatex --version >/dev/null 2>&1; then
+    echo "✅ $(pdflatex --version 2>/dev/null | head -1)"
+else
+    echo "❌ не найден"
+fi
+
+# Manim
+echo -n "Manim: "
+source ~/stack/manim-env/bin/activate 2>/dev/null
+if python3 -c "import manim" >/dev/null 2>&1; then
+    MANIM_VER=$(python3 -c "import manim; print(manim.__version__)" 2>/dev/null)
+    echo "✅ v$MANIM_VER"
+else
+    echo "❌ ошибка"
+fi
+
+# ManimGL
+echo -n "ManimGL: "
+if python3 -c "import manimlib" >/dev/null 2>&1; then
+    echo "✅ OK"
+else
+    echo "❌ ошибка"
+fi
+deactivate 2>/dev/null
+
+# Jupyter
+echo -n "Jupyter: "
+source ~/stack/jupyter-env/bin/activate 2>/dev/null
+if jupyter --version >/dev/null 2>&1; then
+    echo "✅ $(jupyter --version 2>/dev/null | head -1)"
+else
+    echo "❌ не найден"
+fi
+deactivate 2>/dev/null
+
+# VS Code
+echo -n "VS Code: "
+if [ -d "/Applications/Visual Studio Code.app" ]; then
+    VS_VER=$("/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" --version 2>/dev/null | head -1)
+    if [ -n "$VS_VER" ]; then
+        echo "✅ $VS_VER"
+    else
+        echo "✅ установлен"
+    fi
+else
+    echo "❌ не найден"
+fi
+
+# OpenCode
+echo -n "OpenCode: "
+if command -v opencode >/dev/null 2>&1; then
+    echo "✅ $(which opencode)"
+else
+    echo "❌ не найден"
+fi
+
+echo ""
+echo "=== Готово ==="

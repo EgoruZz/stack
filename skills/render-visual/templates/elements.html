@@ -1,0 +1,212 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <!-- THEME: swap ember for slate | paper | terminal | blueprint | frost | neon | sepia. If you copied this file out of
+         the skill, copy the theme file beside it and use href="./ember.css". -->
+    <link rel="stylesheet" href="../themes/ember.css" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        width: 1360px; height: 1180px; overflow: hidden;
+        background: var(--ground);
+        position: relative;
+        font-family: var(--font-display);
+      }
+      .glow { position: absolute; border-radius: 999px; filter: blur(120px); opacity: var(--glow-opacity); }
+      .g1 { width: 560px; height: 560px; top: -240px; left: -100px; background: var(--glow1); }
+      .g2 { width: 520px; height: 520px; top: -200px; right: -120px; background: var(--glow2); }
+      .dots {
+        position: absolute; inset: 0;
+        background-image: radial-gradient(circle at 1px 1px, var(--dot) 1px, transparent 0);
+        background-size: 30px 30px;
+        -webkit-mask-image: radial-gradient(ellipse 80% 75% at 50% 45%, #000 40%, transparent 100%);
+      }
+      svg { position: relative; display: block; }
+      .title { font: 600 20px var(--font-display); fill: var(--ink); }
+      .sub { font: 400 12.5px var(--font-mono); fill: var(--ink-dim); }
+      .lbl { font: 500 12.5px var(--font-mono); }
+      .kicker { font: 500 14px var(--font-mono); fill: var(--ink-faint); letter-spacing: 0.04em; }
+      .sec { font: 500 12px var(--font-mono); fill: var(--ink-faint); letter-spacing: 0.08em; }
+      .node { fill: var(--surface); stroke: var(--line); }
+      .s1 { stroke: var(--a1); } .s2 { stroke: var(--a2); } .s3 { stroke: var(--a3); } .s4 { stroke: var(--a4); }
+      .f1 { fill: var(--a1); } .f2 { fill: var(--a2); } .f3 { fill: var(--a3); } .f4 { fill: var(--a4); }
+      /* element utilities — every part below relies only on these + the classes above */
+      .sline { stroke: var(--line); } .fline { fill: var(--line); }
+      .sfaint { stroke: var(--ink-faint); } .ffaint { fill: var(--ink-faint); }
+      .fground { fill: var(--ground); }
+      .glyph { fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+  </head>
+  <body>
+    <div class="glow g1"></div>
+    <div class="glow g2"></div>
+    <div class="dots"></div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════
+         PARTS SHEET — not a deliverable. Copy a <g id="el-…"> or <g id="g-…">
+         into your figure's <svg>, position it with transform="translate(x,y)",
+         and recolor by swapping s1 → s2/s3/s4 on its accent parts. Each part is
+         anchored at its own top-left and depends only on the classes in <style>
+         (diagram.html and sequence.html already carry the same set).
+         ══════════════════════════════════════════════════════════════════════ -->
+    <svg width="1360" height="1180" viewBox="0 0 1360 1180" fill="none">
+
+      <text class="kicker" x="70" y="58">RENDERCRAFT · ELEMENT LIBRARY — FRAMES, SHAPES, GLYPHS</text>
+
+      <text class="sec" x="70" y="108">FRAMES — nodes in their own right: caption with .title/.sub, or swap skeleton bars for real mono text</text>
+
+      <!-- ▸ el-window · app/desktop window · 280×200 · anchor top-left.
+           Stretch: outer rect width, the y=40 bar line, and skeleton widths move together. -->
+      <g data-part="el-window" transform="translate(70, 124)"/>
+
+      <!-- ▸ el-browser · browser window · 320×200 · anchor top-left.
+           Stretch: outer rect, the y=44 bar line, the URL pill, and panel widths together. -->
+      <g data-part="el-browser" transform="translate(400, 124)"/>
+
+      <!-- ▸ el-terminal · terminal window · 320×200 · anchor top-left.
+           The block cursor is f1; prompt chevrons are s1. -->
+      <g data-part="el-terminal" transform="translate(770, 124)"/>
+
+      <!-- ▸ el-phone · mobile window · 120×236 · anchor top-left. -->
+      <g data-part="el-phone" transform="translate(1160, 124)"/>
+
+      <text class="sub" x="210" y="388" text-anchor="middle">el-window · 280×200</text>
+      <text class="sub" x="560" y="388" text-anchor="middle">el-browser · 320×200</text>
+      <text class="sub" x="930" y="388" text-anchor="middle">el-terminal · 320×200</text>
+      <text class="sub" x="1220" y="388" text-anchor="middle">el-phone · 120×236</text>
+
+      <text class="sec" x="70" y="436">SHAPES — infrastructure actors; caption beneath with .title/.sub like any node</text>
+
+      <!-- ▸ el-database · cylinder · 120×140 · anchor top-left (rim center at y=24). -->
+      <g data-part="el-database" transform="translate(70, 452)"/>
+
+      <!-- ▸ el-server · rack · 140×140 · anchor top-left. LEDs: f4 = healthy. -->
+      <g data-part="el-server" transform="translate(240, 452)"/>
+
+      <!-- ▸ el-queue · slats + flow arrow · 168×64 · anchor top-left. -->
+      <g data-part="el-queue" transform="translate(430, 490)"/>
+
+      <!-- ▸ el-cloud · 180×104 · anchor top-left. -->
+      <g data-part="el-cloud" transform="translate(648, 470)"/>
+
+      <!-- ▸ el-router · router / switch · 84×84 · anchor top-left. -->
+      <g data-part="el-router" transform="translate(850, 480)"/>
+
+      <!-- ▸ el-actor · user badge · 68×68 · anchor top-left. -->
+      <g data-part="el-actor" transform="translate(1040, 488)"/>
+
+      <!-- ▸ el-shield · security / auth · 92×104 · anchor top-left. -->
+      <g data-part="el-shield" transform="translate(1200, 470)"/>
+
+      <text class="sub" x="130" y="622" text-anchor="middle">el-database · 120×140</text>
+      <text class="sub" x="310" y="622" text-anchor="middle">el-server · 140×140</text>
+      <text class="sub" x="514" y="622" text-anchor="middle">el-queue · 168×64</text>
+      <text class="sub" x="738" y="622" text-anchor="middle">el-cloud · 180×104</text>
+      <text class="sub" x="892" y="622" text-anchor="middle">el-router · 84×84</text>
+      <text class="sub" x="1074" y="622" text-anchor="middle">el-actor · 68×68</text>
+      <text class="sub" x="1246" y="622" text-anchor="middle">el-shield · 92×104</text>
+
+      <text class="sec" x="70" y="668">NODES — 3-D boxes for deployment figures; their contents ride alongside, not inside</text>
+
+      <!-- ▸ el-cube · deployment node · 260×170 · anchor top-left.
+           The accent is the top fold edge, so data-accent recolours the box
+           without touching its silhouette. -->
+      <g data-part="el-cube" transform="translate(70, 684)"/>
+
+      <text class="sub" x="370" y="716">Front face: 240×150 at (+0,+20) — stereotype, name and</text>
+      <text class="sub" x="370" y="742">artifact chips go there, as a SIBLING group on the same</text>
+      <text class="sub" x="370" y="768">origin. Includes are not recursive: a data-part nested</text>
+      <text class="sub" x="370" y="794">inside a call site is left unresolved, and that is fatal.</text>
+      <text class="sub" x="370" y="820">See templates/deployment.html for the pattern.</text>
+
+      <text class="sub" x="200" y="872" text-anchor="middle">el-cube · 260×170</text>
+
+      <text class="sec" x="70" y="918">GLYPHS — 28×28 · class "s1 glyph" · drop into a node card at translate(20,30) in place of the stock icon</text>
+
+      <!-- Each glyph is a self-contained <g id="g-…"> in a 28×28 box, stroke 1.6.
+           The 48×48 tiles behind them are catalog furniture — don't copy those. -->
+
+      <g>
+        <rect class="node" x="101" y="934" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="201" y="934" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="301" y="934" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="401" y="934" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="501" y="934" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="601" y="934" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="701" y="934" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="801" y="934" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="901" y="934" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="1001" y="934" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="1101" y="934" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="1201" y="934" width="48" height="48" rx="12" stroke-width="1"/>
+      </g>
+
+      <g data-part="g-user" transform="translate(111, 944)"/>
+      <g data-part="g-users" transform="translate(211, 944)"/>
+      <g data-part="g-db" transform="translate(311, 944)"/>
+      <g data-part="g-cloud" transform="translate(411, 944)"/>
+      <g data-part="g-gear" transform="translate(511, 944)"/>
+      <g data-part="g-lock" transform="translate(611, 944)"/>
+      <g data-part="g-key" transform="translate(711, 944)"/>
+      <g data-part="g-globe" transform="translate(811, 944)"/>
+      <g data-part="g-bolt" transform="translate(911, 944)"/>
+      <g data-part="g-mail" transform="translate(1011, 944)"/>
+      <g data-part="g-clock" transform="translate(1111, 944)"/>
+      <g data-part="g-folder" transform="translate(1211, 944)"/>
+
+      <text class="sub" x="125" y="1008" text-anchor="middle">user</text>
+      <text class="sub" x="225" y="1008" text-anchor="middle">users</text>
+      <text class="sub" x="325" y="1008" text-anchor="middle">db</text>
+      <text class="sub" x="425" y="1008" text-anchor="middle">cloud</text>
+      <text class="sub" x="525" y="1008" text-anchor="middle">gear</text>
+      <text class="sub" x="625" y="1008" text-anchor="middle">lock</text>
+      <text class="sub" x="725" y="1008" text-anchor="middle">key</text>
+      <text class="sub" x="825" y="1008" text-anchor="middle">globe</text>
+      <text class="sub" x="925" y="1008" text-anchor="middle">bolt</text>
+      <text class="sub" x="1025" y="1008" text-anchor="middle">mail</text>
+      <text class="sub" x="1125" y="1008" text-anchor="middle">clock</text>
+      <text class="sub" x="1225" y="1008" text-anchor="middle">folder</text>
+
+      <g>
+        <rect class="node" x="101" y="1034" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="201" y="1034" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="301" y="1034" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="401" y="1034" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="501" y="1034" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="601" y="1034" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="701" y="1034" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="801" y="1034" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="901" y="1034" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="1001" y="1034" width="48" height="48" rx="12" stroke-width="1"/>
+        <rect class="node" x="1101" y="1034" width="48" height="48" rx="12" stroke-width="1"/>
+      </g>
+
+      <g data-part="g-term" transform="translate(111, 1044)"/>
+      <g data-part="g-file" transform="translate(211, 1044)"/>
+      <g data-part="g-mobile" transform="translate(311, 1044)"/>
+      <g data-part="g-screen" transform="translate(411, 1044)"/>
+      <g data-part="g-api" transform="translate(511, 1044)"/>
+      <g data-part="g-chip" transform="translate(611, 1044)"/>
+      <g data-part="g-layers" transform="translate(711, 1044)"/>
+      <g data-part="g-net" transform="translate(811, 1044)"/>
+      <g data-part="g-search" transform="translate(911, 1044)"/>
+      <g data-part="g-check" transform="translate(1011, 1044)"/>
+      <g data-part="g-warn" transform="translate(1111, 1044)"/>
+
+      <text class="sub" x="125" y="1108" text-anchor="middle">term</text>
+      <text class="sub" x="225" y="1108" text-anchor="middle">file</text>
+      <text class="sub" x="325" y="1108" text-anchor="middle">mobile</text>
+      <text class="sub" x="425" y="1108" text-anchor="middle">screen</text>
+      <text class="sub" x="525" y="1108" text-anchor="middle">api</text>
+      <text class="sub" x="625" y="1108" text-anchor="middle">chip</text>
+      <text class="sub" x="725" y="1108" text-anchor="middle">layers</text>
+      <text class="sub" x="825" y="1108" text-anchor="middle">net</text>
+      <text class="sub" x="925" y="1108" text-anchor="middle">search</text>
+      <text class="sub" x="1025" y="1108" text-anchor="middle">check</text>
+      <text class="sub" x="1125" y="1108" text-anchor="middle">warn</text>
+
+      <text class="sub" x="70" y="1148" opacity="0.75">Reference a part by putting a data-part attribute on an empty &lt;g&gt; — never a copy. Recolor with data-accent, 1 to 4: one meaning per accent, never decoration.</text>
+    </svg>
+  </body>
+</html>

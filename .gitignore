@@ -1,0 +1,24 @@
+# Python venv
+*-env/
+
+# Node
+*/node_modules/
+*/dist/
+
+# External repos (cloned by setup.sh)
+paraview-mcp/
+manim-mcp/
+julia-mcp/
+tldraw-mcp/
+aris-research-repo/
+WolframLanguageForJupyter/
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# OpenCode local config
+.opencode/

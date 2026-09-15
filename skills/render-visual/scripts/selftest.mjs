@@ -1,0 +1,921 @@
+#!/usr/bin/env node
+// Deterministic invariant suite for the render pipeline.
+//
+//   node scripts/selftest.mjs [--keep] [--quick]
+//
+// Every child render runs with TMPDIR pointed at a throwaway root, so the suite
+// claims its own profile slots, never races the machine's real renders, and can
+// assert "the temp dir is empty afterwards" as an actual pass condition. That
+// isolation is what makes it safe to run while you are working, and what makes
+// the leak accounting in T7 meaningful. Cost: every profile is cold, so a render
+// here takes about a second longer than a warm one.
+//
+// --quick skips the animation test, the slowest by some way.
+// Exits non-zero on the first failing invariant.
+
+import { spawn, spawnSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
+import { cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { deflateSync } from 'node:zlib'
+import { assertJpeg, assertPdf, assertPng, findChrome } from './chrome.mjs'
+import { decodePng } from './gif.mjs'
+
+const SCRIPTS = dirname(fileURLToPath(import.meta.url))
+const SKILL_DIR = dirname(SCRIPTS)
+const keep = process.argv.includes('--keep')
+const quick = process.argv.includes('--quick')
+
+const root = mkdtempSync(join(tmpdir(), 'render-visual-selftest-'))
+const work = join(root, 'work')   // stands in for a user's project directory
+const iso = join(root, 'tmp')     // the isolated TMPDIR every child renders into
+mkdirSync(work, { recursive: true })
+mkdirSync(iso, { recursive: true })
+
+// A faithful fixture: the real template and the real themes, with the relative
+// link fixed the way SKILL.md tells you to fix it when copying a template out.
+cpSync(join(SKILL_DIR, 'themes'), join(work, 'themes'), { recursive: true })
+writeFileSync(
+  join(work, 'fig.html'),
+  readFileSync(join(SKILL_DIR, 'templates', 'diagram.html'), 'utf8').replace(/\.\.\/themes\//g, 'themes/'),
+)
+cpSync(join(SKILL_DIR, 'templates', 'sequence.html'), join(work, 'seq.html'))
+writeFileSync(
+  join(work, 'seq.html'),
+  readFileSync(join(work, 'seq.html'), 'utf8').replace(/\.\.\/themes\//g, 'themes/'),
+)
+
+const env = { ...process.env, TMPDIR: iso, TMP: iso, TEMP: iso }
+const render = (...args) => spawnSync(process.execPath, [join(SCRIPTS, 'render.mjs'), ...args], { cwd: work, env, encoding: 'utf8' })
+/**
+ * `closed` is attached at spawn, never at the point a test wants to wait. A render
+ * that finished before the test got there has already emitted 'close', and a
+ * listener added afterwards never fires: the await never settles, the loop drains,
+ * and node exits 13 with no failing test named.
+ */
+const renderBg = (...args) => {
+  const child = spawn(process.execPath, [join(SCRIPTS, 'render.mjs'), ...args], { cwd: work, env, stdio: 'ignore' })
+  child.closed = new Promise((res) => child.once('close', res))
+  return child
+}
+const sha = (f) => createHash('sha256').update(readFileSync(join(work, f))).digest('hex').slice(0, 16)
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
+// All of this suite's temp state lives under one directory inside the isolated
+// TMPDIR, which is what lets T8 assert "nothing else was created" rather than
+// hunting for known patterns.
+const isoState = join(iso, 'render-visual')
+
+const WIN = process.platform === 'win32'
+
+/**
+ * One line per process, `"<pid> <full command line>"`.
+ *
+ * Git Bash ships the Cygwin `ps` — `ps [-aeflsW]`, no `-o` — and even `-W -f`
+ * prints a native process's image path without its arguments, so it can never
+ * see a `--user-data-dir`. `wmic` is gone from the current runner image, which
+ * leaves CIM as the only thing on the box that reports a command line.
+ *
+ * Throws rather than returning nothing. `spawnSync` does not throw for a missing
+ * binary — it hands back `{ error: ENOENT, stdout: undefined }` — so the previous
+ * `.stdout || ''` turned "I cannot see" into "I see no Chromes". That made every
+ * orphan assertion vacuously true on Windows: T5 reported PASS while testing
+ * nothing at all, and T4 and T6 failed for a reason that had nothing to do with
+ * the behaviour under test.
+ */
+function procLines() {
+  const r = WIN
+    ? spawnSync('powershell.exe', [
+        '-NoProfile', '-NonInteractive', '-Command',
+        '@(Get-CimInstance Win32_Process) | ForEach-Object { "$($_.ProcessId) $($_.CommandLine)" }',
+      ], { encoding: 'utf8' })
+    : spawnSync('ps', ['-axo', 'pid=,command='], { encoding: 'utf8' })
+  // Three ways to come back empty, and all of them have to be fatal, because an
+  // empty list makes every orphan assertion pass by seeing nothing:
+  //   - error:  the binary is missing (spawnSync reports, never throws)
+  //   - status: it ran and refused — a bad flag, a PowerShell execution policy
+  //   - empty:  it succeeded but printed nothing, which no real process table does
+  const lines = typeof r.stdout === 'string' ? r.stdout.split('\n').filter(Boolean) : []
+  if (r.error || r.status !== 0 || lines.length === 0) {
+    const why = r.error?.code ?? (r.status !== 0 ? `exit ${r.status}` : 'no processes listed')
+    throw new Error(
+      `process probe failed (${why}). Without it every assertion about orphaned ` +
+        'Chromes would pass by seeing nothing, so this is fatal.',
+    )
+  }
+  return lines
+}
+
+// join(), not a literal '/': on Windows the profile path Chrome was launched with
+// carries backslashes, so a hard-coded forward slash matches nothing even once the
+// probe can see. `profile` is a prefix of `profile-1`, so this catches every slot.
+const PROFILE_NEEDLE = `--user-data-dir=${join(isoState, 'profile')}`
+
+/** Chrome processes holding one of THIS suite's profile slots. */
+const isoChromes = () => procLines().filter((l) => l.includes(PROFILE_NEEDLE))
+const ls = (dir, re) => {
+  try { return readdirSync(dir).filter((n) => re.test(n)) } catch { return [] }
+}
+/** Entries under the suite's state root. */
+const isoTemp = (re) => ls(isoState, re)
+/** Entries at the top level of the isolated TMPDIR — should only ever be our root. */
+const isoTop = (re) => ls(iso, re)
+
+/**
+ * SIGKILL anything still on this suite's profiles. A failing run is exactly the
+ * run that leaves Chromes behind, and they hold the scratch tree open — so the
+ * teardown has to reap before it deletes, on every exit path.
+ */
+const killIsoChromes = () => {
+  // Teardown must never throw: it runs from the exit handler, and a probe failure
+  // here would replace a real test result with a crash on the way out.
+  let lines = []
+  try { lines = isoChromes() } catch { return }
+  for (const line of lines) {
+    const pid = Number(line.trim().split(/\s+/)[0])
+    if (Number.isFinite(pid) && pid > 0) { try { process.kill(pid, 'SIGKILL') } catch {} }
+  }
+}
+process.on('exit', () => {
+  killIsoChromes()
+  if (!keep) rmSync(root, { recursive: true, force: true })
+})
+for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => process.exit(130))
+// A hard kill's litter is now a work dir in the temp root, plus anything an
+// older version left beside the input.
+const strays = () => [...isoTemp(/^work-\d+$/), ...ls(work, /^\.render-\d+\.html$/)]
+
+/** Poll until `pred()` is true, or give up. Keeps the timing tests honest. */
+async function until(pred, ms = 20_000) {
+  const deadline = Date.now() + ms
+  while (Date.now() < deadline) {
+    if (pred()) return true
+    await sleep(100)
+  }
+  return false
+}
+
+const results = []
+/** Long enough for the slowest invariant (the animation) on a cold Windows runner. */
+const TIMEOUT = 180_000
+async function test(name, fn, { skip = null, timeout = TIMEOUT } = {}) {
+  const started = Date.now()
+  const n = String(results.length + 1)
+  process.stdout.write(`[T${n}] ${name} … `)
+  if (skip) {
+    console.log(`SKIP — ${skip}`)
+    results.push({ name, ok: true, skipped: true })
+    return
+  }
+  try {
+    // A test that hangs must fail by name. Without this the suite dies on an
+    // unsettled await, and the log ends mid-line with exit code 13.
+    let timer
+    const guard = new Promise((_, rej) => {
+      timer = setTimeout(() => rej(new Error(`timed out after ${timeout / 1000}s`)), timeout)
+    })
+    try { await Promise.race([fn(), guard]) } finally { clearTimeout(timer) }
+    const secs = ((Date.now() - started) / 1000).toFixed(1)
+    console.log(`PASS (${secs}s)`)
+    results.push({ name, ok: true })
+  } catch (err) {
+    console.log('FAIL')
+    console.log(`      ${err.message.split('\n').join('\n      ')}`)
+    results.push({ name, ok: false })
+  }
+}
+const assert = (cond, msg) => { if (!cond) throw new Error(msg) }
+
+/* ───────────────────────────────────────────────────────────────────────── */
+
+let baseline
+
+await test('baseline render writes a real PNG', async () => {
+  const r = render('fig.html', 'base.png', '--theme', 'slate', '--scale', '1')
+  assert(r.status === 0, `exit ${r.status}: ${r.stderr.trim()}`)
+  assert(existsSync(join(work, 'base.png')), 'no PNG written')
+  baseline = sha('base.png')
+})
+
+await test('6 concurrent renders agree, byte for byte', async () => {
+  const kids = Array.from({ length: 6 }, (_, i) =>
+    new Promise((res) => {
+      const c = renderBg('fig.html', `par-${i}.png`, '--theme', 'slate', '--scale', '1')
+      c.on('close', (code) => res(code))
+    }))
+  const codes = await Promise.all(kids)
+  assert(codes.every((c) => c === 0), `exit codes ${codes.join(',')}`)
+  // Identical output from six processes that each picked their own profile slot
+  // is the strongest statement of both isolation and determinism.
+  const hashes = codes.map((_, i) => sha(`par-${i}.png`))
+  assert(hashes.every((h) => h === baseline), `hashes diverged: ${[...new Set(hashes)].join(' ')}`)
+})
+
+await test('overlapping themes never cross-contaminate', async () => {
+  const refs = {}
+  for (const t of ['slate', 'paper']) {
+    const r = render('fig.html', `ref-${t}.png`, '--theme', t, '--scale', '1')
+    assert(r.status === 0, `ref ${t} exit ${r.status}: ${r.stderr.trim()}`)
+    refs[t] = sha(`ref-${t}.png`)
+  }
+  assert(refs.slate !== refs.paper, 'the two themes rendered identically — the --theme rewrite did nothing')
+  const jobs = []
+  for (const round of [1, 2]) {
+    for (const t of ['slate', 'paper']) {
+      jobs.push(new Promise((res) => {
+        const c = renderBg('fig.html', `cc-${round}-${t}.png`, '--theme', t, '--scale', '1')
+        c.on('close', () => res({ round, t }))
+      }))
+    }
+  }
+  for (const { round, t } of await Promise.all(jobs)) {
+    assert(sha(`cc-${round}-${t}.png`) === refs[t], `cc-${round}-${t}.png does not match the ${t} reference`)
+  }
+  const link = readFileSync(join(work, 'fig.html'), 'utf8')
+  assert(link.includes('themes/ember.css'), 'the source file was mutated by --theme')
+})
+
+await test('an unowned Chrome on a slot is reaped, not tripped over', async () => {
+  // The deterministic form of the SIGTERM regression. Rather than racing to
+  // interrupt a render at exactly the wrong moment, put the machine straight
+  // into the state a bad interrupt leaves behind — a live Chrome holding slot
+  // 0's profile with no lock claiming it — and require the pipeline to cope.
+  const slot0 = join(isoState, 'profile')
+  assert(!existsSync(`${slot0}.lock`), 'slot 0 was still claimed; an earlier test did not clean up')
+  const orphan = spawn(findChrome(),
+    ['--headless=new', '--disable-gpu', '--no-first-run', `--user-data-dir=${slot0}`, 'about:blank'],
+    { stdio: 'ignore' })
+  // Watch the exit event, not process.kill(pid, 0): a killed child sits as a
+  // zombie until this process reaps it, and signal 0 succeeds on a zombie.
+  let orphanExited = false
+  orphan.on('exit', () => { orphanExited = true })
+  try {
+    // SingletonLock is the symlink Chrome drops once it actually owns the
+    // profile; before it exists the render could win the race and prove nothing.
+    const held = await until(() => { try { return !!lstatSync(join(slot0, 'SingletonLock')) } catch { return false } })
+    assert(held, 'the stand-in orphan never took the profile')
+    // Stop it. A *healthy* Chrome holding a profile is not the failure state —
+    // the two instances negotiate and the render goes through. What wedges the
+    // pipeline is a holder that cannot answer, which is precisely what a
+    // half-shut-down Chrome is. SIGSTOP reproduces that without racing a
+    // signal into Chrome's startup window.
+    process.kill(orphan.pid, 'SIGSTOP')
+    const r = render('fig.html', 'orphaned.png', '--theme', 'slate', '--scale', '1')
+    assert(r.status === 0, `a render was blocked by an unowned Chrome: ${r.stderr.trim()}`)
+    assert(sha('orphaned.png') === baseline, 'output differed from the baseline')
+    const reaped = await until(() => orphanExited, 5000)
+    assert(reaped, 'the unowned Chrome was left running to block later renders')
+  } finally {
+    try { process.kill(orphan.pid, 'SIGCONT') } catch {}
+    try { process.kill(orphan.pid, 'SIGKILL') } catch {}
+  }
+}, {
+  // The only invariant here that Windows genuinely cannot express, on three
+  // counts: Chrome drops no `SingletonLock` symlink there (it uses a lockfile),
+  // there is no SIGSTOP to wedge the holder with, and the behaviour under test —
+  // killProfileHolders reaping a Chrome nobody owns — is a documented no-op on
+  // win32, where Chrome reports "another instance is using the profile" instead.
+  // T5 and T6 stay enabled: their earlier Windows results were an artefact of a
+  // blind process probe, not of the platform.
+  skip: WIN ? 'POSIX only: no SingletonLock, no SIGSTOP, and killProfileHolders is a no-op on win32' : null,
+})
+
+await test('SIGTERM at any point in startup leaves no orphan', async () => {
+  // Chrome only swallows SIGTERM inside a window during startup, so a single
+  // well-timed kill is a coin flip. Sampling fixed points across the window
+  // keeps the test deterministic while actually covering the band.
+  let interrupted = 0
+  for (const delay of [300, 900, 1500, 2100]) {
+    const child = renderBg('fig.html', `term-${delay}.png`, '--theme', 'slate', '--scale', '1')
+    await sleep(delay)
+    // On a fast machine the later samples land after the render already finished.
+    // Killing a dead child proves nothing, so count the ones that hit a live one.
+    if (child.exitCode === null && child.signalCode === null) interrupted += 1
+    child.kill('SIGTERM')
+    await child.closed
+    const gone = await until(() => isoChromes().length === 0, 10_000)
+    assert(gone, `${isoChromes().length} Chrome process(es) survived SIGTERM sent ${delay}ms in`)
+  }
+  assert(interrupted > 0, 'every sample landed after the render had finished — the startup window was never hit')
+  const after = render('fig.html', 'after-term.png', '--theme', 'slate', '--scale', '1')
+  assert(after.status === 0, `the next render failed: ${after.stderr.trim()}`)
+  assert(sha('after-term.png') === baseline, 'the next render produced different output')
+})
+
+await test('SIGKILL is recovered from by the following run', async () => {
+  const child = renderBg('fig.html', 'kill.png', '--theme', 'slate', '--scale', '1')
+  const appeared = await until(() => isoChromes().length > 0)
+  assert(appeared, 'Chrome never started')
+  child.kill('SIGKILL')
+  await child.closed
+  // Nothing ran on the way out, so the litter is real: a stale lock, an orphaned
+  // Chrome, and the hidden theme copy sitting in the project directory.
+  assert(strays().length > 0 || isoTemp(/\.lock$/).length > 0, 'expected a hard kill to leave something behind')
+  const after = render('fig.html', 'after-kill.png', '--theme', 'slate', '--scale', '1')
+  assert(after.status === 0, `the next render failed: ${after.stderr.trim()}`)
+  assert(strays().length === 0, `hidden theme copies left in the project dir: ${strays().join(', ')}`)
+})
+
+if (!quick) {
+  await test('animation cleans up its frame directory', async () => {
+    const r = spawnSync(process.execPath,
+      [join(SCRIPTS, 'animate.mjs'), 'seq.html', 'anim.gif', '--theme', 'ember', '--transition', '0', '--jobs', '2', '--scale', '1'],
+      { cwd: work, env, encoding: 'utf8' })
+    assert(r.status === 0, `exit ${r.status}: ${r.stderr.trim()}`)
+    const gif = readFileSync(join(work, 'anim.gif'))
+    assert(gif.subarray(0, 6).toString('ascii') === 'GIF89a', 'not a GIF89a')
+    assert(isoTemp(/^frames-/).length === 0, 'frame directory left behind')
+  })
+}
+
+await test('temp dir is left clean', async () => {
+  const locks = isoTemp(/\.lock$/)
+  const tombs = isoTemp(/\.stale$/)
+  const frames = isoTemp(/^frames-/)
+  assert(locks.length === 0, `locks left: ${locks.join(', ')}`)
+  assert(tombs.length === 0, `rename tombs left: ${tombs.join(', ')}`)
+  assert(frames.length === 0, `frame dirs left: ${frames.join(', ')}`)
+  assert(strays().length === 0, `hidden theme copies left: ${strays().join(', ')}`)
+  assert(isoChromes().length === 0, `${isoChromes().length} Chrome process(es) still running`)
+})
+
+await test('a missing stylesheet fails before Chrome launches', async () => {
+  writeFileSync(join(work, 'broken.html'),
+    '<html><head><link rel="stylesheet" href="themes/nope.css"></head><body style="width:400px;height:200px"></body></html>')
+  const started = Date.now()
+  const r = render('broken.html', 'broken.png', '--scale', '1')
+  assert(r.status !== 0, 'a missing stylesheet was accepted')
+  assert(/Stylesheet not found/.test(r.stderr), `unexpected message: ${r.stderr.trim()}`)
+  assert(Date.now() - started < 2000, 'the check ran too late to have preceded Chrome')
+  assert(!existsSync(join(work, 'broken.png')), 'a PNG was written anyway')
+})
+
+await test('a blank canvas is rejected, not shipped', async () => {
+  writeFileSync(join(work, 'blank.css'), '/* resolves, defines nothing */')
+  writeFileSync(join(work, 'blank.html'),
+    '<html><head><link rel="stylesheet" href="blank.css"></head>' +
+    '<body style="width:400px;height:200px;background:#fff;overflow:hidden"></body></html>')
+  const r = render('blank.html', 'blank.png', '--scale', '1')
+  assert(r.status !== 0, 'an all-white canvas was reported as a success')
+  assert(/no content/.test(r.stderr), `unexpected message: ${r.stderr.trim()}`)
+})
+
+await test('a real template with no content is rejected, furniture and all', async () => {
+  // The blank test above uses an empty body, so a distinct-colour count alone is
+  // enough to fail it. This one is the case that count cannot see: a real
+  // template whose content is gone but whose .glow/.dots gradient still paints
+  // 169 distinct colours. Only the luminance spread separates it from a figure.
+  writeFileSync(join(work, 'furniture.html'),
+    readFileSync(join(work, 'fig.html'), 'utf8').replace(/<svg[\s\S]*?<\/svg>/gi, ''))
+  const r = render('furniture.html', 'furniture.png', '--theme', 'ember', '--scale', '1')
+  assert(r.status !== 0, 'a content-free render of a real template was reported as a success')
+  assert(/no content/.test(r.stderr), `unexpected message: ${r.stderr.trim()}`)
+})
+
+await test('a truncated PNG is rejected, not reported as a success', async () => {
+  const r = render('fig.html', 'trunc.png', '--theme', 'slate', '--scale', '1')
+  assert(r.status === 0, `setup render failed: ${r.stderr.trim()}`)
+  const full = readFileSync(join(work, 'trunc.png'))
+  writeFileSync(join(work, 'trunc.png'), full.subarray(0, Math.floor(full.length * 0.6)))
+  let caught = null
+  try { assertPng(join(work, 'trunc.png')) } catch (err) { caught = err }
+  assert(caught, 'a PNG cut to 60% of its bytes was accepted')
+  assert(/truncated/.test(caught.message), `unexpected message: ${caught.message}`)
+})
+
+await test('every shipped preview still passes the content guard', async () => {
+  // The false-positive guard, and the reason the ink threshold can be trusted:
+  // six real pipeline outputs across four themes and five templates, no Chrome
+  // launched. A stricter guard's real risk is rejecting good renders.
+  const dir = join(SKILL_DIR, '..', '..', 'previews')
+  const pngs = ls(dir, /\.png$/)
+  assert(pngs.length >= 5, `expected the shipped previews, found ${pngs.length}`)
+  for (const f of pngs) assertPng(join(dir, f))
+})
+
+await test('bad flag values are refused before Chrome starts', async () => {
+  for (const args of [
+    ['--size', 'zzz'], ['--size', '100'], ['--scale', 'abc'], ['--scale', '0'],
+    ['--theme', 'nosuch'], ['--them', 'paper'],
+  ]) {
+    const r = render('fig.html', 'never.png', ...args)
+    assert(r.status !== 0, `${args.join(' ')} was accepted`)
+    assert(!existsSync(join(work, 'never.png')), `${args.join(' ')} wrote a PNG anyway`)
+  }
+})
+
+await test('doctor cleans up on a machine with no browser', async () => {
+  const r = spawnSync(process.execPath, [join(SCRIPTS, 'doctor.mjs'), '--json'],
+    { cwd: work, env: { ...env, CHROME_PATH: '/nonexistent/chrome' }, encoding: 'utf8' })
+  assert(r.status === 0, `doctor exited ${r.status}: ${r.stderr.trim()}`)
+  const report = JSON.parse(r.stdout)
+  assert(report.chrome === null, `expected no browser, got ${report.chrome}`)
+  assert(report.reaped, 'no reap report — cleanup did not run')
+})
+
+await test('an impossible render fails fast instead of relaunching Chrome', async () => {
+  // Regression guard. A --screenshot path Chrome cannot write does not make it
+  // exit; it waits out the full 120s timeout. While every failure was treated as
+  // worth another slot, one typo meant three Chrome launches over six minutes.
+  const started = Date.now()
+  const r = render('fig.html', 'nosuchdir/out.png', '--scale', '1')
+  const took = Date.now() - started
+  assert(r.status !== 0, 'a bad output path was accepted')
+  assert(/Output directory does not exist/.test(r.stderr), `unexpected message: ${r.stderr.trim()}`)
+  assert(took < 3000, `took ${took}ms — Chrome was launched and waited on`)
+  assert(isoChromes().length === 0, 'Chrome was launched for a render that could never succeed')
+})
+
+/* ── export formats ──────────────────────────────────────────────────────── */
+
+// fig.html is diagram.html, whose body declares the canvas every check below
+// measures against.
+const FIG = { w: 1360, h: 740 }
+
+await test('every export format writes what its name claims', async () => {
+  const png = render('fig.html', 'fmt.png', '--theme', 'slate', '--scale', '1')
+  const jpg = render('fig.html', 'fmt.jpg', '--theme', 'slate', '--scale', '1')
+  const pdf = render('fig.html', 'fmt.pdf', '--theme', 'slate')
+  for (const [name, r] of [['png', png], ['jpg', jpg], ['pdf', pdf]]) {
+    assert(r.status === 0, `${name} exit ${r.status}: ${r.stderr.trim()}`)
+  }
+  // Each guard is format-specific and each one reads the real header, so this
+  // fails if Chrome ever stops honouring the extension and writes a PNG called
+  // .jpg — the exact wrong-file-at-exit-0 case the extension check cannot see.
+  const shot = assertPng(join(work, 'fmt.png'), FIG)
+  const frame = assertJpeg(join(work, 'fmt.jpg'), FIG)
+  assertPdf(join(work, 'fmt.pdf'), FIG)
+  // The JPEG is a transcode of the master, so its frame must match pixel for
+  // pixel in size; a mismatch means the second pass resampled.
+  assert(frame.width === shot.width && frame.height === shot.height,
+    `jpeg ${frame.width}x${frame.height} does not match the master ${shot.width}x${shot.height}`)
+})
+
+await test('no format ships a blank canvas', async () => {
+  // The content guard is the one thing a new output format could quietly lose:
+  // Chrome writes a JPEG or a PDF straight from a blank page and reports success.
+  // blank.html is the fixture the PNG case already uses.
+  for (const [out, extra] of [['blank.jpg', ['--scale', '1']], ['blank.pdf', []]]) {
+    const r = render('blank.html', out, ...extra)
+    assert(r.status !== 0, `a blank canvas shipped as ${out}`)
+    assert(/no content/.test(r.stderr), `${out}: unexpected message: ${r.stderr.trim()}`)
+    assert(!existsSync(join(work, 'blank.jpg')), 'a JPEG was transcoded from a rejected master')
+  }
+})
+
+await test('a guard that names a file leaves that file behind', async () => {
+  // The proof and the master live in the work dir, which is deleted on the way
+  // out. "The file is left in place for inspection" has to stay true for them,
+  // or the message sends you to a path that no longer exists.
+  const r = render('blank.html', 'evidence.pdf')
+  assert(r.status !== 0, 'a blank canvas shipped as a PDF')
+  const named = r.stderr.match(/^(\S+\.png) rendered with no content/m)
+  assert(named, `the guard named no file: ${r.stderr.trim()}`)
+  assert(existsSync(named[1]), `${named[1]} was named in the message and then deleted`)
+})
+
+await test('a format that cannot be right is refused before Chrome starts', async () => {
+  for (const [args, pattern] of [
+    [['out.png', '--format', 'pdf'], /disagrees with the output name/],
+    [['out.jpg', '--format', 'png'], /disagrees with the output name/],
+    [['out.tiff'], /Cannot tell what format/],
+    [['out.png', '--format', 'jpge'], /Unknown format .*Did you mean/],
+    [['out.pdf', '--scale', '2'], /--scale has no meaning for a PDF/],
+    [['out.jpg', '--transparent'], /no alpha channel/],
+    [['out.pdf', '--transparent'], /always paints an opaque page/],
+  ]) {
+    const started = Date.now()
+    const r = render('fig.html', ...args, '--theme', 'ember')
+    assert(r.status !== 0, `${args.join(' ')} was accepted`)
+    assert(pattern.test(r.stderr), `${args.join(' ')}: unexpected message: ${r.stderr.trim()}`)
+    assert(Date.now() - started < 2000, `${args.join(' ')}: the check ran too late to have preceded Chrome`)
+    assert(!existsSync(join(work, args[0])), `${args.join(' ')} wrote ${args[0]} anyway`)
+  }
+})
+
+/* ── element includes ────────────────────────────────────────────────────── */
+
+// A figure that references a part and one that carries its geometry must be the
+// same image. Everything else about includes is a convenience; this is the
+// guarantee, and it is what lets templates/elements.html be rendered through the
+// mechanism instead of holding a second copy of all 33 parts.
+const partsDir = join(SKILL_DIR, 'parts')
+const figWith = (svg, name) => {
+  const html = readFileSync(join(work, 'fig.html'), 'utf8')
+  const at = html.indexOf('<svg')
+  const tagEnd = html.indexOf('>', at) + 1
+  writeFileSync(join(work, name), html.slice(0, tagEnd) + svg + html.slice(tagEnd))
+  return name
+}
+/** The part's markup positioned by hand — the control, built without inlineParts. */
+const byHand = (id, transform, accent = null) => {
+  let svg = readFileSync(join(partsDir, `${id}.svg`), 'utf8').replace(/<!--[\s\S]*?-->\s*/g, '').trim()
+  if (accent) {
+    svg = svg.replace(/class="([^"]*)"/g, (_, c) =>
+      `class="${c.split(/\s+/).map((k) => (k === 's1' ? `s${accent}` : k === 'f1' ? `f${accent}` : k)).join(' ')}"`)
+  }
+  return svg.replace(/^<g\b/, `<g transform="${transform}"`)
+}
+
+await test('an included part renders identically to the same geometry inlined', async () => {
+  for (const [id, accent] of [['el-database', null], ['el-server', null], ['g-key', '3'], ['el-shield', '2']]) {
+    const tf = 'translate(300,300)'
+    const a = accent ? ` data-accent="${accent}"` : ''
+    figWith(`<g data-part="${id}"${a} transform="${tf}"/>`, 'inc.png.html')
+    figWith(byHand(id, tf, accent), 'hand.png.html')
+    for (const [src, out] of [['inc.png.html', 'inc.png'], ['hand.png.html', 'hand.png']]) {
+      const r = render(src, out, '--theme', 'slate', '--scale', '1')
+      assert(r.status === 0, `${id}: ${out} exit ${r.status}: ${r.stderr.trim()}`)
+    }
+    assert(sha('inc.png') === sha('hand.png'), `${id}${a} rendered differently than the same markup inlined`)
+  }
+})
+
+await test('every shipped part inlines and paints', async () => {
+  // A part file that lost its root <g>, or whose body references a class no
+  // template defines, is invisible in a figure and perfectly plausible in a PNG.
+  const ids = readdirSync(partsDir).filter((f) => f.endsWith('.svg')).map((f) => f.slice(0, -4)).sort()
+  assert(ids.length >= 30, `expected the shipped parts, found ${ids.length}`)
+  // The canvas is sized from the part count, not fixed. A grid that outgrew a
+  // hard-coded height would put the overflow outside the body box, where it is
+  // cropped in silence and the render still passes on the ink the rest put down.
+  const cols = 6, cellW = 350, cellH = 270, pad = 40
+  const W = pad + cols * cellW
+  const H = pad + Math.ceil(ids.length / cols) * cellH + pad
+  const placed = ids.map((id, i) => `<g data-part="${id}" transform="translate(${pad + (i % cols) * cellW},${pad + Math.floor(i / cols) * cellH})"/>`)
+  const css = readFileSync(join(SKILL_DIR, 'templates', 'diagram.html'), 'utf8').match(/<style>[\s\S]*?<\/style>/)[0]
+  writeFileSync(join(work, 'allparts.html'),
+    '<html><head><link rel="stylesheet" href="themes/ember.css">' +
+    css.replace(/width: 1360px; height: 740px/, `width: ${W}px; height: ${H}px`) + '</head><body>' +
+    `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" fill="none">${placed.join('')}</svg></body></html>`)
+  const r = render('allparts.html', 'allparts.png', '--scale', '1')
+  assert(r.status === 0, `exit ${r.status}: ${r.stderr.trim()}`)
+  assertPng(join(work, 'allparts.png'), { w: W, h: H })
+})
+
+await test('a part that cannot render right is refused before Chrome starts', async () => {
+  const cases = [
+    ['unknown id', '<g data-part="el-datbase" transform="translate(300,300)"/>', /Unknown part/],
+    ['accent out of range', '<g data-part="el-database" data-accent="9" transform="translate(300,300)"/>', /must be 1, 2, 3 or 4/],
+    ['two accent classes', '<g data-part="g-key" class="s3" transform="translate(300,300)"/>', /two accent classes/],
+    ['unclosed call site', '<g data-part="el-database" transform="translate(300,300)">', /never closed/],
+    ['accent already used by the part', '<g data-part="el-server" data-accent="4" transform="translate(300,300)"/>', /already uses accent 4/],
+    ['accent onto a semantic mark', '<g data-part="el-stat-tile" data-accent="4" transform="translate(300,300)"/>', /already uses accent 4/],
+  ]
+  for (const [label, svg, pattern] of cases) {
+    figWith(svg, 'guard.html')
+    const started = Date.now()
+    const r = render('guard.html', 'guard.png', '--theme', 'slate', '--scale', '1')
+    assert(r.status !== 0, `${label} was accepted`)
+    assert(pattern.test(r.stderr), `${label}: unexpected message: ${r.stderr.trim()}`)
+    assert(Date.now() - started < 3000, `${label}: the check ran too late to have preceded Chrome`)
+    assert(!existsSync(join(work, 'guard.png')), `${label} wrote a PNG anyway`)
+  }
+  // The one a screenshot cannot catch: the part resolves, the page renders, and
+  // the shapes come out unstroked on an otherwise correct figure.
+  writeFileSync(join(work, 'nocss.html'),
+    '<html><head><link rel="stylesheet" href="themes/ember.css"><style>body{width:400px;height:300px;background:var(--ground)}</style></head>' +
+    '<body><svg width="400" height="300" viewBox="0 0 400 300"><g data-part="el-database" transform="translate(60,60)"/></svg></body></html>')
+  const r = render('nocss.html', 'nocss.png', '--scale', '1')
+  assert(r.status !== 0, 'a part with no CSS to colour it was rendered anyway')
+  // Named classes, not the shape of the message: the suggestion is derived from
+  // the reference template, so matching boilerplate would pass on an empty list.
+  for (const c of ['.node', '.s1', '.sfaint']) {
+    assert(r.stderr.includes(c), `${c} is used by el-database but was not reported missing: ${r.stderr.trim()}`)
+  }
+  assert(/stroke: var\(--a1\)/.test(r.stderr), 'the message did not carry the real declaration to paste')
+  assert(!existsSync(join(work, 'nocss.png')), 'a PNG was written anyway')
+  assert(isoChromes().length === 0, 'Chrome was launched for a render that could never be right')
+})
+
+/* ── images ──────────────────────────────────────────────────────────────── */
+
+// A missing image is the defect this whole module exists for: an <image href>
+// that resolves to nothing renders nothing, the frame around it still paints,
+// and assertPng sees a fully inked figure. So the invariant is not "the render
+// succeeded" — it is "those pixels are that colour".
+
+const CRC = Int32Array.from({ length: 256 }, (_, n) => {
+  let c = n
+  for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1
+  return c
+})
+const crc32 = (buf) => {
+  let c = -1
+  for (const b of buf) c = CRC[(c ^ b) & 0xff] ^ (c >>> 8)
+  return (c ^ -1) >>> 0
+}
+/** A real, minimal, solid-colour PNG — no fixture binaries checked into the repo. */
+function solidPng(w, h, [r, g, b]) {
+  const stride = 1 + w * 3
+  const raw = Buffer.alloc(h * stride)
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const o = y * stride + 1 + x * 3
+      raw[o] = r; raw[o + 1] = g; raw[o + 2] = b
+    }
+  }
+  const chunk = (type, data) => {
+    const len = Buffer.alloc(4)
+    len.writeUInt32BE(data.length)
+    const body = Buffer.concat([Buffer.from(type, 'ascii'), data])
+    const crc = Buffer.alloc(4)
+    crc.writeUInt32BE(crc32(body))
+    return Buffer.concat([len, body, crc])
+  }
+  const ihdr = Buffer.alloc(13)
+  ihdr.writeUInt32BE(w, 0); ihdr.writeUInt32BE(h, 4)
+  ihdr[8] = 8; ihdr[9] = 2 // 8-bit, truecolour
+  return Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    chunk('IHDR', ihdr), chunk('IDAT', deflateSync(raw)), chunk('IEND', Buffer.alloc(0)),
+  ])
+}
+/** Pixels within `tol` of a colour on every channel. */
+function countNear(file, [r, g, b], tol = 24) {
+  const { rgb } = decodePng(readFileSync(file))
+  let n = 0
+  for (let i = 0; i + 2 < rgb.length; i += 3) {
+    if (Math.abs(rgb[i] - r) <= tol && Math.abs(rgb[i + 1] - g) <= tol && Math.abs(rgb[i + 2] - b) <= tol) n++
+  }
+  return n
+}
+
+// Three placements, three colours, so a working surface cannot cover for a
+// broken one: the frame screen, an <img> in HTML, and a CSS background.
+const SCREEN_RGB = [255, 0, 255]
+const IMG_RGB = [0, 255, 0]
+const BG_RGB = [255, 255, 0]
+const imagePage = (withImages) => {
+  const css = readFileSync(join(SKILL_DIR, 'templates', 'diagram.html'), 'utf8').match(/<style>[\s\S]*?<\/style>/)[0]
+  // The control is the same page with every image reference removed, not the
+  // same page pointing at nothing: a broken reference is the thing under test.
+  return '<html><head><link rel="stylesheet" href="themes/ember.css">' +
+    css.replace(/width: 1360px; height: 740px/, 'width: 900px; height: 620px') +
+    (withImages ? '<style>.bg { background-image: url(bg.png); background-size: cover; }</style>' : '') +
+    '</head><body>' +
+    (withImages ? '<img src="img.png" style="position:absolute;left:560px;top:40px;width:300px;height:160px">' : '') +
+    '<div class="bg" style="position:absolute;left:560px;top:240px;width:300px;height:160px"></div>' +
+    '<svg width="900" height="620" viewBox="0 0 900 620" fill="none">' +
+    `<g data-part="el-browser"${withImages ? ' data-image="screen.png"' : ''} transform="translate(40,40)"/>` +
+    '</svg></body></html>'
+}
+
+await test('an image reaches the pixels, on every surface that takes one', async () => {
+  writeFileSync(join(work, 'screen.png'), solidPng(64, 64, SCREEN_RGB))
+  writeFileSync(join(work, 'img.png'), solidPng(64, 64, IMG_RGB))
+  writeFileSync(join(work, 'bg.png'), solidPng(64, 64, BG_RGB))
+
+  writeFileSync(join(work, 'noimg.html'), imagePage(false))
+  const control = render('noimg.html', 'noimg.png', '--theme', 'ember', '--scale', '1')
+  assert(control.status === 0, `control exit ${control.status}: ${control.stderr.trim()}`)
+  // The colours are chosen to be absent from every theme; proving that here is
+  // what makes the counts below evidence rather than coincidence.
+  for (const [what, rgb] of [['screen', SCREEN_RGB], ['img', IMG_RGB], ['bg', BG_RGB]]) {
+    const n = countNear(join(work, 'noimg.png'), rgb)
+    assert(n < 200, `the ${what} colour already appears ${n} times without any image — pick another`)
+  }
+
+  writeFileSync(join(work, 'img.html'), imagePage(true))
+  const r = render('img.html', 'placed.png', '--theme', 'ember', '--scale', '1')
+  assert(r.status === 0, `exit ${r.status}: ${r.stderr.trim()}`)
+  assert(/image screen\.png .*png/.test(r.stdout), `the render did not report the images it placed: ${r.stdout.trim()}`)
+  // el-browser's screen is 318x154; the <img> and the background are 300x160.
+  for (const [what, rgb, least] of [['frame screen', SCREEN_RGB, 40_000], ['<img>', IMG_RGB, 40_000], ['CSS background', BG_RGB, 40_000]]) {
+    const n = countNear(join(work, 'placed.png'), rgb)
+    assert(n >= least, `the ${what} image is missing or tiny — ${n} matching pixels, expected at least ${least}`)
+  }
+})
+
+await test('an image that cannot be right is refused before Chrome starts', async () => {
+  writeFileSync(join(work, 'notreally.png'), 'this is a text file wearing a PNG name\n')
+  const cases = [
+    ['missing file', '<g data-part="el-browser" data-image="gone.png" transform="translate(60,60)"/>', /Image not found/],
+    ['not an image', '<g data-part="el-browser" data-image="notreally.png" transform="translate(60,60)"/>', /Not an image this renderer recognises/],
+    ['remote source', '<g data-part="el-browser" data-image="https://example.com/a.png" transform="translate(60,60)"/>', /Remote image source/],
+    ['part with no screen', '<g data-part="el-database" data-image="screen.png" transform="translate(60,60)"/>', /no screen for an image/],
+    ['unknown fit', '<g data-part="el-browser" data-image="screen.png" data-fit="squish" transform="translate(60,60)"/>', /not one of: cover, contain, stretch/],
+    ['shape on a frame', '<g data-part="el-browser" data-image="screen.png" data-shape="circle" transform="translate(60,60)"/>', /belong on an <image> or <img>/],
+    ['<image> with no size', '<image data-image="screen.png" x="60" y="60"/>', /needs both a width and a height/],
+    ['unknown shape', '<image data-image="screen.png" x="60" y="60" width="90" height="90" data-shape="blob"/>', /not one of: rect, rounded, circle, hex/],
+  ]
+  for (const [label, svg, pattern] of cases) {
+    figWith(svg, 'imgguard.html')
+    const started = Date.now()
+    const r = render('imgguard.html', 'imgguard.png', '--theme', 'slate', '--scale', '1')
+    assert(r.status !== 0, `${label} was accepted`)
+    assert(pattern.test(r.stderr), `${label}: unexpected message: ${r.stderr.trim()}`)
+    assert(Date.now() - started < 3000, `${label}: the check ran too late to have preceded Chrome`)
+    assert(!existsSync(join(work, 'imgguard.png')), `${label} wrote a PNG anyway`)
+  }
+  assert(isoChromes().length === 0, 'Chrome was launched for a render that could never be right')
+})
+
+await test('every theme declares the same tokens, alpha components included', async () => {
+  // No Chrome for this one: it is a text check, and it is here because the
+  // failure it catches is silent. A theme missing --a3-raw does not fail a
+  // render — every oklch(var(--a3-raw) / 12%) on the page resolves to nothing
+  // and paints nothing, inside a figure that screenshots as a perfect success.
+  const dir = join(SKILL_DIR, 'themes')
+  const files = ls(dir, /\.css$/)
+  assert(files.length >= 4, `expected the shipped themes, found ${files.length}`)
+  const strip = (css) => css.replace(/\/\*[\s\S]*?\*\//g, '')
+  const declared = (css) => new Set([...strip(css).matchAll(/(--[a-z0-9-]+)\s*:/gi)].map((m) => m[1]))
+  const reference = declared(readFileSync(join(dir, 'ember.css'), 'utf8'))
+  assert(reference.has('--a1-raw'), 'ember.css lost its alpha components, so the reference set is wrong')
+  for (const f of files) {
+    const css = strip(readFileSync(join(dir, f), 'utf8'))
+    const have = declared(css)
+    const missing = [...reference].filter((t) => !have.has(t))
+    const extra = [...have].filter((t) => !reference.has(t))
+    assert(!missing.length, `${f} declares no ${missing.join(', ')} — a page reading one renders it as nothing`)
+    assert(!extra.length, `${f} declares ${extra.join(', ')}, which no other theme does`)
+    for (const [, name] of css.matchAll(/var\((--[a-z0-9-]+)/gi)) {
+      assert(have.has(name), `${f} reads ${name}, which it never declares`)
+    }
+    // The alpha contract: a component token has to be three bare numbers, or
+    // every grade composed from it is an invalid colour that draws nothing.
+    for (const [, name, value] of css.matchAll(/(--[a-z0-9-]+-raw)\s*:\s*([^;]+);/gi)) {
+      assert(
+        /^[\d.]+\s+[\d.]+\s+[\d.]+$/.test(value.trim()),
+        `${f}: ${name} is "${value.trim()}" — an alpha component must be three bare numbers, ` +
+          `or oklch(var(${name}) / 20%) resolves to nothing`,
+      )
+    }
+  }
+})
+
+/* ── mermaid flowcharts ──────────────────────────────────────────────────── */
+
+// The defect this section exists for is a statement that goes in and does not
+// come out: a node the parser skipped is a step missing from the flowchart, and
+// the page around it still lays out and screenshots perfectly. So the assertion
+// is never "generation succeeded" — it is "that label is in the markup, that
+// many edges were drawn, and it renders at the size it claimed".
+
+const MERMAID = join(SCRIPTS, 'mermaid.mjs')
+const mermaid = (...args) => spawnSync(process.execPath, [MERMAID, ...args], { cwd: work, env, encoding: 'utf8' })
+
+// Every shape, both label forms, a chain, an `&` fan-out, a subgraph, a class,
+// a return edge and a self loop — one source, so a regression in any of them
+// fails here rather than in whichever figure someone happens to draw next.
+const MMD = [
+  'flowchart TD',
+  '  Start([Ingest]) --> Check{Well formed?}',
+  '  Check -->|no| Reject[/Reject and log/]',
+  '  Check -- yes --> Norm[[Normalise]]',
+  '  Norm --> Store[(Warehouse)] & Index[(Search index)]',
+  '  subgraph serving [read path]',
+  '    Store --> Api[Query API]',
+  '    Index --> Api',
+  '  end',
+  '  Api --> Cache((Edge cache))',
+  '  Cache -.-> Client[\\Client\\]',
+  '  Client ==> Client',
+  '  Reject --> Start',
+  '  classDef risky stroke-dasharray:3',
+  '  class Reject risky',
+].join('\n')
+const MMD_LABELS = ['Ingest', 'Well formed?', 'Reject and log', 'Normalise', 'Warehouse', 'Search index', 'Query API', 'Edge cache', 'Client']
+const MMD_EDGES = 11
+
+await test('mermaid text becomes a figure with every node and edge in it', async () => {
+  writeFileSync(join(work, 'flow.mmd'), MMD)
+  const r = mermaid('flow.mmd', 'flow.html', '--theme', 'slate', '--kicker', 'pipeline', '--note', 'One source of truth.')
+  assert(r.status === 0, `exit ${r.status}: ${r.stderr.trim()}`)
+  const html = readFileSync(join(work, 'flow.html'), 'utf8')
+
+  for (const label of MMD_LABELS) {
+    // The rendered text, not the id: an id surviving into the markup while its
+    // label was dropped is exactly the failure this is here to catch.
+    assert(html.includes(`>${label}</text>`), `no node label "${label}" reached the markup`)
+  }
+  const drawn = (html.match(/class="edge\b/g) ?? []).length
+  assert(drawn === MMD_EDGES, `${MMD_EDGES} edges in the source, ${drawn} drawn`)
+  assert(/class="grouparea"/.test(html) && html.includes('>READ PATH<'), 'the subgraph was not drawn')
+
+  // The log has to tell the truth about the file it wrote, because the canvas
+  // is computed and nothing downstream re-derives it.
+  const said = /wrote flow\.html \((\d+)x(\d+),/.exec(r.stdout)
+  assert(said, `the generator did not report a canvas size: ${r.stdout.trim()}`)
+  const [w, h] = [Number(said[1]), Number(said[2])]
+  assert(new RegExp(`width:\\s*${w}px;\\s*height:\\s*${h}px`).test(html), 'the body does not declare the size that was reported')
+  assert(html.includes(`<svg width="${w}" height="${h}"`), 'the svg does not carry the size that was reported')
+
+  // Same input, same file — the layout may never depend on iteration order.
+  const again = mermaid('flow.mmd', 'flow2.html', '--theme', 'slate', '--kicker', 'pipeline', '--note', 'One source of truth.')
+  assert(again.status === 0, `second run: ${again.stderr.trim()}`)
+  assert(
+    readFileSync(join(work, 'flow2.html'), 'utf8').replace('flow2', 'flow') === html.replace('flow2', 'flow'),
+    'two runs over one source produced different markup',
+  )
+
+  const shot = render('flow.html', 'flow.png', '--theme', 'slate', '--scale', '1')
+  assert(shot.status === 0, `render exit ${shot.status}: ${shot.stderr.trim()}`)
+  assertPng(join(work, 'flow.png'), { w, h })
+})
+
+await test('generated markup the template cannot colour is refused before Chrome starts', async () => {
+  // The mirror of T18's missing-part-CSS case. The generator places geometry and
+  // the template colours it; they meet only through class names, so a rule the
+  // template has lost paints invisible lines on an otherwise perfect figure.
+  const tpl = readFileSync(join(SKILL_DIR, 'templates', 'flowchart.html'), 'utf8')
+  assert(/\.chip\s*\{/.test(tpl), 'the shipped template lost .chip, so this test would pass vacuously')
+  writeFileSync(join(work, 'notpl.html'), tpl.replace(/\.chip\s*\{[^}]*\}/, ''))
+  writeFileSync(join(work, 'lbl.mmd'), 'flowchart TD\n  A[One] -->|labelled| B[Two]\n')
+  const started = Date.now()
+  const r = mermaid('lbl.mmd', 'nocolour.html', '--template', 'notpl.html')
+  assert(r.status !== 0, 'a template with no rule for .chip was used anyway')
+  assert(/defines no CSS for \.chip/.test(r.stderr), `unexpected message: ${r.stderr.trim()}`)
+  assert(!existsSync(join(work, 'nocolour.html')), 'a page was written anyway')
+  assert(Date.now() - started < 3000, 'the check ran too late to have preceded a render')
+  assert(isoChromes().length === 0, 'Chrome was launched by the generator')
+})
+
+await test('mermaid this engine does not implement is refused, never half-drawn', async () => {
+  const cases = [
+    ['another diagram kind', 'sequenceDiagram\n  A->>B: hi\n', /does not look like a mermaid flowchart/],
+    ['no header', 'A[One] --> B[Two]\n', /does not look like a mermaid flowchart/],
+    ['unknown direction', 'flowchart XY\n  A --> B\n', /Unknown direction/],
+    ['a style line', 'flowchart TD\n  A --> B\n  style A fill:#f00\n', /"style" is not implemented/],
+    ['a click handler', 'flowchart TD\n  A --> B\n  click A "https://x"\n', /"click" is not implemented/],
+    ['nested subgraphs', 'flowchart TD\n  subgraph a\n    subgraph b\n      X\n    end\n  end\n', /Nested subgraphs/],
+    ['an unclosed subgraph', 'flowchart TD\n  subgraph a\n    X --> Y\n', /never closed/],
+    ['a fifth class', 'flowchart TD\n  A:::w --> B:::x --> C:::y --> D:::z --> E:::v\n', /only four accents/],
+    ['unpaired brackets', 'flowchart TD\n  A[Broken --> B\n', /brackets do not pair up/],
+    ['the @{} node syntax', 'flowchart TD\n  A@{ shape: rect } --> B\n', /not implemented/],
+    ['a subgraph with no nodes', 'flowchart TD\n  A --> g\n  subgraph g\n  end\n', /holds no nodes/],
+    ['an id that is both', 'flowchart TD\n  g[Node] --> B\n  subgraph g\n    B\n  end\n', /both a subgraph and a node/],
+  ]
+  for (const [label, src, pattern] of cases) {
+    writeFileSync(join(work, 'bad.mmd'), src)
+    const r = mermaid('bad.mmd', 'bad.html', '--theme', 'slate')
+    assert(r.status !== 0, `${label} was accepted`)
+    assert(pattern.test(r.stderr), `${label}: unexpected message: ${r.stderr.trim()}`)
+    assert(!existsSync(join(work, 'bad.html')), `${label} wrote a page anyway`)
+  }
+  // And the flags, which never reach the parser at all.
+  writeFileSync(join(work, 'ok.mmd'), 'flowchart TD\n  A --> B\n')
+  for (const [args, pattern] of [
+    [['ok.mmd', 'out.png'], /Output must be an \.html file/],
+    [['ok.mmd', 'out.html', '--theme', 'slat'], /Unknown theme/],
+    [['ok.mmd', 'out.html', '--direction', 'sideways'], /--direction must be one of/],
+    [['ok.mmd', 'out.html', '--thme', 'slate'], /Did you mean --theme/],
+    [['missing.mmd', 'out.html'], /Input not found/],
+  ]) {
+    const r = mermaid(...args)
+    assert(r.status !== 0, `${args.join(' ')} was accepted`)
+    assert(pattern.test(r.stderr), `${args.join(' ')}: unexpected message: ${r.stderr.trim()}`)
+  }
+  assert(isoChromes().length === 0, 'Chrome was launched for input that could never be drawn')
+})
+
+// The link is made before the test, so "symlinks cannot be created here" can be
+// declared as a skip through the harness rather than faked from inside a test.
+const linkedSkill = join(root, 'linked-skill')
+let linkError = null
+try {
+  symlinkSync(SKILL_DIR, linkedSkill, WIN ? 'junction' : 'dir')
+} catch (err) {
+  linkError = err.code ?? err.message
+}
+
+await test('the generator still runs when it is reached through a symlink', async () => {
+  // Node reports import.meta.url as the real path and process.argv[1] as the
+  // path that was typed, so an entry-point guard comparing them raw is defeated
+  // by any symlink on the way in — /tmp and /var on macOS, and the symlinked
+  // dev install cli.mjs supports on purpose. The command then exits 0 having
+  // printed nothing and written nothing, which no other guard can catch: there
+  // is no bad output to inspect, only no output at all.
+  writeFileSync(join(work, 'link.mmd'), 'flowchart TD\n  A[One] --> B[Two]\n')
+  const r = spawnSync(
+    process.execPath,
+    [join(linkedSkill, 'scripts', 'mermaid.mjs'), 'link.mmd', 'linked.html', '--theme', 'slate'],
+    { cwd: work, env, encoding: 'utf8' },
+  )
+  assert(r.status === 0, `exit ${r.status}: ${r.stderr.trim() || '(silent)'}`)
+  // The exit code proves nothing here: the defect this covers exits 0.
+  assert(/^wrote linked\.html \(/m.test(r.stdout), `it exited 0 and reported nothing: ${JSON.stringify(r.stdout)}`)
+  assert(existsSync(join(work, 'linked.html')), 'it exited 0 without writing a page')
+}, { skip: linkError ? `symlinks cannot be created here (${linkError})` : null })
+
+/* ───────────────────────────────────────────────────────────────────────── */
+
+const failed = results.filter((r) => !r.ok)
+const skipped = results.filter((r) => r.skipped)
+// Skips are counted separately rather than folded into the pass tally: "16/16
+// hold" on a platform where three were never run is the kind of green that hides
+// a regression.
+const held = results.length - failed.length - skipped.length
+console.log(
+  `\n${held}/${results.length - skipped.length} invariants hold` +
+    (skipped.length ? `, ${skipped.length} skipped on ${process.platform}` : '') +
+    (keep ? `  (scratch kept at ${root})` : ''),
+)
+if (skipped.length) console.log(`skipped: ${skipped.map((s) => s.name).join('; ')}`)
+if (failed.length) {
+  console.log(`failed: ${failed.map((f) => f.name).join('; ')}`)
+  process.exit(1)
+}

@@ -1,0 +1,63 @@
+0. Убедись что ты в актуальном main
+git checkout main
+git pull origin main
+
+1. Создаешь рабочую ветку
+git checkout -b working
+
+2. Работаешь с файлами
+(пишешь конспекты, код, схемы)
+
+3. проверяешь изменения (очень важно)
+git status
+git diff
+
+4. Добавляешь файлы (осознанно)
+Вариант А: git add path/to/file1 path/to/file2
+Вариант Б: git add -p (интерактивно — лучше для роста)
+
+5. Создаешь commit
+git commit -m "type(scope): short description"
+правило:1 commit = 1 смысловой блок изменений
+
+6. Проверка истории (обязательно)
+git log --oneline -n 5
+
+7. Синхронизация с main (ПЕРЕД PUSH)
+git fetch origin
+git rebase origin/main
+
+8. Отправляешь ветку в GitHub
+git push origin working
+
+9. Создаешь Pull Request (gh есть)
+* base: main
+* compare: working
+
+10. Описание PR (обязательно)
+## What was added
+- ...
+
+## Why
+- ...
+
+## Notes
+- ...
+
+11. Review (обязательно)
+Перед merge проверь:
+* нет ли мусора
+* логично ли разбиты изменения
+* нет ли лишних файлов
+
+12. Merge через GitHub (gh есть)
+Нажимаешь: “Merge pull request”
+Выбирай: “Create merge commit”
+
+13. Уходишь в другую ветку
+git checkout main
+git pull origin main
+
+14. Удаляешь ветку (опционально)
+git branch -d working
+git push origin --delete working
