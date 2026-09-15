@@ -6,7 +6,7 @@
 Запускай OpenCode отсюда: `cd ~/stack && opencode`
 
 ### Wolfram Language
-- **Wolfram Engine 15.0** — бесплатная лицензия для разработчиков
+- **Wolfram Engine** — бесплатная лицензия для разработчиков
 - Запуск: `wolframscript`
 - MCP сервер: `Wolfram` (в конфиге ~/.config/opencode/opencode.jsonc)
 - Jupyter kernel: `wolframlanguage15` (для Jupyter notebooks)
@@ -16,8 +16,8 @@
 - Jupyter интеграция: ~/stack/WolframLanguageForJupyter/
 
 ### Manim
-- **Manim 0.21.0** (community edition) — основная версия для анимаций
-- **ManimGL 1.7.2** (3Blue1Brown) — OpenGL версия
+- **Manim** (community edition) — основная версия для анимаций
+- **ManimGL** (3Blue1Brown) — OpenGL версия
 - Окружение: ~/stack/manim-env (Python 3.12)
 - Активация: `source ~/stack/manim-env/bin/activate` или `manim-activate`
 - Запуск (community): `manim script.py SceneName`
@@ -49,12 +49,12 @@
   3. Остановить bridge: `kill $(pgrep -f paraview_bridge)`
 
 ### LaTeX
-- **MacTeX 2026** — `pdflatex` в PATH
+- **MacTeX** — `pdflatex` в PATH
 - Запуск: `pdflatex document.tex`
 - Интеграция: расширение LaTeX Workshop в VS Code
 
 ### Julia
-- **Julia 1.12.7** (через juliaup)
+- **Julia** (через juliaup)
 - Запуск: `julia`
 - MCP сервер: `julia` (в конфиге ~/.config/opencode/opencode.jsonc)
 - Пакеты: LinearAlgebra, SparseArrays, Plots, DifferentialEquations, StaticArrays, Optim, JuMP, IJulia, Flux, Turing, DataFrames, CSV, ForwardDiff, SymPy, SpecialFunctions, StatsBase, Distributions, Polynomials, FFTW, IterativeSolvers

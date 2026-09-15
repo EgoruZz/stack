@@ -11,7 +11,7 @@ if [ -z "$NAME" ]; then
     exit 1
 fi
 
-PROJECT_DIR=~/projects/$NAME
+PROJECT_DIR=~/projects/"$NAME"
 
 if [ -d "$PROJECT_DIR" ]; then
     echo "❌ Папка уже существует: $PROJECT_DIR"

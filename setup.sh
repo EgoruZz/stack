@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 STACK_DIR="$HOME/stack"
 
@@ -12,7 +12,7 @@ echo ""
 # 1. СИСТЕМНЫЕ ЗАВИСИМОСТИ
 # ═══════════════════════════════════════
 
-echo ">>> 1/10 Homebrew..."
+echo ">>> 1/11 Homebrew..."
 if ! command -v brew &>/dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
@@ -24,13 +24,13 @@ brew install python@3.12 node julia
 # 2. ВНЕШНИЕ MCP РЕПОЗИТОРИИ
 # ═══════════════════════════════════════
 
-echo ">>> 2/10 Клонирование MCP серверов..."
+echo ">>> 2/11 Клонирование MCP серверов..."
 cd "$STACK_DIR"
 
 clone_if_missing() {
     local url=$1 dir=$2
     if [ ! -d "$dir" ]; then
-        git clone "$url" "$dir"
+        git clone --depth 1 "$url" "$dir"
     else
         echo "  $dir уже существует, пропускаю"
     fi
@@ -47,7 +47,7 @@ clone_if_missing https://github.com/WolframResearch/WolframLanguageForJupyter.gi
 # 3. PYTHON VENV
 # ═══════════════════════════════════════
 
-echo ">>> 3/10 Python venv..."
+echo ">>> 3/11 Python venv..."
 
 create_venv() {
     local name=$1; shift
@@ -56,8 +56,8 @@ create_venv() {
         python3.12 -m venv "$dir"
     fi
     source "$dir/bin/activate"
-    pip install --upgrade pip --quiet
-    pip install --quiet "$@"
+    pip install --upgrade pip
+    pip install "$@"
     deactivate
     echo "  $name готов"
 }
@@ -70,8 +70,8 @@ if [ ! -d "$STACK_DIR/paraview-mcp-env" ]; then
     python3.12 -m venv "$STACK_DIR/paraview-mcp-env"
 fi
 source "$STACK_DIR/paraview-mcp-env/bin/activate"
-pip install --upgrade pip --quiet
-pip install --quiet -r "$STACK_DIR/paraview-mcp/requirements.txt"
+pip install --upgrade pip
+pip install -r "$STACK_DIR/paraview-mcp/requirements.txt"
 deactivate
 echo "  paraview-mcp-env готов"
 
@@ -80,8 +80,8 @@ if [ ! -d "$STACK_DIR/julia-mcp-env" ]; then
     python3.12 -m venv "$STACK_DIR/julia-mcp-env"
 fi
 source "$STACK_DIR/julia-mcp-env/bin/activate"
-pip install --upgrade pip --quiet
-pip install --quiet "mcp[cli]"
+pip install --upgrade pip
+pip install "mcp[cli]"
 deactivate
 echo "  julia-mcp-env готов"
 
@@ -89,41 +89,51 @@ echo "  julia-mcp-env готов"
 # 4. NODE.JS ЗАВИСИМОСТИ
 # ═══════════════════════════════════════
 
-echo ">>> 4/10 tldraw MCP..."
+echo ">>> 4/11 tldraw MCP..."
 cd "$STACK_DIR/tldraw-mcp"
-npm install --silent
-npm run build --silent
+npm install
+npm run build
 
 # ═══════════════════════════════════════
 # 5. GLOBAЛЬНЫЕ CLI
 # ═══════════════════════════════════════
 
-echo ">>> 5/10 CLI инструменты..."
+echo ">>> 5/11 CLI инструменты..."
 
 echo "  Firecrawl CLI..."
 npx -y firecrawl-cli@latest init -y --browser
 
 echo "  tldraw CLI..."
-npm install -g @kitschpatrol/tldraw-cli --silent
+npm install -g @kitschpatrol/tldraw-cli
 
 # ═══════════════════════════════════════
-# 6. SKILLS
+# 6. BROWSER ДЛЯ RENDERS
 # ═══════════════════════════════════════
 
-echo ">>> 6/10 Skills..."
+echo ">>> 6/11 Browser для render-visual и tldraw export..."
+echo "  Installing Playwright Chromium..."
+npx -y playwright install chromium 2>/dev/null || echo "  Playwright: установи вручную (npx playwright install chromium)"
+echo "  Installing Puppeteer Chrome..."
+npx -y puppeteer browsers install chrome@152.0.7977.75 2>/dev/null || echo "  Puppeteer: установи вручную (npx puppeteer browsers install chrome@152.0.7977.75)"
+
+# ═══════════════════════════════════════
+# 7. SKILLS
+# ═══════════════════════════════════════
+
+echo ">>> 7/11 Skills..."
 mkdir -p "$HOME/.config/opencode/skills"
 
-# 6a. Firecrawl skills (28) — уже установлены через firecrawl-cli init
+# 7a. Firecrawl skills (28) — уже установлены через firecrawl-cli init
 
-# 6b. ARIS skills (14) — из cloned repo
+# 7b. ARIS skills (14) — из cloned repo
 if [ -d "$STACK_DIR/aris-research-repo/skills" ]; then
     cp -r "$STACK_DIR/aris-research-repo/skills/"* "$HOME/.config/opencode/skills/" 2>/dev/null || true
     echo "  ARIS skills скопированы"
 fi
 
-# 6c. tldraw-skill — из GitHub
+# 7c. tldraw-skill — из GitHub
 if [ ! -d "$HOME/.config/opencode/skills/tldraw-skill" ]; then
-    git clone https://github.com/Agents365-ai/tldraw-skill.git /tmp/tldraw-skill-repo 2>/dev/null
+    git clone --depth 1 https://github.com/Agents365-ai/tldraw-skill.git /tmp/tldraw-skill-repo 2>/dev/null
     cp -r /tmp/tldraw-skill-repo "$HOME/.config/opencode/skills/tldraw-skill"
     rm -rf /tmp/tldraw-skill-repo
     echo "  tldraw-skill установлен"
@@ -131,15 +141,15 @@ else
     echo "  tldraw-skill уже существует"
 fi
 
-# 6d. Standalone skills (7) — из репозитория
+# 7d. Standalone skills (8) — из репозитория
 cp -r "$STACK_DIR/skills/"* "$HOME/.config/opencode/skills/"
 echo "  Standalone skills скопированы"
 
 # ═══════════════════════════════════════
-# 7. JULIA ПАКЕТЫ
+# 8. JULIA ПАКЕТЫ
 # ═══════════════════════════════════════
 
-echo ">>> 7/10 Julia пакеты..."
+echo ">>> 8/11 Julia пакеты..."
 julia -e '
 using Pkg
 Pkg.add([
@@ -151,10 +161,10 @@ Pkg.add([
 ' 2>/dev/null || echo "  Julia: установка пакетов пропущена (повтори вручную: julia → Pkg.add(...))"
 
 # ═══════════════════════════════════════
-# 8. OPENCODE КОНФИГ
+# 9. OPENCODE КОНФИГ
 # ═══════════════════════════════════════
 
-echo ">>> 8/10 Генерация opencode.jsonc..."
+echo ">>> 9/11 Генерация opencode.jsonc..."
 mkdir -p "$HOME/.config/opencode"
 
 python3 << 'PYEOF'
@@ -217,10 +227,10 @@ print(f"  Written to {path}")
 PYEOF
 
 # ═══════════════════════════════════════
-# 9. АЛИАСЫ В .zshrc
+# 10. АЛИАСЫ В .zshrc
 # ═══════════════════════════════════════
 
-echo ">>> 9/10 Алиасы..."
+echo ">>> 10/11 Алиасы..."
 if ! grep -q "Stack Aliases" "$HOME/.zshrc" 2>/dev/null; then
     cat >> "$HOME/.zshrc" << 'ALIASES'
 
@@ -238,11 +248,11 @@ else
 fi
 
 # ═══════════════════════════════════════
-# 10. ПРОВЕРКА
+# 11. ПРОВЕРКА
 # ═══════════════════════════════════════
 
 echo ""
-echo ">>> 10/10 Проверка стека..."
+echo ">>> 11/11 Проверка стека..."
 bash "$STACK_DIR/check-all.sh"
 
 echo ""

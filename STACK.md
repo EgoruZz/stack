@@ -51,8 +51,8 @@ wolframscript -code 'PacletUpdate["Wolfram/AgentTools"]'
 ## 2. Manim
 
 ### Версии
-- **Manim 0.21.0** (community edition) — основная, больше возможностей, проще в использовании
-- **ManimGL 1.7.2** (3Blue1Brown) — OpenGL, оригинальная версия
+- **Manim** (community edition) — основная, больше возможностей, проще в использовании
+- **ManimGL** (3Blue1Brown) — OpenGL, оригинальная версия
 
 ### Как я использую
 - Пишу `.py` файлы с кодом анимации

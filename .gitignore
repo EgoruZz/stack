@@ -1,9 +1,12 @@
 # Python venv
-*-env/
+manim-env/
+jupyter-env/
+paraview-mcp-env/
+julia-mcp-env/
 
 # Node
-*/node_modules/
-*/dist/
+tldraw-mcp/node_modules/
+tldraw-mcp/dist/
 
 # External repos (cloned by setup.sh)
 paraview-mcp/

@@ -50,7 +50,15 @@ Some components require manual installation:
 | **OpenCode** | https://opencode.ai |
 | **Wolfram Engine** | `brew install --cask wolfram-engine` then `wolframscript` to activate license |
 | **ParaView** | https://www.paraview.org/download/ |
+| **MacTeX** | `brew install --cask mactex` (for LaTeX/pdflatex) |
+| **gh CLI** | `brew install gh` (for GitHub repo management) |
 | **Firecrawl auth** | `firecrawl login --browser` (optional, works without on free tier) |
+
+> **Note:** Playwright Chromium and Puppeteer Chrome are installed automatically by `setup.sh` for render-visual and tldraw export. If they fail, install manually:
+> ```bash
+> npx playwright install chromium
+> npx puppeteer browsers install chrome@152.0.7977.75
+> ```
 
 ## Project Structure
 
@@ -65,7 +73,6 @@ Some components require manual installation:
 ├── update-all.sh                # Update everything
 ├── new-project.sh               # Create new project
 ├── check-wolfram-license.sh     # Check Wolfram license expiry
-├── opencode-template.jsonc      # MCP config template
 ├── .gitignore
 ├── skills/                      # 8 standalone skills
 │   ├── aris-research-pipeline/
