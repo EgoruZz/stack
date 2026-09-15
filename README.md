@@ -22,7 +22,7 @@ bash setup.sh
 | Firecrawl CLI | npm | Web scraping and research (28 skills) |
 | tldraw CLI | npm | Whiteboard diagram export |
 | 5 MCP servers | git clone | Wolfram, Julia, Manim, ParaView, tldraw |
-| 49 skills | npm + git + local | AI skills for OpenCode |
+| 51 skills | npm + git + local | AI skills for OpenCode |
 
 ### MCP Servers
 
@@ -34,12 +34,12 @@ bash setup.sh
 | **ParaView** | 3D visualization pipeline (via TCP bridge) |
 | **tldraw** | Whiteboard canvas with 30+ tools |
 
-### Skills (49 total)
+### Skills (51 total)
 
 - **28 Firecrawl** — web research, scraping, SEO, lead gen, market research
 - **14 ARIS** — research pipeline, paper writing, experiment planning
 - **1 tldraw-skill** — whiteboard diagram generation
-- **7 standalone** — render-visual, data-analysis, xlsx, deep-mind, epistemic-rigor, grill-me, dag-hallucination-detector
+- **8 standalone** — render-visual, data-analysis, xlsx, deep-mind, epistemic-rigor, grill-me, dag-hallucination-detector, aris-research-pipeline
 
 ## Manual Steps
 
@@ -67,7 +67,8 @@ Some components require manual installation:
 ├── check-wolfram-license.sh     # Check Wolfram license expiry
 ├── opencode-template.jsonc      # MCP config template
 ├── .gitignore
-├── skills/                      # 7 standalone skills
+├── skills/                      # 8 standalone skills
+│   ├── aris-research-pipeline/
 │   ├── dag-hallucination-detector/
 │   ├── data-analysis/
 │   ├── deep-mind/
