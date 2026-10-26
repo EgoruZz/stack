@@ -18,6 +18,8 @@ bash setup.sh
 | Node.js | Homebrew | Runtime for tldraw MCP |
 | Julia | Homebrew | Scientific computing language |
 | Manim + ManimGL | pip | Animation engine (community + OpenGL) |
+
+> **Manim vs ManimGL:** `manim` (community edition) is the primary engine — used by the MCP server for headless rendering to video files. `manimgl` (3Blue1Brown) is a separate interactive tool with its own GUI window; it is **not** used by any MCP server. Use `manim` for automation and `manimgl` for interactive development and live preview.
 | JupyterLab | pip | Interactive notebooks |
 | Firecrawl CLI | npm | Web scraping and research (28 skills) |
 | tldraw CLI | npm | Whiteboard diagram export |
@@ -57,7 +59,7 @@ Some components require manual installation:
 > **Note:** Playwright Chromium and Puppeteer Chrome are installed automatically by `setup.sh` for render-visual and tldraw export. If they fail, install manually:
 > ```bash
 > npx playwright install chromium
-> npx puppeteer browsers install chrome@152.0.7977.75
+> npx puppeteer browsers install chrome@155.0.8059.79
 > ```
 
 ## Project Structure

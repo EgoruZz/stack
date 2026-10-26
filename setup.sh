@@ -114,7 +114,7 @@ echo ">>> 6/11 Browser для render-visual и tldraw export..."
 echo "  Installing Playwright Chromium..."
 npx -y playwright install chromium 2>/dev/null || echo "  Playwright: установи вручную (npx playwright install chromium)"
 echo "  Installing Puppeteer Chrome..."
-npx -y puppeteer browsers install chrome@152.0.7977.75 2>/dev/null || echo "  Puppeteer: установи вручную (npx puppeteer browsers install chrome@152.0.7977.75)"
+npx -y puppeteer browsers install chrome@155.0.8059.79 2>/dev/null || echo "  Puppeteer: установи вручную (npx puppeteer browsers install chrome@155.0.8059.79)"
 
 # ═══════════════════════════════════════
 # 7. SKILLS
