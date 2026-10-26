@@ -43,7 +43,7 @@
 brew upgrade --cask wolfram-engine
 
 # Пакеты Wolfram
-wolframscript -code 'PacletUpdate["Wolfram/AgentTools"]'
+wolframscript -code 'PacletInstall["Wolfram/AgentTools"]'
 ```
 
 ---
@@ -620,7 +620,7 @@ cd ~/stack && bash update-all.sh
 source ~/stack/manim-env/bin/activate && pip install --upgrade manim manimgl
 source ~/stack/jupyter-env/bin/activate && pip install --upgrade jupyterlab numpy matplotlib
 juliaup update
-wolframscript -code 'PacletUpdate[]'
+wolframscript -code 'PacletInstall["Wolfram/AgentTools"]'
 ```
 
 ### Просмотр установленных пакетов

@@ -109,7 +109,7 @@ echo ""
 # ═══════════════════════════════════════
 
 echo ">>> 6/13 npm global CLI..."
-npm install -g firecrawl-cli@latest @kitschpatrol/tldraw-cli@latest || echo "  npm: обновление частичное (возможно нужен sudo или проверь сеть)"
+npm install -g --allow-scripts=puppeteer firecrawl-cli@latest @kitschpatrol/tldraw-cli@latest || echo "  npm: обновление частичное (возможно нужен sudo или проверь сеть)"
 echo "  firecrawl-cli: $(firecrawl --version 2>/dev/null || echo 'не установлен')"
 echo "  tldraw CLI: $(tldraw --version 2>/dev/null || echo 'не установлен')"
 
@@ -223,7 +223,7 @@ echo ""
 # ═══════════════════════════════════════
 
 echo ">>> 10/13 Wolfram..."
-wolframscript -code 'PacletUpdate[]' 2>/dev/null || echo "  Wolfram: обновление пропущено (проверь лицензию)"
+wolframscript -code 'PacletInstall["Wolfram/AgentTools"]' 2>/dev/null || echo "  Wolfram: обновление пропущено (проверь лицензию)"
 echo ""
 
 # ═══════════════════════════════════════

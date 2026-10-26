@@ -142,7 +142,7 @@ Pkg.update()          # обновить всё
 ```bash
 wolframscript -code 'PacletInformation[]'  # список пакетов
 wolframscript -code 'PacletInstall["PackageName"]'  # добавить
-wolframscript -code 'PacletUpdate[]'  # обновить
+wolframscript -code 'PacletInstall["Wolfram/AgentTools"]'  # обновить
 ```
 
 ### Проверка полноты

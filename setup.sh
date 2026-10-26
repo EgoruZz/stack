@@ -104,7 +104,7 @@ echo "  Firecrawl CLI..."
 npx -y firecrawl-cli@latest init -y --browser || echo "  Firecrawl: init пропущен (выполни вручную: firecrawl init)"
 
 echo "  tldraw CLI..."
-npm install -g @kitschpatrol/tldraw-cli
+npm install -g --allow-scripts=puppeteer @kitschpatrol/tldraw-cli
 
 # ═══════════════════════════════════════
 # 6. BROWSER ДЛЯ RENDERS
