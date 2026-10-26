@@ -20,8 +20,12 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-# Разворачиваем ~ и делаем абсолютный путь
-INPUT_DIR=$(eval echo "$1")
+# Разворачиваем ~ в абсолютный путь (без eval для безопасности)
+INPUT_DIR="$1"
+case "$INPUT_DIR" in
+    "~") INPUT_DIR="$HOME" ;;
+    "~/"*) INPUT_DIR="$HOME/${INPUT_DIR#\~/}" ;;
+esac
 
 # Если директории нет — создаём
 if [ ! -d "$INPUT_DIR" ]; then
@@ -55,7 +59,11 @@ ALREADY_REGISTERED=false
 while IFS= read -r line; do
     [[ "$line" =~ ^[[:space:]]*# ]] && continue
     [[ -z "${line// }" ]] && continue
-    EXPANDED=$(eval echo "$line")
+    EXPANDED="$line"
+    case "$EXPANDED" in
+        "~") EXPANDED="$HOME" ;;
+        "~/"*) EXPANDED="$HOME/${EXPANDED#\~/}" ;;
+    esac
     if [ "$EXPANDED" = "$PROJECT_DIR" ]; then
         ALREADY_REGISTERED=true
         break

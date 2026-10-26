@@ -101,7 +101,7 @@ npm run build
 echo ">>> 5/11 CLI инструменты..."
 
 echo "  Firecrawl CLI..."
-npx -y firecrawl-cli@latest init -y --browser
+npx -y firecrawl-cli@latest init -y --browser || echo "  Firecrawl: init пропущен (выполни вручную: firecrawl init)"
 
 echo "  tldraw CLI..."
 npm install -g @kitschpatrol/tldraw-cli

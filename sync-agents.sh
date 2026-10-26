@@ -41,8 +41,11 @@ while IFS= read -r project || [ -n "$project" ]; do
     [[ "$project" =~ ^[[:space:]]*# ]] && continue
     [[ -z "${project// }" ]] && continue
 
-    # Разворачиваем ~ в абсолютный путь
-    project=$(eval echo "$project")
+    # Разворачиваем ~ в абсолютный путь (без eval)
+    case "$project" in
+        "~") project="$HOME" ;;
+        "~/"*) project="$HOME/${project#\~/}" ;;
+    esac
 
     # Дедупликация
     if grep -qxF "$project" "$SEEN" 2>/dev/null; then
@@ -94,7 +97,7 @@ print(f'  {agents_path}: синхронизирован')
 PYEOF
         SYNCED=$((SYNCED + 1))
     else
-        # Нет маркеров — добавляем их вокруг содержимого, затем синхронизируем
+        # Нет маркеров — добавляем stack-секцию после заголовка (# AGENTS.md)
         python3 - "$AGENTS" "$STACK_AGENTS" << 'PYEOF'
 import re, sys
 
@@ -112,32 +115,20 @@ if not stack_match:
 
 stack_section = stack_match.group()
 
-# Если маркеров нет — заворачиваем содержимое после заголовка
-if 'STACK:START' not in content:
-    lines = content.split('\n')
-    # Находим первую секцию (первый ##)
-    insert_idx = 0
-    for i, line in enumerate(lines):
-        if line.startswith('## '):
-            insert_idx = i
-            break
-    lines.insert(insert_idx, '<!-- STACK:START -->')
-    lines.insert(insert_idx + 1, stack_section.split('\n', 2)[2] if stack_section.count('\n') >= 2 else '')
-    # Вставляем STACK:END перед последней строкой stack-секции
-    content = '\n'.join(lines)
-    # Более простой подход: заменяем всё после заголовка на stack-секцию
-    # Находим конец заголовка
-    header_end = 0
-    for i, line in enumerate(lines):
-        if line.startswith('<!-- STACK:START -->'):
-            header_end = i
-            break
-    # Оставляем только заголовок + stack-секцию
-    header = lines[:header_end]
-    content = '\n'.join(header) + '\n' + stack_section + '\n'
+# Находим конец заголовка (строка # AGENTS.md) и вставляем stack-секцию после неё
+lines = content.split('\n')
+insert_idx = 0
+for i, line in enumerate(lines):
+    if line.startswith('# '):
+        insert_idx = i + 1
+        break
+# Пропускаем пустые строки после заголовка
+while insert_idx < len(lines) and not lines[insert_idx].strip():
+    insert_idx += 1
 
+new_lines = lines[:insert_idx] + stack_section.split('\n') + [''] + lines[insert_idx:]
 with open(agents_path, 'w') as f:
-    f.write(content)
+    f.write('\n'.join(new_lines))
 print(f'  {agents_path}: маркеры добавлены, синхронизирован')
 PYEOF
         SYNCED=$((SYNCED + 1))

@@ -53,8 +53,8 @@ echo ""
 echo ">>> 4/13 tldraw MCP сборка..."
 if [ -d "$STACK_DIR/tldraw-mcp" ]; then
     cd "$STACK_DIR/tldraw-mcp"
-    npm install --silent 2>/dev/null
-    npm run build --silent 2>/dev/null
+    npm install --silent || echo "  npm install: ошибка (проверь сеть)"
+    npm run build --silent || echo "  npm build: ошибка"
     echo "  tldraw-mcp собран"
 else
     echo "  tldraw-mcp: не найден, пропускаю"
@@ -109,9 +109,9 @@ echo ""
 # ═══════════════════════════════════════
 
 echo ">>> 6/13 npm global CLI..."
-npm install -g --silent firecrawl-cli@latest @kitschpatrol/tldraw-cli@latest 2>/dev/null
-echo "  firecrawl-cli: $(firecrawl --version 2>/dev/null || echo 'ошибка')"
-echo "  tldraw CLI: $(tldraw --version 2>/dev/null || echo 'ошибка')"
+npm install -g firecrawl-cli@latest @kitschpatrol/tldraw-cli@latest || echo "  npm: обновление частичное (возможно нужен sudo или проверь сеть)"
+echo "  firecrawl-cli: $(firecrawl --version 2>/dev/null || echo 'не установлен')"
+echo "  tldraw CLI: $(tldraw --version 2>/dev/null || echo 'не установлен')"
 echo ""
 
 # ═══════════════════════════════════════
@@ -165,26 +165,32 @@ NEW_ENV="$HOME/.julia/environments/v$JULIA_VER"
 
 # Если окружение новое (пустое) — мигрируем пакеты из старого
 if [ -d "$NEW_ENV" ] && [ -n "$OLD_ENV" ] && [ "$OLD_ENV" != "$NEW_ENV" ]; then
-    if grep -q "^\s*\[" "$NEW_ENV/Project.toml" 2>/dev/null; then
+    if grep -q "^\[" "$NEW_ENV/Project.toml" 2>/dev/null; then
         echo "  Julia v$JULIA_VER окружение уже содержит пакеты"
-    elif grep -q "^\s*\[" "$OLD_ENV/Project.toml" 2>/dev/null; then
+    elif grep -q "^\[" "$OLD_ENV/Project.toml" 2>/dev/null; then
         echo "  Миграция пакетов: $(basename "$OLD_ENV") → $(basename "$NEW_ENV")"
-        # Извлекаем имена пакетов из старого Project.toml
-        PACKAGES=$(grep -oP '^\s*\[\K[a-zA-Z0-9]+' "$OLD_ENV/Project.toml" | tr -d '[]' | while read -r uuid; do
-            grep -B1 "$uuid" "$OLD_ENV/Project.toml" 2>/dev/null | grep '"' | tr -d '" '
-        done | sort -u | grep -v "^$")
-        if [ -n "$PACKAGES" ]; then
-            julia -e "
-using Pkg
-pkgs = String[]
-for line in split(raw\"$PACKAGES\", '\n')
-    s = strip(line)
-    isempty(s) || push!(pkgs, s)
-end
-unique!(pkgs)
-println(\"  Переношу пакеты: \", join(pkgs, \", \"))
-Pkg.add(pkgs)
-" 2>/dev/null || echo "  Миграция: пропущена (ошибка)"
+        # Извлекаем имена пакетов из [deps] секции и создаём Julia-массив
+        PACKAGES_JL=$(python3 - "$OLD_ENV/Project.toml" << 'PYEOF'
+import sys
+with open(sys.argv[1]) as f:
+    content = f.read()
+packages = []
+in_deps = False
+for line in content.split('\n'):
+    line = line.strip()
+    if line.startswith('['):
+        in_deps = line == '[deps]'
+        continue
+    if in_deps and '=' in line:
+        name = line.split('=')[0].strip().strip('"')
+        if name:
+            packages.append(name)
+print('[' + ', '.join('"' + p + '"' for p in packages) + ']')
+PYEOF
+)
+        if [ -n "$PACKAGES_JL" ] && [ "$PACKAGES_JL" != "[]" ]; then
+            echo "  Переношу: $PACKAGES_JL"
+            julia -e "using Pkg; Pkg.add($PACKAGES_JL)" 2>/dev/null || echo "  Миграция: пропущена (ошибка)"
         fi
     fi
 fi
