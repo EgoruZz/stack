@@ -56,10 +56,11 @@ Some components require manual installation:
 | **gh CLI** | `brew install gh` (for GitHub repo management) |
 | **Firecrawl auth** | `firecrawl login --browser` (optional, works without on free tier) |
 
-> **Note:** Playwright Chromium and Puppeteer Chrome are installed automatically by `setup.sh` for render-visual and tldraw export. If they fail, install manually:
+> **Note:** Playwright Chromium and Puppeteer Chrome are installed automatically by `setup.sh` (and kept in sync by `update-all.sh`) for render-visual and tldraw export. The Chrome version is auto-detected from the pinned tldraw-cli — no hardcoded version. If install fails, detect and install manually:
 > ```bash
+> VER=$(bash ~/stack/chrome-version.sh)   # detect version needed by tldraw
 > npx playwright install chromium
-> npx puppeteer browsers install chrome@155.0.8059.79
+> npx puppeteer browsers install "chrome@$VER"
 > ```
 
 ## Project Structure
@@ -73,8 +74,13 @@ Some components require manual installation:
 ├── setup.sh                     # Installation script
 ├── check-all.sh                 # Verify all tools work
 ├── update-all.sh                # Update everything
-├── new-project.sh               # Create new project
+├── new-project.sh               # Create/register project
+├── sync-agents.sh               # Sync AGENTS.md to registered projects
+├── sync-aris.sh                 # Sync ARIS skills from aris-skills.txt
+├── chrome-version.sh            # Detect Chrome version pinned by tldraw-cli
 ├── check-wolfram-license.sh     # Check Wolfram license expiry
+├── projects.txt                 # Project registry (one path per line)
+├── aris-skills.txt              # ARIS skill list (single source of truth)
 ├── .gitignore
 ├── skills/                      # 8 standalone skills
 │   ├── aris-research-pipeline/

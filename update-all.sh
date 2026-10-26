@@ -112,26 +112,30 @@ echo ">>> 6/13 npm global CLI..."
 npm install -g firecrawl-cli@latest @kitschpatrol/tldraw-cli@latest || echo "  npm: обновление частичное (возможно нужен sudo или проверь сеть)"
 echo "  firecrawl-cli: $(firecrawl --version 2>/dev/null || echo 'не установлен')"
 echo "  tldraw CLI: $(tldraw --version 2>/dev/null || echo 'не установлен')"
+
+# Chrome под tldraw export — версия берётся из пина установленного tldraw-cli
+CHROME_VER=$(bash "$STACK_DIR/chrome-version.sh" 2>/dev/null)
+if [ -n "$CHROME_VER" ]; then
+    if ls ~/.cache/puppeteer/chrome/ 2>/dev/null | grep -q "$CHROME_VER"; then
+        echo "  Chrome $CHROME_VER: уже установлен"
+    else
+        echo "  Chrome $CHROME_VER: устанавливаю под tldraw export..."
+        npx -y puppeteer browsers install "chrome@$CHROME_VER" 2>/dev/null || echo "  Chrome: установка пропущена"
+    fi
+else
+    echo "  Chrome: tldraw-cli не найден, пропускаю"
+fi
 echo ""
 
 # ═══════════════════════════════════════
-# 7. ARIS SKILLS
+# 7. ARIS SKILLS (список из aris-skills.txt)
 # ═══════════════════════════════════════
 
 echo ">>> 7/13 ARIS skills..."
 if [ -d "$STACK_DIR/aris-research-repo" ]; then
-    (cd "$STACK_DIR/aris-research-repo" && git pull --ff-only 2>/dev/null && echo "  ARIS репо обновлён" || echo "  ARIS репо: актуален или ошибка")
-    mkdir -p "$SKILLS_DIR"
-    for skill in ablation-planner auto-review-loop experiment-bridge experiment-queue \
-                 idea-creator idea-discovery novelty-check paper-writing render-html \
-                 research-lit research-review run-experiment shared-references training-check; do
-        if [ -d "$STACK_DIR/aris-research-repo/skills/$skill" ]; then
-            rsync -a --delete "$STACK_DIR/aris-research-repo/skills/$skill/" "$SKILLS_DIR/$skill/" 2>/dev/null
-        fi
-    done
-    echo "  ARIS skills синхронизированы"
+    bash "$STACK_DIR/sync-aris.sh" --update || echo "  ARIS: синхронизация пропущена"
 else
-    echo "  ARIS: не найден, пропускаю"
+    echo "  ARIS: клон не найден, пропускаю"
 fi
 echo ""
 

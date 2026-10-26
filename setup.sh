@@ -114,7 +114,12 @@ echo ">>> 6/11 Browser для render-visual и tldraw export..."
 echo "  Installing Playwright Chromium..."
 npx -y playwright install chromium 2>/dev/null || echo "  Playwright: установи вручную (npx playwright install chromium)"
 echo "  Installing Puppeteer Chrome..."
-npx -y puppeteer browsers install chrome@155.0.8059.79 2>/dev/null || echo "  Puppeteer: установи вручную (npx puppeteer browsers install chrome@155.0.8059.79)"
+CHROME_VER=$(bash "$STACK_DIR/chrome-version.sh" 2>/dev/null)
+if [ -n "$CHROME_VER" ]; then
+    npx -y puppeteer browsers install "chrome@$CHROME_VER" 2>/dev/null || echo "  Puppeteer: установи вручную (npx puppeteer browsers install chrome@$CHROME_VER)"
+else
+    echo "  tldraw-cli не установлен — Chrome пропущен (поставится при обновлении)"
+fi
 
 # ═══════════════════════════════════════
 # 7. SKILLS
@@ -125,10 +130,11 @@ mkdir -p "$HOME/.config/opencode/skills"
 
 # 7a. Firecrawl skills (28) — уже установлены через firecrawl-cli init
 
-# 7b. ARIS skills (14) — из cloned repo
-if [ -d "$STACK_DIR/aris-research-repo/skills" ]; then
-    cp -r "$STACK_DIR/aris-research-repo/skills/"* "$HOME/.config/opencode/skills/" 2>/dev/null || true
-    echo "  ARIS skills скопированы"
+# 7b. ARIS skills (14) — из списка aris-skills.txt через sync-aris.sh
+if [ -d "$STACK_DIR/aris-research-repo" ]; then
+    bash "$STACK_DIR/sync-aris.sh" || echo "  ARIS: синхронизация пропущена"
+else
+    echo "  ARIS: клон не найден, пропускаю"
 fi
 
 # 7c. tldraw-skill — из GitHub (или из skills/ если репо недоступен)

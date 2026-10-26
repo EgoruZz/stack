@@ -1,0 +1,17 @@
+# ARIS skills используемые в стеке (по одному имени на строку)
+# Единственный источник правды — читается setup.sh и update-all.sh
+# через sync-aris.sh. Скиллы не из этого списка НЕ устанавливаются.
+ablation-planner
+auto-review-loop
+experiment-bridge
+experiment-queue
+idea-creator
+idea-discovery
+novelty-check
+paper-writing
+render-html
+research-lit
+research-review
+run-experiment
+shared-references
+training-check
