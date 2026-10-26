@@ -525,21 +525,15 @@ CHROME_PATH="$HOME/Library/Caches/ms-playwright/chromium_headless_shell-1234/chr
 cd ~/stack && bash update-all.sh
 ```
 
-### Или вручную
-```bash
-# Homebrew
-brew update && brew upgrade
-
-# Python пакеты
-source ~/stack/manim-env/bin/activate && pip install --upgrade manim manimgl
-source ~/stack/jupyter-env/bin/activate && pip install --upgrade jupyterlab
-
-# Julia
-juliaup update
-
-# Wolfram
-wolframscript -code 'PacletUpdate[]'
-```
+Обновляет все компоненты:
+- Homebrew пакеты (node, python, gh, ffmpeg и др.)
+- Внешние MCP репозитории (paraview-mcp, manim-mcp, julia-mcp, tldraw-mcp, WolframLanguageForJupyter)
+- tldraw-mcp сборка (npm install + build)
+- Python venv (manim-env, jupyter-env, paraview-mcp-env, julia-mcp-env)
+- npm global CLI (firecrawl-cli, tldraw CLI)
+- ARIS skills + standalone skills
+- Julia пакеты
+- Wolfram paclets
 
 ### Проверить что всё работает
 ```bash

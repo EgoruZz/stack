@@ -147,4 +147,5 @@ wolframscript -code 'PacletUpdate[]'  # обновить
 ### Проверка полноты
 ```bash
 cd ~/stack && bash check-all.sh  # проверить что всё работает
+cd ~/stack && bash update-all.sh  # обновить весь стек
 ```

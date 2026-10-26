@@ -1,73 +1,174 @@
 #!/bin/bash
-# Скрипт обновления всего стека
+# Скрипт полного обновления всего стека
 # Запуск: cd ~/stack && bash update-all.sh
+# Обновляет: brew, внешние репозитории, tldraw-mcp, Python venv, npm CLI,
+#            ARIS skills, standalone skills, Julia, Wolfram
 
-echo "=== Обновление стека ==="
+set -uo pipefail
+
+STACK_DIR="$HOME/stack"
+SKILLS_DIR="$HOME/.config/opencode/skills"
+
+echo "============================================"
+echo "  Обновление стека"
+echo "============================================"
 echo ""
 
-# Homebrew
-echo ">>> Homebrew..."
+# ═══════════════════════════════════════
+# 1. GIT PULL (сам репозиторий)
+# ═══════════════════════════════════════
+
+echo ">>> 1/11 Репозиторий..."
+cd "$STACK_DIR"
+git pull --ff-only 2>/dev/null && echo "  Репозиторий обновлён" || echo "  Репозиторий уже актуален или ошибка"
+echo ""
+
+# ═══════════════════════════════════════
+# 2. HOMEBREW
+# ═══════════════════════════════════════
+
+echo ">>> 2/11 Homebrew..."
 brew update && brew upgrade
 echo ""
 
-# Manim
-echo ">>> Manim..."
-source ~/stack/manim-env/bin/activate
-pip install --upgrade manim manimgl
-deactivate
+# ═══════════════════════════════════════
+# 3. ВНЕШНИЕ MCP РЕПОЗИТОРИИ
+# ═══════════════════════════════════════
+
+echo ">>> 3/11 Внешние MCP репозитории..."
+for repo in paraview-mcp manim-mcp julia-mcp tldraw-mcp WolframLanguageForJupyter; do
+    if [ -d "$STACK_DIR/$repo" ]; then
+        (cd "$STACK_DIR/$repo" && git pull --ff-only 2>/dev/null && echo "  $repo: обновлён" || echo "  $repo: актуален или ошибка")
+    else
+        echo "  $repo: не найден, пропускаю"
+    fi
+done
 echo ""
 
-# JupyterLab + deps
-echo ">>> JupyterLab..."
-source ~/stack/jupyter-env/bin/activate
-pip install --upgrade jupyterlab numpy matplotlib pandas sympy plotly ipywidgets openpyxl markitdown
-deactivate
+# ═══════════════════════════════════════
+# 4. TLDRAW MCP СБОРКА
+# ═══════════════════════════════════════
+
+echo ">>> 4/11 tldraw MCP сборка..."
+if [ -d "$STACK_DIR/tldraw-mcp" ]; then
+    cd "$STACK_DIR/tldraw-mcp"
+    npm install --silent 2>/dev/null
+    npm run build --silent 2>/dev/null
+    echo "  tldraw-mcp собран"
+else
+    echo "  tldraw-mcp: не найден, пропускаю"
+fi
 echo ""
 
-# ParaView MCP deps
-echo ">>> ParaView MCP..."
-source ~/stack/paraview-mcp-env/bin/activate
-pip install --upgrade -r ~/stack/paraview-mcp/requirements.txt
-deactivate
+# ═══════════════════════════════════════
+# 5. PYTHON VENV (4 шт.)
+# ═══════════════════════════════════════
+
+echo ">>> 5/11 Python venv..."
+
+update_venv() {
+    local name=$1; shift
+    local dir="$STACK_DIR/$name"
+    if [ ! -d "$dir" ]; then
+        echo "  $name: не найден, пропускаю"
+        return
+    fi
+    source "$dir/bin/activate"
+    pip install --upgrade --quiet "$@" 2>/dev/null
+    deactivate
+    echo "  $name: обновлён"
+}
+
+update_venv manim-env manim manimgl
+update_venv jupyter-env jupyterlab numpy matplotlib pandas sympy plotly ipywidgets openpyxl markitdown
+
+# ParaView MCP venv
+if [ -d "$STACK_DIR/paraview-mcp-env" ]; then
+    source "$STACK_DIR/paraview-mcp-env/bin/activate"
+    pip install --upgrade --quiet -r "$STACK_DIR/paraview-mcp/requirements.txt" 2>/dev/null
+    deactivate
+    echo "  paraview-mcp-env: обновлён"
+else
+    echo "  paraview-mcp-env: не найден, пропускаю"
+fi
+
+# Julia MCP venv
+if [ -d "$STACK_DIR/julia-mcp-env" ]; then
+    source "$STACK_DIR/julia-mcp-env/bin/activate"
+    pip install --upgrade --quiet "mcp[cli]" 2>/dev/null
+    deactivate
+    echo "  julia-mcp-env: обновлён"
+else
+    echo "  julia-mcp-env: не найден, пропускаю"
+fi
 echo ""
 
-# Julia MCP deps
-echo ">>> Julia MCP..."
-source ~/stack/julia-mcp-env/bin/activate
-pip install --upgrade "mcp[cli]"
-deactivate
+# ═══════════════════════════════════════
+# 6. NPM GLOBAL CLI
+# ═══════════════════════════════════════
+
+echo ">>> 6/11 npm global CLI..."
+npm install -g --silent firecrawl-cli@latest @kitschpatrol/tldraw-cli@latest 2>/dev/null
+echo "  firecrawl-cli: $(firecrawl --version 2>/dev/null || echo 'ошибка')"
+echo "  tldraw CLI: $(tldraw --version 2>/dev/null || echo 'ошибка')"
 echo ""
 
-# Julia packages
-echo ">>> Julia..."
-juliaup update
+# ═══════════════════════════════════════
+# 7. ARIS SKILLS
+# ═══════════════════════════════════════
+
+echo ">>> 7/11 ARIS skills..."
+if [ -d "$STACK_DIR/aris-research-repo" ]; then
+    (cd "$STACK_DIR/aris-research-repo" && git pull --ff-only 2>/dev/null && echo "  ARIS репо обновлён" || echo "  ARIS репо: актуален или ошибка")
+    mkdir -p "$SKILLS_DIR"
+    for skill in ablation-planner auto-review-loop experiment-bridge experiment-queue \
+                 idea-creator idea-discovery novelty-check paper-writing render-html \
+                 research-lit research-review run-experiment shared-references training-check; do
+        if [ -d "$STACK_DIR/aris-research-repo/skills/$skill" ]; then
+            rsync -a --delete "$STACK_DIR/aris-research-repo/skills/$skill/" "$SKILLS_DIR/$skill/" 2>/dev/null
+        fi
+    done
+    echo "  ARIS skills синхронизированы"
+else
+    echo "  ARIS: не найден, пропускаю"
+fi
+echo ""
+
+# ═══════════════════════════════════════
+# 8. STANDALONE SKILLS
+# ═══════════════════════════════════════
+
+echo ">>> 8/11 Standalone skills..."
+mkdir -p "$SKILLS_DIR"
+cp -r "$STACK_DIR/skills/"* "$SKILLS_DIR/" 2>/dev/null
+echo "  Standalone skills скопированы"
+echo ""
+
+# ═══════════════════════════════════════
+# 9. JULIA
+# ═══════════════════════════════════════
+
+echo ">>> 9/11 Julia..."
+juliaup update 2>/dev/null
 julia -e 'using Pkg; Pkg.update()' 2>/dev/null || echo "  Julia packages: обновление пропущено"
 echo ""
 
-# Wolfram
-echo ">>> Wolfram..."
-wolframscript -code 'PacletUpdate[]' 2>/dev/null
+# ═══════════════════════════════════════
+# 10. WOLFRAM
+# ═══════════════════════════════════════
+
+echo ">>> 10/11 Wolfram..."
+wolframscript -code 'PacletUpdate[]' 2>/dev/null || echo "  Wolfram: обновление пропущено (проверь лицензию)"
 echo ""
 
-# Firecrawl CLI
-echo ">>> Firecrawl CLI..."
-npm update -g firecrawl-cli 2>/dev/null || echo "  Firecrawl: обновление пропущено"
-echo ""
+# ═══════════════════════════════════════
+# 11. ПРОВЕРКА
+# ═══════════════════════════════════════
 
-# tldraw CLI
-echo ">>> tldraw CLI..."
-npm update -g @kitschpatrol/tldraw-cli 2>/dev/null || echo "  tldraw CLI: обновление пропущено"
-echo ""
+echo ">>> 11/11 Проверка стека..."
+bash "$STACK_DIR/check-all.sh"
 
-echo "=== Готово! ==="
 echo ""
-echo "Проверка версий:"
-PVAPP=$(ls -d /Applications/ParaView-*.app 2>/dev/null | head -1)
-echo "  Wolfram: $(wolframscript -version 2>/dev/null || echo 'не найден')"
-echo "  ParaView: $("$PVAPP/Contents/bin/pvpython" --version 2>/dev/null || echo 'не найден')"
-echo "  Julia: $(julia --version 2>/dev/null || echo 'не найден')"
-echo "  LaTeX: $(pdflatex --version 2>/dev/null | head -1 || echo 'не найден')"
-echo "  Manim: $(source ~/stack/manim-env/bin/activate && python3 -c 'import manim; print(manim.__version__)' 2>/dev/null || echo 'не найден')"
-echo "  Jupyter: $(source ~/stack/jupyter-env/bin/activate && jupyter --version 2>/dev/null | head -1 || echo 'не найден')"
-echo "  Firecrawl: $(firecrawl --version 2>/dev/null || echo 'не найден')"
-echo "  tldraw CLI: $(tldraw --version 2>/dev/null || echo 'не найден')"
+echo "============================================"
+echo "  Обновление завершено!"
+echo "============================================"

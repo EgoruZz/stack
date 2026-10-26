@@ -120,8 +120,18 @@ cd ~/stack && opencode
 ### Update Everything
 
 ```bash
-bash ~/stack/update-all.sh
+cd ~/stack && bash update-all.sh
 ```
+
+Updates all components in one command:
+- Homebrew packages (node, python, gh, ffmpeg, etc.)
+- External MCP repos (paraview-mcp, manim-mcp, julia-mcp, tldraw-mcp, etc.)
+- tldraw-mcp build
+- Python venvs (manim, jupyter, paraview-mcp, julia-mcp)
+- npm global CLIs (firecrawl-cli, tldraw CLI)
+- ARIS skills + standalone skills
+- Julia packages
+- Wolfram paclets
 
 ### Check Everything Works
 
