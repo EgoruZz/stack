@@ -1,5 +1,6 @@
 # AGENTS.md
 
+<!-- STACK:START -->
 ## Установленный стэк
 
 Весь стэк находится в ~/stack/
@@ -149,3 +150,4 @@ wolframscript -code 'PacletUpdate[]'  # обновить
 cd ~/stack && bash check-all.sh  # проверить что всё работает
 cd ~/stack && bash update-all.sh  # обновить весь стек
 ```
+<!-- STACK:END -->

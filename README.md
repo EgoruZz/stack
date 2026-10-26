@@ -132,6 +132,9 @@ Updates all components in one command:
 - ARIS skills + standalone skills
 - Julia packages
 - Wolfram paclets
+- AGENTS.md sync (all projects)
+
+> **After updating, restart OpenCode** for MCP servers and skills to pick up changes.
 
 ### Check Everything Works
 

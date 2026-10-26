@@ -18,7 +18,7 @@ echo ""
 # 1. GIT PULL (сам репозиторий)
 # ═══════════════════════════════════════
 
-echo ">>> 1/11 Репозиторий..."
+echo ">>> 1/13 Репозиторий..."
 cd "$STACK_DIR"
 git pull --ff-only 2>/dev/null && echo "  Репозиторий обновлён" || echo "  Репозиторий уже актуален или ошибка"
 echo ""
@@ -27,7 +27,7 @@ echo ""
 # 2. HOMEBREW
 # ═══════════════════════════════════════
 
-echo ">>> 2/11 Homebrew..."
+echo ">>> 2/13 Homebrew..."
 brew update && brew upgrade
 echo ""
 
@@ -35,7 +35,7 @@ echo ""
 # 3. ВНЕШНИЕ MCP РЕПОЗИТОРИИ
 # ═══════════════════════════════════════
 
-echo ">>> 3/11 Внешние MCP репозитории..."
+echo ">>> 3/13 Внешние MCP репозитории..."
 for repo in paraview-mcp manim-mcp julia-mcp tldraw-mcp WolframLanguageForJupyter; do
     if [ -d "$STACK_DIR/$repo" ]; then
         (cd "$STACK_DIR/$repo" && git pull --ff-only 2>/dev/null && echo "  $repo: обновлён" || echo "  $repo: актуален или ошибка")
@@ -49,7 +49,7 @@ echo ""
 # 4. TLDRAW MCP СБОРКА
 # ═══════════════════════════════════════
 
-echo ">>> 4/11 tldraw MCP сборка..."
+echo ">>> 4/13 tldraw MCP сборка..."
 if [ -d "$STACK_DIR/tldraw-mcp" ]; then
     cd "$STACK_DIR/tldraw-mcp"
     npm install --silent 2>/dev/null
@@ -64,7 +64,7 @@ echo ""
 # 5. PYTHON VENV (4 шт.)
 # ═══════════════════════════════════════
 
-echo ">>> 5/11 Python venv..."
+echo ">>> 5/13 Python venv..."
 
 update_venv() {
     local name=$1; shift
@@ -107,7 +107,7 @@ echo ""
 # 6. NPM GLOBAL CLI
 # ═══════════════════════════════════════
 
-echo ">>> 6/11 npm global CLI..."
+echo ">>> 6/13 npm global CLI..."
 npm install -g --silent firecrawl-cli@latest @kitschpatrol/tldraw-cli@latest 2>/dev/null
 echo "  firecrawl-cli: $(firecrawl --version 2>/dev/null || echo 'ошибка')"
 echo "  tldraw CLI: $(tldraw --version 2>/dev/null || echo 'ошибка')"
@@ -117,7 +117,7 @@ echo ""
 # 7. ARIS SKILLS
 # ═══════════════════════════════════════
 
-echo ">>> 7/11 ARIS skills..."
+echo ">>> 7/13 ARIS skills..."
 if [ -d "$STACK_DIR/aris-research-repo" ]; then
     (cd "$STACK_DIR/aris-research-repo" && git pull --ff-only 2>/dev/null && echo "  ARIS репо обновлён" || echo "  ARIS репо: актуален или ошибка")
     mkdir -p "$SKILLS_DIR"
@@ -138,7 +138,7 @@ echo ""
 # 8. STANDALONE SKILLS
 # ═══════════════════════════════════════
 
-echo ">>> 8/11 Standalone skills..."
+echo ">>> 8/13 Standalone skills..."
 mkdir -p "$SKILLS_DIR"
 cp -r "$STACK_DIR/skills/"* "$SKILLS_DIR/" 2>/dev/null
 echo "  Standalone skills скопированы"
@@ -148,7 +148,7 @@ echo ""
 # 9. JULIA
 # ═══════════════════════════════════════
 
-echo ">>> 9/11 Julia..."
+echo ">>> 9/13 Julia..."
 juliaup update 2>/dev/null
 julia -e 'using Pkg; Pkg.update()' 2>/dev/null || echo "  Julia packages: обновление пропущено"
 echo ""
@@ -157,7 +157,7 @@ echo ""
 # 10. WOLFRAM
 # ═══════════════════════════════════════
 
-echo ">>> 10/11 Wolfram..."
+echo ">>> 10/13 Wolfram..."
 wolframscript -code 'PacletUpdate[]' 2>/dev/null || echo "  Wolfram: обновление пропущено (проверь лицензию)"
 echo ""
 
@@ -165,10 +165,27 @@ echo ""
 # 11. ПРОВЕРКА
 # ═══════════════════════════════════════
 
-echo ">>> 11/11 Проверка стека..."
+echo ">>> 11/13 Проверка стека..."
 bash "$STACK_DIR/check-all.sh"
+
+# ═══════════════════════════════════════
+# 12. СИНХРОНИЗАЦИЯ AGENTS.md
+# ═══════════════════════════════════════
+
+echo ""
+echo ">>> 12/13 Синхронизация AGENTS.md..."
+bash "$STACK_DIR/sync-agents.sh"
+
+# ═══════════════════════════════════════
+# 13. ФИНАЛ
+# ═══════════════════════════════════════
 
 echo ""
 echo "============================================"
 echo "  Обновление завершено!"
 echo "============================================"
+echo ""
+echo "⚠️  ПЕРЕЗАПУСТИ OPENCODE ДЛЯ ПРИМЕНЕНИЯ ИЗМЕНЕНИЙ:"
+echo "  1. Закрой все открытые сессии OpenCode"
+echo "  2. Запусти заново: cd ~/проект && opencode"
+echo ""
