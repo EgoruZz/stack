@@ -223,7 +223,12 @@ echo ""
 # ═══════════════════════════════════════
 
 echo ">>> 10/13 Wolfram..."
-wolframscript -code 'PacletInstall["Wolfram/AgentTools"]' 2>/dev/null || echo "  Wolfram: обновление пропущено (проверь лицензию)"
+WOLFRAM_VER=$(wolframscript -code 'p = PacletInstall["Wolfram/AgentTools"]; Print[p["Version"]]' 2>/dev/null | head -1)
+if [ -n "$WOLFRAM_VER" ]; then
+    echo "  AgentTools: $WOLFRAM_VER"
+else
+    echo "  Wolfram: обновление пропущено (проверь лицензию)"
+fi
 echo ""
 
 # ═══════════════════════════════════════
