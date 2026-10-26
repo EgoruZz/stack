@@ -24,11 +24,12 @@ git pull --ff-only 2>/dev/null && echo "  Репозиторий обновлё�
 echo ""
 
 # ═══════════════════════════════════════
-# 2. HOMEBREW
+# 2. HOMEBREW (только стек-пакеты)
 # ═══════════════════════════════════════
 
-echo ">>> 2/13 Homebrew..."
-brew update && brew upgrade
+echo ">>> 2/13 Homebrew (только стек-пакеты)..."
+brew update
+brew upgrade node python@3.12 gh ffmpeg anomalyco/tap/opencode 2>/dev/null || echo "  brew: часть пакетов обновлена"
 echo ""
 
 # ═══════════════════════════════════════
@@ -145,12 +146,66 @@ echo "  Standalone skills скопированы"
 echo ""
 
 # ═══════════════════════════════════════
-# 9. JULIA
+# 9. JULIA (миграция окружения + IJulia)
 # ═══════════════════════════════════════
 
 echo ">>> 9/13 Julia..."
+
+# Запоминаем текущее окружение
+OLD_ENV=""
+for d in ~/.julia/environments/v*; do
+    [ -d "$d" ] && OLD_ENV="$d"
+done
+
 juliaup update 2>/dev/null
+
+# Определяем новую версию Julia
+JULIA_VER=$(julia -e 'println(VERSION.major, ".", VERSION.minor)' 2>/dev/null)
+NEW_ENV="$HOME/.julia/environments/v$JULIA_VER"
+
+# Если окружение новое (пустое) — мигрируем пакеты из старого
+if [ -d "$NEW_ENV" ] && [ -n "$OLD_ENV" ] && [ "$OLD_ENV" != "$NEW_ENV" ]; then
+    if grep -q "^\s*\[" "$NEW_ENV/Project.toml" 2>/dev/null; then
+        echo "  Julia v$JULIA_VER окружение уже содержит пакеты"
+    elif grep -q "^\s*\[" "$OLD_ENV/Project.toml" 2>/dev/null; then
+        echo "  Миграция пакетов: $(basename "$OLD_ENV") → $(basename "$NEW_ENV")"
+        # Извлекаем имена пакетов из старого Project.toml
+        PACKAGES=$(grep -oP '^\s*\[\K[a-zA-Z0-9]+' "$OLD_ENV/Project.toml" | tr -d '[]' | while read -r uuid; do
+            grep -B1 "$uuid" "$OLD_ENV/Project.toml" 2>/dev/null | grep '"' | tr -d '" '
+        done | sort -u | grep -v "^$")
+        if [ -n "$PACKAGES" ]; then
+            julia -e "
+using Pkg
+pkgs = String[]
+for line in split(raw\"$PACKAGES\", '\n')
+    s = strip(line)
+    isempty(s) || push!(pkgs, s)
+end
+unique!(pkgs)
+println(\"  Переношу пакеты: \", join(pkgs, \", \"))
+Pkg.add(pkgs)
+" 2>/dev/null || echo "  Миграция: пропущена (ошибка)"
+        fi
+    fi
+fi
+
+# Обновляем пакеты в текущем окружении
 julia -e 'using Pkg; Pkg.update()' 2>/dev/null || echo "  Julia packages: обновление пропущено"
+
+# Проверяем и собираем IJulia если нужно
+julia -e '
+try
+    using IJulia
+    println("  IJulia: OK")
+catch
+    println("  IJulia: собираю и регистрирую kernel...")
+    using Pkg
+    Pkg.build("IJulia")
+    using IJulia
+    installkernel("Julia $(Base.VERSION.major).$(Base.VERSION.minor)")
+    println("  IJulia kernel установлен")
+end
+' 2>/dev/null || echo "  IJulia: пропущен"
 echo ""
 
 # ═══════════════════════════════════════
