@@ -101,6 +101,24 @@ After installation, external repos are cloned into `~/stack/`:
 
 ## Usage
 
+### Create New Project
+
+```bash
+~/stack/new-project.sh ~/projects/my-project    # create new
+~/stack/new-project.sh ~/work/analysis          # anywhere
+~/stack/new-project.sh ~/learn                  # register existing
+```
+
+Creates folder (if needed), copies `AGENTS.md`, registers in `projects.txt`.
+
+### Sync AGENTS.md to All Projects
+
+```bash
+bash ~/stack/sync-agents.sh
+```
+
+Reads `projects.txt`, replaces stack section between `STACK:START`/`STACK:END` markers in each project's `AGENTS.md`. Project-specific content outside markers is preserved.
+
 ### Start OpenCode
 
 ```bash

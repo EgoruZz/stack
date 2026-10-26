@@ -1,0 +1,6 @@
+# Реестр проектов использующих стек
+# По одному пути на строку. # комментарии игнорируются.
+# Обновляется автоматически new-project.sh или вручную.
+
+/Users/egorsergeev/learn
+/Users/egorsergeev/projects/project1

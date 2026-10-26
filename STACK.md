@@ -556,19 +556,29 @@ echo "=== Jupyter ===" && source ~/stack/jupyter-env/bin/activate && jupyter --v
 
 ---
 
-## 9. Управление пакетами
+## 9. Управление проектами и пакетами
 
 ### Структура проектов
 
+Проекты хранятся **в любом месте** (`~/projects/`, `~/learn/`, `~/work/` и т.д.).
+Каждый проект содержит `AGENTS.md` — OpenCode читает его при запуске.
+
 ```
-~/
-├── stack/              # Инструменты (не трогаем)
-└── projects/           # Твои проекты
-    ├── wolfram/
-    ├── manim/
-    ├── julia/
-    ├── paraview/
-    └── latex/
+Реестр проектов: ~/stack/projects.txt  (по одному пути на строку)
+```
+
+### Управление проектами
+
+```bash
+# Создать новый проект (где угодно)
+~/stack/new-project.sh ~/projects/my-calculation
+~/stack/new-project.sh ~/work/analysis
+
+# Зарегистрировать существующий проект
+~/stack/new-project.sh ~/learn
+
+# Синхронизировать AGENTS.md во все проекты
+bash ~/stack/sync-agents.sh
 ```
 
 ### Добавление пакетов
