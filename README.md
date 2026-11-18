@@ -242,6 +242,25 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 
 <div align="center">
 
-**Stack** · macOS · [OpenCode](https://opencode.ai) · обновляется одной командой 🔄
+![OpenCode](https://img.shields.io/badge/работает_на-OpenCode-1F6FEB?style=for-the-badge&logo=opencode&logoColor=white)
+![macOS](https://img.shields.io/badge/платформа-macOS-000000?style=for-the-badge&logo=apple&logoColor=white)
+![Bash](https://img.shields.io/badge/CLI-Bash-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
+
+**Stack** · MCP ×5 · скиллы 60 · обновляется одной командой 🔄
+
+[🤖 `AGENTS.md`](AGENTS.md) · [📖 `STACK.md`](STACK.md) · [🔀 `workflow.txt`](workflow.txt) · [⬆️ наверх](#-stack)
+
+<details>
+<summary>🧲 стикер</summary>
+
+```text
+        ▄
+  █▀▀█ █▀▀█ █▀▀█ █▀▀▄ █▀▀▀ █▀▀█ █▀▀█
+  █  █ █  █ █▀▀▀ █  █ █    █  █ █▀▀█
+  ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀
+        opencode
+```
+
+</details>
 
 </div>
