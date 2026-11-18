@@ -177,7 +177,7 @@ Paclet `Wolfram/AgentTools` (MCP-интеграция Wolfram). Требует �
 | **Firecrawl** | ~37 | `firecrawl setup skills/build/workflows` → перенос в хранилище |
 | **ARIS** | 14 | `aris-research-repo` через `sync-aris.sh` |
 | **tldraw-skill** | 1 | GitHub (`Agents365-ai/tldraw-skill`) |
-| **tldraw-offline** | 1 | перенесён из `~/.claude/skills` |
+| **tldraw-offline** | 1 | ставится приложением tldraw Desktop (агент-скилл его локального API) |
 | **Standalone** | 8 | `skills/` этого репозитория |
 
 Количество firecrawl-скиллов меняется с версиями CLI — точное число: `ls ~/stack/skills-store | wc -l`.
