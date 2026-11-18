@@ -2,15 +2,22 @@
 
 # 🧰 Stack
 
-**Персональный набор инструментов для macOS** — MCP-серверы, AI-скиллы, CLI-утилиты и скрипты для полноценной AI-разработки через [OpenCode](https://opencode.ai).
+![платформа](https://img.shields.io/badge/платформа-macOS-black)
+![агент](https://img.shields.io/badge/AI--агент-OpenCode-1F6FEB)
+![MCP](https://img.shields.io/badge/MCP--серверы-5-2EA043)
+![скиллы](https://img.shields.io/badge/скиллы-~61-E16F24)
+![VS_Code](https://img.shields.io/badge/расширения_VS_Code-6-8250DF)
+![обновление](https://img.shields.io/badge/обновление-update--all.sh-D29922)
 
-```bash
-git clone https://github.com/EgoruZz/stack.git ~/stack && cd ~/stack && bash setup.sh
-```
-
-🤖 *ИИ-агент? Начни с [`AGENTS.md`](AGENTS.md) — карта репозитория и конвенции.*
+[![AGENTS.md](https://img.shields.io/badge/🤖_карта_и_конвенции-AGENTS.md-1F6FEB)](AGENTS.md)
+[![STACK.md](https://img.shields.io/badge/📖_полная_дока-STACK.md-1F6FEB)](STACK.md)
+[![workflow.txt](https://img.shields.io/badge/🔀_git--workflow-workflow.txt-1F6FEB)](workflow.txt)
 
 </div>
+
+**Персональный набор инструментов для macOS** — MCP-серверы, AI-скиллы, CLI-утилиты и скрипты для полноценной AI-разработки через [OpenCode](https://opencode.ai).
+
+🤖 *ИИ-агент? Начни с [`AGENTS.md`](AGENTS.md) — карта репозитория и конвенции.*
 
 ---
 
@@ -42,7 +49,9 @@ cd ~/stack
 bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, скиллы, конфиги
 ```
 
-Скрипт спрашивает пароль только там, где его требует система. В конце запускается проверка — все компоненты должны быть ✅.
+- 12 шагов: brew · репозитории · venv · CLI · браузеры · скиллы · конфиги
+- Пароль спрашивается только там, где его требует система
+- В конце запускается автопроверка — все компоненты должны быть ✅
 
 ## 📦 Что внутри
 
@@ -139,14 +148,14 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | `AGENTS.md` | Инструкции агента: карта стека, MCP-инструменты, конвенции |
 | `.opencode/opencode.json` | `mcp` ×5 · `lsp: true` · `skills.paths` → skills-store |
 
-**Ключевые факты:**
-
-- 🔌 Пути в конфиге записаны через `{env:HOME}` — файл переносим между машинами и коммитобезопасен
-- 📋 Реестр всех проектов: `~/stack/projects.txt`
-- 🔁 Перегенерация конфигов и AGENTS.md во всех проектах: `bash ~/stack/sync-agents.sh` (входит в `update-all.sh`, шаг 12)
-- 🧠 **LSP включён** — при открытии файла OpenCode поднимает языковой сервер и получает ошибки в свой цикл: `pyright` (`.py`), `bash-language-server` (`.sh`), `julials` (`.jl`), typescript и др. Отключение: убрать поле `lsp`. Документация: [opencode.ai/docs/lsp](https://opencode.ai/docs/lsp)
-- 🚫 Вне проектов — ни MCP, ни скиллов, ни LSP. Глобальный каталог `~/.config/opencode/` остаётся пустым (OpenCode сам создаёт там лишь 2 файла-стаба)
-- 🚫 В конфиге нет поля `plugin`: пакет `opencode-firecrawl` не существует на npm (404), его строка когда-то заставляла OpenCode разворачивать ~62 МБ зависимостей в глобальном каталоге. Если когда-нибудь понадобится плагинный уровень — есть сторонний `opencode-firecrawl-ng`
+| Факт | Детали |
+|------|--------|
+| 🔌 **Переносимость** | Пути в конфиге через `{env:HOME}` — файл переносим между машинами и коммитобезопасен |
+| 📋 **Реестр проектов** | `~/stack/projects.txt` — по одному пути на строку |
+| 🔁 **Синхронизация** | `bash ~/stack/sync-agents.sh` перегенерирует AGENTS.md + конфиги во всех проектах (входит в `update-all.sh`, шаг 12); проект-специфичный контент AGENTS.md **вне маркеров** `<!-- STACK:START -->…<!-- STACK:END -->` сохраняется |
+| 🧠 **LSP включён** | При открытии файла OpenCode поднимает языковой сервер и получает ошибки в свой цикл: `pyright` (`.py`), `bash-language-server` (`.sh`), `julials` (`.jl`), typescript и др. Отключение: убрать поле `lsp` · Проверка: `opencode debug lsp diagnostics <файл>` · [docs](https://opencode.ai/docs/lsp) |
+| 🚫 **Вне проектов** | Ни MCP, ни скиллов, ни LSP. Глобальный каталог `~/.config/opencode/` пуст (OpenCode сам создаёт там лишь 2 файла-стаба) |
+| 🚫 **Без поля `plugin`** | Пакет `opencode-firecrawl` не существует на npm (404); раньше его строка разворачивала ~62 МБ зависимостей в глобальном каталоге. Понадобится плагинный уровень — есть сторонний `opencode-firecrawl-ng` |
 
 ## 👀 Файлы: пользователь vs ИИ-агент
 
