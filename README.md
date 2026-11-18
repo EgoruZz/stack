@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🧰 Stack
+# Stack
 
 ![платформа](https://img.shields.io/badge/платформа-macOS-black)
 ![агент](https://img.shields.io/badge/AI--агент-OpenCode-1F6FEB)
@@ -16,7 +16,7 @@
 
 </div>
 
-**Персональный набор инструментов для macOS** — MCP-серверы, AI-скиллы и 10 CLI-инструментов для полноценной AI-разработки через [OpenCode](https://opencode.ai).
+**Персональный набор инструментов для macOS** — MCP-серверы, AI-скиллы, 10 CLI-инструментов и расширения VS Code для полноценной AI-разработки через [OpenCode](https://opencode.ai).
 
 🤖 *ИИ-агент? Начни с [`AGENTS.md`](AGENTS.md) — карта репозитория и конвенции.*
 
@@ -247,20 +247,5 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 ![Bash](https://img.shields.io/badge/CLI-Bash-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
 
 **Stack** · MCP ×5 · скиллы 60 · обновляется одной командой 🔄
-
-[🤖 `AGENTS.md`](AGENTS.md) · [📖 `STACK.md`](STACK.md) · [🔀 `workflow.txt`](workflow.txt) · [⬆️ наверх](#-stack)
-
-<details>
-<summary>🧲 стикер</summary>
-
-```text
-        ▄
-  █▀▀█ █▀▀█ █▀▀█ █▀▀▄ █▀▀▀ █▀▀█ █▀▀█
-  █  █ █  █ █▀▀▀ █  █ █    █  █ █▀▀█
-  ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀
-        opencode
-```
-
-</details>
 
 </div>
