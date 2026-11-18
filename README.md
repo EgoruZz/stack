@@ -93,7 +93,7 @@ Paclet `Wolfram/AgentTools` (MCP-интеграция Wolfram). Требует �
 
 ## MCP-серверы (5)
 
-Прописываются в `~/.config/opencode/opencode.jsonc` (генерируется `setup.sh`).
+Прописываются в `.opencode/opencode.json` каждого проекта (генерируется `gen-opencode-config.sh`). **Глобально стек не поднимается** — MCP запускается только в проектах из реестра `projects.txt` и в самом `~/stack`.
 
 | Сервер | Что делает |
 |--------|-----------|
@@ -117,6 +117,52 @@ Paclet `Wolfram/AgentTools` (MCP-интеграция Wolfram). Требует �
 | `james-yu.latex-workshop` | `.tex` — LaTeX (компиляция, превью) |
 
 Ручная установка одного расширения: `code --install-extension <id>`.
+
+---
+
+## Просмотр и контроль файлов: пользователь vs ИИ-агент
+
+Стек даёт **двойной контроль** над файлами: ты работаешь с ними в VS Code, агент — в OpenCode. Это не конфликтует: LSP VS Code и LSP OpenCode — независимые процессы (Pylance у тебя в редакторе, pyright у агента), они не делят состояние и не мешают друг другу.
+
+### Как контролирует пользователь (VS Code)
+
+Ты открываешь файл во вкладке — расширение даёт визуальный редактор и живую диагностику:
+
+| Формат | Расширение | Что даёт тебе |
+|--------|-----------|---------------|
+| `.tldr` | tldraw | Полноценный белый холст прямо во вкладке: рисуешь, сохраняешь |
+| `.py` | Python + Pylance | Автодополнение, ошибки подчёркиваются прямо в коде |
+| `.sh` | (встроенное) | Подсветка; запуск и ошибки — в терминале ``Cmd+` `` |
+| `.jl` | Julia | Автодополнение, переходы к определениям (LanguageServer.jl) |
+| `.ts` | встроенный TS | Типы, автодополнение для tldraw-mcp |
+| `.ipynb` | Jupyter | Запуск ячеек, графики, превью ноутбука |
+| `.tex` | LaTeX Workshop | Компиляция + PDF-превью рядом с кодом |
+| `.wl` | Wolfram | Подсветка, интеграция с wolframscript |
+
+Плюс терминал VS Code: запускаешь `manim`, `julia`, `pdflatex` сам и видишь вывод.
+
+### Как контролирует ИИ-агент (OpenCode)
+
+Агент работает с теми же файлами тремя слоями:
+
+1. **Чтение как текст** (`read`/`grep`/`glob`) — любой формат, включая `.tldr` (JSON) и `.ipynb` (JSON ячеек)
+2. **LSP-диагностика** — серверы запускаются автоматически при открытии файла и присылают ошибки в цикл агента (см. раздел LSP ниже)
+3. **Запуск инструментов** — агент сам выполняет компиляторы и линтеры через терминал и видит реальный вывод
+
+### Сводная таблица: кто как видит каждый формат
+
+| Формат | Пользователь (VS Code) | ИИ-агент (OpenCode) |
+|--------|------------------------|----------------------|
+| `.tldr` | Рисуешь на холсте визуально | Читает JSON; создаёт/правит через tldraw MCP; рендерит через `tldraw export` |
+| `.py` | Pylance: ошибки в редакторе | pyright LSP + запуск `python` |
+| `.sh` | Терминал: `bash -n`, запуск | bash-language-server + `bash -n` + запуск |
+| `.jl` | Julia LS: автодополнение | julials LSP + запуск `julia` |
+| `.ts` | Встроенный TypeScript | typescript-language-server + `npm run build` |
+| `.ipynb` | Запуск ячеек в GUI | Читает JSON; запускает через `jupyter` |
+| `.tex` | Компиляция + PDF превью | Пишет `.tex`, запускает `pdflatex`, читает лог ошибок |
+| `.wl` | Подсветка + wolframscript | Проверяет код через `wolframscript` |
+
+> Для `.tex` и `.wl` агент намеренно полагается на **компиляторы**, а не на LSP: `pdflatex` и `wolframscript` дают честные ошибки сборки.
 
 ---
 
@@ -150,15 +196,33 @@ Paclet `Wolfram/AgentTools` (MCP-интеграция Wolfram). Требует �
 
 ## Конфигурация OpenCode и LSP
 
-### Глобальный конфиг
+### Проектный конфиг (стек живёт в проектах)
 
-`~/.config/opencode/opencode.jsonc` **генерируется `setup.sh`** (шаг 10) и содержит:
+Стек **намеренно не прописан в глобальном** `~/.config/opencode/opencode.jsonc` — там могут быть только твои личные настройки. Конфиг стека генерируется в каждую папку, где стек указан:
 
-- `plugin: ["opencode-firecrawl"]` — интеграция firecrawl
-- `lsp: true` — включённые LSP-серверы (см. ниже)
-- `mcp` — 5 MCP-серверов стека
+| Файл | Кто создаёт | Что содержит |
+|------|-------------|--------------|
+| `<проект>/.opencode/opencode.json` | `sync-agents.sh` и `new-project.sh` | `plugin`, `lsp`, 5 `mcp`-серверов |
+| `~/stack/.opencode/opencode.json` | `setup.sh` (шаг 10) | то же — для сессий в самом стеке |
 
-Конфиг обновляется повторным запуском `bash setup.sh`.
+Один источник шаблона — `gen-opencode-config.sh [директория]`:
+
+```bash
+bash ~/stack/gen-opencode-config.sh ~/work/my-project   # вручную для любой папки
+```
+
+Пути внутри записаны через `{env:HOME}` — OpenCode подставляет переменные окружения при чтении, поэтому файл переносим между машинами и его можно коммитить.
+
+**Что получает зарегистрированный проект** (при `new-project.sh` или `sync-agents.sh`):
+
+- `AGENTS.md` — инструкции для агента (stack-секция между маркерами)
+- `.opencode/opencode.json` — MCP-серверы, LSP, плагин
+
+**Вне проектов** (`opencode` в случайной папке): ни MCP, ни LSP стека не запускаются.
+
+> **Скиллы — исключение:** `~/.config/opencode/skills/` читается OpenCode глобально по своей архитектуре, поэтому 51 скилл доступен везде. Конфиг-файлы (MCP/LSP) при этом проектные.
+
+Обновление конфигов всех проектов: `bash ~/stack/sync-agents.sh` (входит в `update-all.sh`, шаг 12).
 
 ### LSP (Language Server Protocol)
 
@@ -173,7 +237,7 @@ Paclet `Wolfram/AgentTools` (MCP-интеграция Wolfram). Требует �
 | `julials` | `.jl` | Диагностика Julia (нужен пакет `LanguageServer.jl` — ставится setup.sh) |
 | + встроенные (typescript, clangd и др.) | по расширениям | Для остальных языков проектов |
 
-Отключить: удалить поле `"lsp"` из `opencode.jsonc`. Подробности: https://opencode.ai/docs/lsp
+Отключить: удалить поле `"lsp"` из `.opencode/opencode.json` (и перегенерировать через `sync-agents.sh`). LSP-серверы также можно проверить из CLI: `opencode debug lsp diagnostics <файл>`. Подробности: https://opencode.ai/docs/lsp
 
 ---
 
@@ -213,6 +277,7 @@ npx puppeteer browsers install "chrome@$VER"
 ├── sync-agents.sh               # Синхронизация AGENTS.md в проекты
 ├── sync-aris.sh                 # Синхронизация ARIS-скиллов
 ├── new-project.sh               # Создание/регистрация проекта
+├── gen-opencode-config.sh       # Генератор .opencode/opencode.json (MCP/LSP)
 ├── chrome-version.sh            # Определение версии Chrome под tldraw
 ├── check-wolfram-license.sh     # Проверка лицензии Wolfram
 ├── projects.txt                 # Реестр проектов (по одному пути на строку)
@@ -221,7 +286,9 @@ npx puppeteer browsers install "chrome@$VER"
 └── WolframLanguage/             # Пользовательские Wolfram-пакеты
 ```
 
-После установки рядом появляются внешние репозитории: `paraview-mcp/`, `manim-mcp/`, `julia-mcp/`, `tldraw-mcp/`, `aris-research-repo/`, `WolframLanguageForJupyter/`.
+После установки рядом появляются:
+- внешние репозитории: `paraview-mcp/`, `manim-mcp/`, `julia-mcp/`, `tldraw-mcp/`, `aris-research-repo/`, `WolframLanguageForJupyter/`
+- `.opencode/opencode.json` в самом `~/stack` и в каждом зарегистрированном проекте (генерируется, в `.gitignore`)
 
 ---
 
@@ -233,7 +300,7 @@ npx puppeteer browsers install "chrome@$VER"
 cd ~/stack && bash update-all.sh
 ```
 
-13 шагов: git-репозиторий → brew → внешние репо → сборка tldraw-mcp → Python venv → npm CLI + Chrome → ARIS-скиллы → standalone-скиллы → Julia (с миграцией окружения) → Wolfram → проверка → синхронизация AGENTS.md → напоминание о перезапуске.
+13 шагов: git-репозиторий → brew → внешние репо → сборка tldraw-mcp → Python venv → npm CLI + Chrome → ARIS-скиллы → standalone-скиллы → Julia (с миграцией окружения) → Wolfram → проверка → синхронизация AGENTS.md **и конфигов OpenCode** во все проекты → напоминание о перезапуске.
 
 > **После обновления перезапусти OpenCode** — MCP-серверы и скиллы подхватятся только при старте сессии.
 
@@ -251,15 +318,17 @@ bash ~/stack/check-all.sh
 ~/stack/new-project.sh ~/learn                  # зарегистрировать существующий
 ```
 
-Создаёт папку (если нужно), копирует `AGENTS.md`, регистрирует в `projects.txt`.
+Создаёт папку (если нужно), копирует `AGENTS.md`, генерирует `.opencode/opencode.json`, регистрирует в `projects.txt`.
 
-### Синхронизация AGENTS.md во все проекты
+### Синхронизация AGENTS.md и конфигов во все проекты
 
 ```bash
 bash ~/stack/sync-agents.sh
 ```
 
-Читает `projects.txt`, заменяет stack-секцию между маркерами `STACK:START`/`STACK:END`. Проект-специфичный контент (вне маркеров) сохраняется.
+Читает `projects.txt` и для каждого проекта:
+- заменяет stack-секцию в `AGENTS.md` между маркерами `STACK:START`/`STACK:END` (проект-специфичный контент сохраняется);
+- перегенерирует `.opencode/opencode.json` (MCP/LSP стека).
 
 ### Алиасы
 

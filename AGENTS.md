@@ -9,7 +9,7 @@
 ### Wolfram Language
 - **Wolfram Engine** — бесплатная лицензия для разработчиков
 - Запуск: `wolframscript`
-- MCP сервер: `Wolfram` (в конфиге ~/.config/opencode/opencode.jsonc)
+- MCP сервер: `Wolfram` (в .opencode/opencode.json проекта)
 - Jupyter kernel: `wolframlanguage15` (для Jupyter notebooks)
 - Лицензия: продлевать на https://www.wolfram.com/engine/ каждые ~40 дней
 - Проверка лицензии: `wolframscript -code 'Print[$LicenseExpirationDate]'`
@@ -23,7 +23,7 @@
 - Активация: `source ~/stack/manim-env/bin/activate` или `manim-activate`
 - Запуск (community): `manim script.py SceneName`
 - Запуск (GL): `manimgl script.py SceneName`
-- MCP сервер: `manim` (в конфиге ~/.config/opencode/opencode.jsonc)
+- MCP сервер: `manim` (в .opencode/opencode.json проекта)
 - MCP использует community `manim` для headless-рэндера; `manimgl` остаётся отдельным интерактивным CLI
 
 ### ParaView
@@ -31,7 +31,7 @@
 - pvpython: `$PVAPP/Contents/bin/pvpython` (определи путь: `PVAPP=$(ls -d /Applications/ParaView-*.app | head -1)`)
 - Python API: `paraview.simple`
 - Скрипты: писать → запускать через pvpython или вставлять в GUI Python Shell
-- MCP сервер: `ParaView` (в конфиге ~/.config/opencode/opencode.jsonc)
+- MCP сервер: `ParaView` (в .opencode/opencode.json проекта)
 - Окружение: ~/stack/paraview-mcp-env (Python 3.12)
 - MCP инструменты: load_data, create_source, create_isosurface, create_slice, toggle_volume_rendering, color_by, rotate_camera, reset_camera, plot_over_line, warp_by_vector, create_streamline, get_pipeline, и др.
 - **Скриншоты:** папка `~/stack/paraview-mcp/screenshots/`
@@ -57,12 +57,12 @@
 ### Julia
 - **Julia** (через juliaup)
 - Запуск: `julia`
-- MCP сервер: `julia` (в конфиге ~/.config/opencode/opencode.jsonc)
+- MCP сервер: `julia` (в .opencode/opencode.json проекта)
 - Пакеты: LinearAlgebra, SparseArrays, Plots, DifferentialEquations, StaticArrays, Optim, JuMP, IJulia, Flux, Turing, DataFrames, CSV, ForwardDiff, SymPy, SpecialFunctions, StatsBase, Distributions, Polynomials, FFTW, IterativeSolvers
 
 ### tldraw
 - **tldraw MCP** — управление canvas через MCP (30 инструментов)
-- MCP сервер: `tldraw` (в конфиге ~/.config/opencode/opencode.jsonc)
+- MCP сервер: `tldraw` (в .opencode/opencode.json проекта)
 - Сервер: ~/stack/tldraw-mcp/ (Node.js, zero browser deps)
 - Скилл: `tldraw-skill` — генерация .tldr диаграмм из текста (6 presets, vision self-check)
 - Инструменты: create_geo, create_text, create_arrow, create_note, create_frame, move_shapes, group_shapes, set_camera, save_document, load_document и др.
@@ -82,7 +82,7 @@
 - Конфиг: ~/Library/Application Support/Code/User/settings.json
 
 ### OpenCode
-- Конфиг MCP: ~/.config/opencode/opencode.jsonc (генерируется setup.sh)
+- Конфиг MCP: .opencode/opencode.json проекта (генерируется gen-opencode-config.sh; глобально стек не поднимается — MCP/LSP живут только в проектах из projects.txt)
 - LSP включён (`"lsp": true`): диагностика pyright (.py), bash-language-server (.sh), julials (.jl) — ошибки кода приходят в цикл агента. Отключается удалением поля "lsp" из конфига.
 - Skills: ARIS research pipeline, Firecrawl, render-visual, xlsx, data-analysis, grill-me, tldraw-skill, epistemic-rigor, deep-mind, dag-hallucination-detector, и др. (51 скилл, полный список в ~/.config/opencode/skills/)
 - ARIS работает в local-only режиме: внешние Codex/Oracle/manual-review MCP не используются и не считаются доступными.

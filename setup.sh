@@ -198,71 +198,14 @@ Pkg.add([
 ' 2>/dev/null || echo "  Julia: установка пакетов пропущена (повтори вручную: julia → Pkg.add(...))"
 
 # ═══════════════════════════════════════
-# 10. OPENCODE КОНФИГ
+# 10. OPENCODE КОНФИГ (проектный)
 # ═══════════════════════════════════════
 
-echo ">>> 10/12 Генерация opencode.jsonc..."
-mkdir -p "$HOME/.config/opencode"
-
-python3 << 'PYEOF'
-import os, json
-
-home = os.path.expanduser("~")
-stack = os.path.join(home, "stack")
-
-config = {
-    "$schema": "https://opencode.ai/config.json",
-    "plugin": ["opencode-firecrawl"],
-    "lsp": True,
-    "mcp": {
-        "Wolfram": {
-            "type": "local",
-            "command": [
-                "/Applications/Wolfram Engine.app/Contents/Resources/Wolfram Player.app/Contents/MacOS/wolfram",
-                "-run",
-                'PacletSymbol["Wolfram/AgentTools","Wolfram`AgentTools`StartMCPServer"][]',
-                "-noinit", "-noprompt"
-            ],
-            "enabled": True,
-            "environment": {
-                "MCP_SERVER_NAME": "WolframLanguage",
-                "WOLFRAM_BASE": "/Library/WolframEngine",
-                "WOLFRAM_LOCALBASE": os.path.join(home, ".local/Wolfram/Objects"),
-                "WOLFRAM_USERBASE": os.path.join(home, ".local/WolframEngine")
-            },
-            "timeout": 60000
-        },
-        "julia": {
-            "type": "local",
-            "command": [os.path.join(stack, "julia-mcp-env/bin/python"),
-                        os.path.join(stack, "julia-mcp/server.py")],
-            "enabled": True, "timeout": 60000
-        },
-        "manim": {
-            "type": "local",
-            "command": [os.path.join(stack, "manim-env/bin/python"),
-                        os.path.join(stack, "manim-mcp/src/manim_server.py")],
-            "enabled": True, "timeout": 120000
-        },
-        "ParaView": {
-            "type": "local",
-            "command": [os.path.join(stack, "paraview-mcp-env/bin/python"),
-                        os.path.join(stack, "paraview-mcp/paraview_mcp_server.py")],
-            "enabled": True, "timeout": 60000
-        },
-        "tldraw": {
-            "type": "local",
-            "command": ["node", os.path.join(stack, "tldraw-mcp/dist/index.js")],
-            "enabled": True, "timeout": 60000
-        }
-    }
-}
-
-path = os.path.join(home, ".config/opencode/opencode.jsonc")
-with open(path, "w") as f:
-    json.dump(config, f, indent=2)
-print(f"  Written to {path}")
-PYEOF
+echo ">>> 10/12 Генерация конфига OpenCode..."
+# Стек поднимается ТОЛЬКО в проектах: конфиг пишется в .opencode/opencode.json
+# папки стека. Проекты получают такой же конфиг через sync-agents.sh
+# и new-project.sh. Глобальный ~/.config/opencode стек не использует.
+bash "$STACK_DIR/gen-opencode-config.sh" "$STACK_DIR"
 
 # ═══════════════════════════════════════
 # 11. АЛИАСЫ В .zshrc

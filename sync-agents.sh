@@ -29,14 +29,20 @@ if [ ! -f "$REGISTRY" ]; then
     exit 1
 fi
 
-echo "=== Синхронизация AGENTS.md ==="
+echo "=== Синхронизация AGENTS.md и конфигов OpenCode ==="
 echo ""
 
 SYNCED=0
 CREATED=0
+CONFIGURED=0
 SKIPPED=0
 MISSING=0
 SEEN=$(mktemp)
+
+# Конфиг самого стека (для сессий в ~/stack) — перегенерируем из шаблона
+bash "$STACK_DIR/gen-opencode-config.sh" "$STACK_DIR" >/dev/null 2>&1 \
+    && echo "  ~/stack/.opencode/opencode.json: перегенерирован" \
+    || echo "  ⚠️ конфиг ~/stack не сгенерирован"
 
 while IFS= read -r project || [ -n "$project" ]; do
     # Пропускаем комментарии и пустые строки
@@ -59,6 +65,14 @@ while IFS= read -r project || [ -n "$project" ]; do
         echo "  $project: папка не найдена — пропускаю"
         MISSING=$((MISSING + 1))
         continue
+    fi
+
+    # Конфиг OpenCode (.opencode/opencode.json) — MCP/LSP стека для проекта.
+    # Стек поднимается только там, где сгенерирован этот файл.
+    if bash "$STACK_DIR/gen-opencode-config.sh" "$project" >/dev/null 2>&1; then
+        CONFIGURED=$((CONFIGURED + 1))
+    else
+        echo "  $project: ⚠️ конфиг OpenCode не сгенерирован"
     fi
 
     AGENTS="$project/AGENTS.md"
@@ -141,8 +155,9 @@ rm -f "$SEEN"
 
 echo ""
 echo "=== Готово! ==="
-echo "  Синхронизировано: $SYNCED"
-echo "  Создано: $CREATED"
+echo "  Синхронизировано AGENTS.md: $SYNCED"
+echo "  Создано AGENTS.md: $CREATED"
+echo "  Сгенерировано конфигов OpenCode: $CONFIGURED"
 echo "  Пропущено (нет маркеров): $SKIPPED"
 echo "  Не найдено (папка удалена): $MISSING"
 
