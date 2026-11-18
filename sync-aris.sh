@@ -1,5 +1,5 @@
 #!/bin/bash
-# Синхронизация ARIS-скиллов из клона в ~/.config/opencode/skills/
+# Синхронизация ARIS-скиллов из клона в ~/stack/skills-store/
 # Список скиллов: ~/stack/aris-skills.txt (единый источник правды)
 # Использование:
 #   bash sync-aris.sh            # только синхронизация
@@ -8,7 +8,7 @@
 set -uo pipefail
 
 STACK_DIR="$HOME/stack"
-SKILLS_DIR="$HOME/.config/opencode/skills"
+SKILLS_DIR="$HOME/stack/skills-store"
 ARIS_REPO="$STACK_DIR/aris-research-repo"
 ARIS_LIST="$STACK_DIR/aris-skills.txt"
 

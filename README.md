@@ -20,7 +20,7 @@ bash setup.sh
 | Playwright Chromium, Puppeteer Chrome | npx | Headless-рендер (render-visual, tldraw export) |
 | 5 MCP-серверов | git clone | Wolfram, Julia, Manim, ParaView, tldraw |
 | 6 расширений VS Code | code CLI | Просмотр файлов стека (.tldr, .ipynb, .tex, .wl, .jl, .py) |
-| 51 скилл OpenCode | npm + git + local | AI-навыки для агента |
+| ~61 скилл OpenCode | npm + git + local | AI-навыки для агента (проектные, через skills-store) |
 | LSP-серверы | встроены в OpenCode | Диагностика кода для агента |
 
 ---
@@ -45,7 +45,7 @@ bash setup.sh
 
 | Пакет | Зачем |
 |-------|-------|
-| `firecrawl-cli` | Веб-поиск, скрапинг, research (ставит 28 скиллов firecrawl) |
+| `firecrawl-cli` | Веб-поиск, скрапинг, research (ставит ~37 скиллов firecrawl) |
 | `@kitschpatrol/tldraw-cli` | Экспорт `.tldr` → PNG/SVG |
 
 ### Python venv (шаг 5)
@@ -166,16 +166,21 @@ Paclet `Wolfram/AgentTools` (MCP-интеграция Wolfram). Требует �
 
 ---
 
-## Скиллы OpenCode (51)
+## Скиллы OpenCode (~61)
 
-Хранятся глобально в `~/.config/opencode/skills/` — доступны из любого проекта.
+**Как и MCP — проектные:** скиллы собраны в хранилище `~/stack/skills-store/` и подключаются к проекту через `skills.paths` в `.opencode/opencode.json`. Вне проектов агент видит только 1 встроенный скилл OpenCode. Глобальные каталоги (`~/.config/opencode/skills`, `~/.claude/skills`, `~/.agents/skills`) опустошаются `consolidate-skills.sh` — OpenCode сканирует их всегда, отключить сканирование нельзя, поэтому скиллы физически не должны там жить.
 
-| Группа | Кол-во | Источник | Назначение |
-|--------|--------|----------|-----------|
-| **Firecrawl** | 28 | `firecrawl-cli init` (npm) | Веб-поиск, скрапинг, SEO, lead gen, market research, мониторинг |
-| **ARIS** | 14 | `aris-research-repo` через `sync-aris.sh` | Research pipeline, написание статей, планирование экспериментов |
-| **tldraw-skill** | 1 | GitHub (`Agents365-ai/tldraw-skill`) | Генерация `.tldr`-диаграмм из текста |
-| **Standalone** | 8 | `skills/` этого репозитория | См. ниже |
+Сборка хранилища (`consolidate-skills.sh`, входит в setup и update-all):
+
+| Группа | Кол-во | Источник |
+|--------|--------|----------|
+| **Firecrawl** | ~37 | `firecrawl setup skills/build/workflows` → перенос в хранилище |
+| **ARIS** | 14 | `aris-research-repo` через `sync-aris.sh` |
+| **tldraw-skill** | 1 | GitHub (`Agents365-ai/tldraw-skill`) |
+| **tldraw-offline** | 1 | перенесён из `~/.claude/skills` |
+| **Standalone** | 8 | `skills/` этого репозитория |
+
+Количество firecrawl-скиллов меняется с версиями CLI — точное число: `ls ~/stack/skills-store | wc -l`.
 
 ### Standalone-скиллы (8, хранятся в репозитории)
 
@@ -216,11 +221,11 @@ bash ~/stack/gen-opencode-config.sh ~/work/my-project   # вручную для 
 **Что получает зарегистрированный проект** (при `new-project.sh` или `sync-agents.sh`):
 
 - `AGENTS.md` — инструкции для агента (stack-секция между маркерами)
-- `.opencode/opencode.json` — MCP-серверы, LSP, плагин
+- `.opencode/opencode.json` — MCP-серверы, LSP, плагин, подключение skills-store
 
 **Вне проектов** (`opencode` в случайной папке): ни MCP, ни LSP стека не запускаются.
 
-> **Скиллы — исключение:** `~/.config/opencode/skills/` читается OpenCode глобально по своей архитектуре, поэтому 51 скилл доступен везде. Конфиг-файлы (MCP/LSP) при этом проектные.
+> Скиллы подключаются так же, как MCP: через `skills.paths` в проектном конфиге. Единственное глобальное — 2 встроенных скилла самого OpenCode (`customize-opencode`, `report`), они есть всегда.
 
 Обновление конфигов всех проектов: `bash ~/stack/sync-agents.sh` (входит в `update-all.sh`, шаг 12).
 
@@ -276,13 +281,14 @@ npx puppeteer browsers install "chrome@$VER"
 ├── check-all.sh                 # Проверка работоспособности
 ├── sync-agents.sh               # Синхронизация AGENTS.md в проекты
 ├── sync-aris.sh                 # Синхронизация ARIS-скиллов
+├── consolidate-skills.sh        # Сборка skills-store + очистка глобальных каталогов
 ├── new-project.sh               # Создание/регистрация проекта
 ├── gen-opencode-config.sh       # Генератор .opencode/opencode.json (MCP/LSP)
 ├── chrome-version.sh            # Определение версии Chrome под tldraw
 ├── check-wolfram-license.sh     # Проверка лицензии Wolfram
 ├── projects.txt                 # Реестр проектов (по одному пути на строку)
 ├── aris-skills.txt              # Список ARIS-скиллов (14)
-├── skills/                      # 8 standalone-скиллов
+├── skills/                      # 8 standalone-скиллов (источник)
 └── WolframLanguage/             # Пользовательские Wolfram-пакеты
 ```
 
@@ -300,7 +306,7 @@ npx puppeteer browsers install "chrome@$VER"
 cd ~/stack && bash update-all.sh
 ```
 
-13 шагов: git-репозиторий → brew → внешние репо → сборка tldraw-mcp → Python venv → npm CLI + Chrome → ARIS-скиллы → standalone-скиллы → Julia (с миграцией окружения) → Wolfram → проверка → синхронизация AGENTS.md **и конфигов OpenCode** во все проекты → напоминание о перезапуске.
+13 шагов: git-репозиторий → brew → внешние репо → сборка tldraw-mcp → Python venv → npm CLI + Chrome → ARIS-скиллы → консолидация скиллов (skills-store) → Julia (с миграцией окружения) → Wolfram → проверка → синхронизация AGENTS.md **и конфигов OpenCode** во все проекты → напоминание о перезапуске.
 
 > **После обновления перезапусти OpenCode** — MCP-серверы и скиллы подхватятся только при старте сессии.
 

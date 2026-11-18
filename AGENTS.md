@@ -84,7 +84,7 @@
 ### OpenCode
 - Конфиг MCP: .opencode/opencode.json проекта (генерируется gen-opencode-config.sh; глобально стек не поднимается — MCP/LSP живут только в проектах из projects.txt)
 - LSP включён (`"lsp": true`): диагностика pyright (.py), bash-language-server (.sh), julials (.jl) — ошибки кода приходят в цикл агента. Отключается удалением поля "lsp" из конфига.
-- Skills: ARIS research pipeline, Firecrawl, render-visual, xlsx, data-analysis, grill-me, tldraw-skill, epistemic-rigor, deep-mind, dag-hallucination-detector, и др. (51 скилл, полный список в ~/.config/opencode/skills/)
+- Skills: ARIS research pipeline, Firecrawl, render-visual, xlsx, data-analysis, grill-me, tldraw-skill, epistemic-rigor, deep-mind, dag-hallucination-detector, и др. (51 скилл, хранилище: ~/stack/skills-store (проектные, через skills.paths))
 - ARIS работает в local-only режиме: внешние Codex/Oracle/manual-review MCP не используются и не считаются доступными.
 - Для многораундовой проверки используются локальные OpenCode subagents; результат нельзя называть независимой cross-model экспертизой.
 - Для исследовательских утверждений явно разделять verified, inferred и unknown; отсутствие источника не считать подтверждением.

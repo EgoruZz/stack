@@ -138,5 +138,21 @@ else
     echo "❌ не найден"
 fi
 
+# Хранилище скиллов
+echo -n "Skills store: "
+if [ -d ~/stack/skills-store ]; then
+    N=$(ls ~/stack/skills-store | wc -l | tr -d ' ')
+    GLOBAL=$(ls ~/.config/opencode/skills 2>/dev/null | wc -l | tr -d ' ')
+    if [ "$N" -ge 50 ] && [ "$GLOBAL" -eq 0 ]; then
+        echo "✅ $N скиллов (глобальные каталоги чисты)"
+    elif [ "$N" -lt 50 ]; then
+        echo "⚠️ только $N скиллов — запусти: bash ~/stack/consolidate-skills.sh"
+    else
+        echo "⚠️ в ~/.config/opencode/skills $GLOBAL скиллов — запусти: bash ~/stack/consolidate-skills.sh"
+    fi
+else
+    echo "❌ ~/stack/skills-store не найден"
+fi
+
 echo ""
 echo "=== Готово ==="

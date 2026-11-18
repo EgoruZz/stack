@@ -25,3 +25,6 @@ __pycache__/
 
 # OpenCode local config
 .opencode/
+
+# Skills runtime store (assembled from skills/, ARIS clone, firecrawl)
+skills-store/

@@ -7,7 +7,6 @@
 set -uo pipefail
 
 STACK_DIR="$HOME/stack"
-SKILLS_DIR="$HOME/.config/opencode/skills"
 
 echo "============================================"
 echo "  Обновление стека"
@@ -113,6 +112,14 @@ npm install -g --allow-scripts=puppeteer firecrawl-cli@latest @kitschpatrol/tldr
 echo "  firecrawl-cli: $(firecrawl --version 2>/dev/null || echo 'не установлен')"
 echo "  tldraw CLI: $(tldraw --version 2>/dev/null || echo 'не установлен')"
 
+# Firecrawl: обновление скиллов (core + build + workflows) из свежего CLI.
+# Ставятся во временные глобальные каталоги — consolidate-skills.sh (шаг 8)
+# переносит их в ~/stack/skills-store и очищает глобальные каталоги.
+echo "  Firecrawl skills..."
+firecrawl setup skills >/dev/null 2>&1 || true
+firecrawl setup build >/dev/null 2>&1 || true
+firecrawl setup workflows >/dev/null 2>&1 || true
+
 # Chrome под tldraw export — версия берётся из пина установленного tldraw-cli
 CHROME_VER=$(bash "$STACK_DIR/chrome-version.sh" 2>/dev/null)
 if [ -n "$CHROME_VER" ]; then
@@ -143,10 +150,8 @@ echo ""
 # 8. STANDALONE SKILLS
 # ═══════════════════════════════════════
 
-echo ">>> 8/13 Standalone skills..."
-mkdir -p "$SKILLS_DIR"
-cp -r "$STACK_DIR/skills/"* "$SKILLS_DIR/" 2>/dev/null
-echo "  Standalone skills скопированы"
+echo ">>> 8/13 Skills (консолидация в ~/stack/skills-store)..."
+bash "$STACK_DIR/consolidate-skills.sh" || echo "  Консолидация: пропущена"
 echo ""
 
 # ═══════════════════════════════════════

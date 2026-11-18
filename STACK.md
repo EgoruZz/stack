@@ -500,7 +500,7 @@ MCP скриншоты не доступны. Договорённость:
 - `dag-hallucination-detector` — проверка цитат, URL, статистики и противоречий
 - `aris-research-pipeline` — research pipeline в local-only режиме
 - `firecrawl-*` — live web research, scraping и workflow deliverables
-- Полный список: `ls ~/.config/opencode/skills/` (50+ скиллов)
+- Хранилище: `ls ~/stack/skills-store` (~61 скилл, проектные)
 
 ### Ограничения research pipeline
 - Codex CLI/MCP намеренно не установлен: он не нужен для обычной работы и может требовать отдельную оплату/авторизацию.
@@ -511,7 +511,7 @@ MCP скриншоты не доступны. Договорённость:
 ```bash
 # render-visual использует Chromium из Playwright
 CHROME_PATH="$HOME/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell" \
-  node ~/.config/opencode/skills/render-visual/scripts/doctor.mjs
+  node ~/stack/skills-store/render-visual/scripts/doctor.mjs
 
 # tldraw CLI
 ```

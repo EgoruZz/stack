@@ -146,40 +146,19 @@ fi
 echo ""
 
 # ═══════════════════════════════════════
-# 8. SKILLS
+# 8. SKILLS (хранилище ~/stack/skills-store)
 # ═══════════════════════════════════════
 
-echo ">>> 8/12 Skills..."
-mkdir -p "$HOME/.config/opencode/skills"
-
-# 8a. Firecrawl skills (28) — уже установлены через firecrawl-cli init
-
-# 8b. ARIS skills (14) — из списка aris-skills.txt через sync-aris.sh
+echo ">>> 8/12 Skills (консолидация в ~/stack/skills-store)..."
+# Firecrawl-скиллы поставлены firecrawl-cli init (шаг 5) — переносятся
+# в хранилище. Глобальные каталоги скиллов опустошаются: скиллы видны
+# только в проектах (подключаются через skills.paths в конфиге).
 if [ -d "$STACK_DIR/aris-research-repo" ]; then
     bash "$STACK_DIR/sync-aris.sh" || echo "  ARIS: синхронизация пропущена"
 else
     echo "  ARIS: клон не найден, пропускаю"
 fi
-
-# 8c. tldraw-skill — из GitHub (или из skills/ если репо недоступен)
-if [ ! -d "$HOME/.config/opencode/skills/tldraw-skill" ]; then
-    if git clone --depth 1 https://github.com/Agents365-ai/tldraw-skill.git /tmp/tldraw-skill-repo 2>/dev/null; then
-        cp -r /tmp/tldraw-skill-repo "$HOME/.config/opencode/skills/tldraw-skill"
-        rm -rf /tmp/tldraw-skill-repo
-        echo "  tldraw-skill установлен из GitHub"
-    elif [ -d "$STACK_DIR/skills/tldraw-skill" ]; then
-        cp -r "$STACK_DIR/skills/tldraw-skill" "$HOME/.config/opencode/skills/tldraw-skill"
-        echo "  tldraw-skill установлен из skills/ (GitHub недоступен)"
-    else
-        echo "  tldraw-skill: пропущен (ни GitHub, ни локальная копия)"
-    fi
-else
-    echo "  tldraw-skill уже существует"
-fi
-
-# 8d. Standalone skills (8) — из репозитория
-cp -r "$STACK_DIR/skills/"* "$HOME/.config/opencode/skills/"
-echo "  Standalone skills скопированы"
+bash "$STACK_DIR/consolidate-skills.sh"
 
 # ═══════════════════════════════════════
 # 9. JULIA ПАКЕТЫ
