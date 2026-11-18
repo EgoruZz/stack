@@ -207,7 +207,7 @@ Paclet `Wolfram/AgentTools` (MCP-интеграция Wolfram). Требует �
 
 | Файл | Кто создаёт | Что содержит |
 |------|-------------|--------------|
-| `<проект>/.opencode/opencode.json` | `sync-agents.sh` и `new-project.sh` | `plugin`, `lsp`, 5 `mcp`-серверов |
+| `<проект>/.opencode/opencode.json` | `sync-agents.sh` и `new-project.sh` | `lsp`, `skills.paths`, 5 `mcp`-серверов |
 | `~/stack/.opencode/opencode.json` | `setup.sh` (шаг 10) | то же — для сессий в самом стеке |
 
 Один источник шаблона — `gen-opencode-config.sh [директория]`:
@@ -221,7 +221,9 @@ bash ~/stack/gen-opencode-config.sh ~/work/my-project   # вручную для 
 **Что получает зарегистрированный проект** (при `new-project.sh` или `sync-agents.sh`):
 
 - `AGENTS.md` — инструкции для агента (stack-секция между маркерами)
-- `.opencode/opencode.json` — MCP-серверы, LSP, плагин, подключение skills-store
+- `.opencode/opencode.json` — MCP-серверы, LSP, подключение skills-store
+
+> **Про плагин firecrawl:** в конфиге стека **нет** поля `plugin` — пакет `opencode-firecrawl` не существует на npm (404), это была битая ссылка, и OpenCode из-за неё разворачивал ~62 МБ зависимостей в глобальном каталоге. Интеграция firecrawl работает через CLI + скиллы. Если когда-нибудь захочется плагинный уровень — есть сторонний `opencode-firecrawl-ng` (npm, сторонний автор).
 
 **Вне проектов** (`opencode` в случайной папке): ни MCP, ни LSP стека не запускаются.
 
