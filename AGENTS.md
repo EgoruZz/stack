@@ -26,7 +26,7 @@
 | `check-wolfram-license.sh` | Срок лицензии Wolfram |
 | `projects.txt` | Реестр проектов (по одному пути на строку) |
 | `aris-skills.txt` | Список из 14 ARIS-скиллов |
-| `skills/` | 9 скиллов-источников (8 standalone + tldraw-skill) |
+| `skills/` | 8 standalone-скиллов (источник) |
 | `skills-store/` | Runtime-хранилище ~61 скилла (gitignored, генерируется) |
 | `WolframLanguage/` | Пользовательские Wolfram-пакеты |
 | `paraview-mcp/`, `manim-mcp/`, `julia-mcp/`, `tldraw-mcp/`, `aris-research-repo/`, `WolframLanguageForJupyter/` | Клонированные внешние репозитории (gitignored) |
@@ -89,7 +89,6 @@
 - **tldraw MCP** — управление canvas через MCP (30 инструментов)
 - MCP сервер: `tldraw` (в .opencode/opencode.json проекта)
 - Сервер: ~/stack/tldraw-mcp/ (Node.js, zero browser deps)
-- Скилл: `tldraw-skill` — генерация .tldr диаграмм из текста (6 presets, vision self-check)
 - Инструменты: create_geo, create_text, create_arrow, create_note, create_frame, move_shapes, group_shapes, set_camera, save_document, load_document и др.
 - Экспорт: `.tldr` → PNG/SVG через `@kitschpatrol/tldraw-cli`; после обновления CLI нужно проверять совместимость схемы MCP-файлов.
 - Текущий MCP надёжно создаёт/сохраняет `.tldr` и редактирует документ; live-синхронизация с уже открытым desktop canvas не гарантируется.
@@ -109,14 +108,14 @@
 ### OpenCode
 - Конфиг MCP: .opencode/opencode.json проекта (генерируется gen-opencode-config.sh; глобально стек не поднимается — MCP/LSP живут только в проектах из projects.txt)
 - LSP включён (`"lsp": true`): диагностика pyright (.py), bash-language-server (.sh), julials (.jl) — ошибки кода приходят в цикл агента. Отключается удалением поля "lsp" из конфига.
-- Skills: ARIS research pipeline, Firecrawl, render-visual, xlsx, data-analysis, grill-me, tldraw-skill, epistemic-rigor, deep-mind, dag-hallucination-detector, и др. (~61 скилл, хранилище: ~/stack/skills-store (проектные, через skills.paths))
+- Skills: ARIS research pipeline, Firecrawl, render-visual, xlsx, data-analysis, grill-me, epistemic-rigor, deep-mind, dag-hallucination-detector, и др. (~61 скилл, хранилище: ~/stack/skills-store (проектные, через skills.paths))
 - ARIS работает в local-only режиме: внешние Codex/Oracle/manual-review MCP не используются и не считаются доступными.
 - Для многораундовой проверки используются локальные OpenCode subagents; результат нельзя называть независимой cross-model экспертизой.
 - Для исследовательских утверждений явно разделять verified, inferred и unknown; отсутствие источника не считать подтверждением.
 
 ### Визуализация и маршрутизация
 - `render-visual` — polished PNG/SVG/PDF, слайды, архитектурные схемы и GIF через headless Chromium.
-- `tldraw-skill` + tldraw MCP — редактируемые whiteboard `.tldr` документы и shapes.
+- tldraw MCP — редактируемые whiteboard `.tldr` документы и shapes.
 - Если нужен data chart из числового набора, использовать `data-analysis`/matplotlib/plotly, а не schematic `render-visual` charts.
 - Если запрос неоднозначен между tldraw и render-visual, сначала уточнить нужный результат: редактируемый canvas или финальная картинка.
 

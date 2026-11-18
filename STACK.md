@@ -492,7 +492,6 @@ MCP скриншоты не доступны. Договорённость:
 
 ### Skills (установлены)
 - `render-visual` — polished PNG/SVG/PDF, слайды, схемы и GIF
-- `tldraw-skill` — редактируемые `.tldr` whiteboard-диаграммы
 - `xlsx` — Excel/CSV/TSV с формулами и проверкой
 - `data-analysis` — EDA, визуализация данных, отчёты и гипотезы
 - `grill-me` — проверка планов и скрытых допущений

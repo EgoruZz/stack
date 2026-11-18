@@ -5,7 +5,7 @@
 ![платформа](https://img.shields.io/badge/платформа-macOS-black)
 ![агент](https://img.shields.io/badge/AI--агент-OpenCode-1F6FEB)
 ![MCP](https://img.shields.io/badge/MCP--серверы-5-2EA043)
-![скиллы](https://img.shields.io/badge/скиллы-~61-E16F24)
+![скиллы](https://img.shields.io/badge/скиллы-60-E16F24)
 ![VS_Code](https://img.shields.io/badge/расширения_VS_Code-6-8250DF)
 ![CLI](https://img.shields.io/badge/CLI--инструменты-10-0969DA)
 ![обновление](https://img.shields.io/badge/обновление-update--all.sh-D29922)
@@ -94,7 +94,7 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | `wolframresearch.wolfram` | `.wl` |
 | `james-yu.latex-workshop` | `.tex` — компиляция + PDF-превью |
 
-### 🎯 Скиллы OpenCode (~61)
+### 🎯 Скиллы OpenCode (60)
 
 Собираются в хранилище `~/stack/skills-store/` и подключаются к проектам через `skills.paths` — **вне проектов агент видит только 1 встроенный скилл**.
 
@@ -102,12 +102,11 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 |--------|---------|----------|
 | Firecrawl — веб-research, скрапинг, SEO | 37 | `firecrawl setup skills/build/workflows` |
 | ARIS — research pipeline, статьи, эксперименты | 14 | клон ARIS → `sync-aris.sh` |
-| `tldraw-skill` — генерация `.tldr` из текста | 1 | этот репозиторий *(оригинал на GitHub удалён)* |
 | `tldraw-offline` — управление открытым tldraw Desktop | 1 | ставит само приложение |
 | Standalone — см. `skills/` репозитория | 8 | этот репозиторий |
 
 <details>
-<summary><b>8 standalone-скиллов поимённо</b> · +`tldraw-skill` тоже хранится в репозитории</summary>
+<summary><b>8 standalone-скиллов поимённо</b></summary>
 
 | Скилл | Назначение |
 |-------|-----------|
@@ -223,7 +222,7 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 │
 ├── projects.txt                 # 📋 Реестр проектов
 ├── aris-skills.txt              # 📚 Список 14 ARIS-скиллов
-├── skills/                      # 🎯 9 скиллов-источников (8 standalone + tldraw-skill)
+├── skills/                      # 🎯 8 standalone-скиллов (источник)
 ├── skills-store/                # 🗃 Собранные ~61 скилл (gitignored)
 ├── WolframLanguage/             # 🐺 Пользовательские Wolfram-пакеты
 │
