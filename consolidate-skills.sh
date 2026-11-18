@@ -17,7 +17,7 @@ ARIS_LIST="$STACK_DIR/aris-skills.txt"
 
 mkdir -p "$STORE"
 
-# ── 1. Standalone-скиллы из репозитория (8) ──
+# ── 1. Скиллы-источники из репозитория (8 standalone + tldraw-skill) ──
 cp -R "$STACK_DIR/skills/"* "$STORE/" 2>/dev/null || true
 
 # ── 2. ARIS-скиллы из клона (список aris-skills.txt) ──

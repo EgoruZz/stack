@@ -16,11 +16,6 @@ set -euo pipefail
 
 TARGET="${1:-$HOME/stack}"
 
-if [ ! -d "$TARGET" ]; then
-    echo "ОШИБКА: директория не найдена: $TARGET"
-    exit 1
-fi
-
 mkdir -p "$TARGET/.opencode"
 
 cat > "$TARGET/.opencode/opencode.json" << 'CONF'
