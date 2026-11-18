@@ -96,6 +96,24 @@ else
     echo "❌ не найден"
 fi
 
+# VS Code расширения стека
+echo -n "VS Code ext: "
+if command -v code >/dev/null 2>&1; then
+    VS_EXTS=$(code --list-extensions 2>/dev/null)
+    MISSING_EXT=""
+    for ext in tldraw-org.tldraw-vscode ms-python.python ms-toolsai.jupyter \
+               julialang.language-julia wolframresearch.wolfram james-yu.latex-workshop; do
+        echo "$VS_EXTS" | grep -qix "$ext" || MISSING_EXT="$MISSING_EXT $ext"
+    done
+    if [ -z "$MISSING_EXT" ]; then
+        echo "✅ 6/6"
+    else
+        echo "⚠️ не хватает:$MISSING_EXT"
+    fi
+else
+    echo "❌ code CLI не найден"
+fi
+
 # OpenCode
 echo -n "OpenCode: "
 if command -v opencode >/dev/null 2>&1; then

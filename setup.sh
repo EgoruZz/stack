@@ -12,7 +12,7 @@ echo ""
 # 1. СИСТЕМНЫЕ ЗАВИСИМОСТИ
 # ═══════════════════════════════════════
 
-echo ">>> 1/11 Homebrew..."
+echo ">>> 1/12 Homebrew..."
 if ! command -v brew &>/dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
@@ -24,7 +24,7 @@ brew install python@3.12 node julia
 # 2. ВНЕШНИЕ MCP РЕПОЗИТОРИИ
 # ═══════════════════════════════════════
 
-echo ">>> 2/11 Клонирование MCP серверов..."
+echo ">>> 2/12 Клонирование MCP серверов..."
 cd "$STACK_DIR"
 
 clone_if_missing() {
@@ -47,7 +47,7 @@ clone_if_missing https://github.com/WolframResearch/WolframLanguageForJupyter.gi
 # 3. PYTHON VENV
 # ═══════════════════════════════════════
 
-echo ">>> 3/11 Python venv..."
+echo ">>> 3/12 Python venv..."
 
 create_venv() {
     local name=$1; shift
@@ -89,7 +89,7 @@ echo "  julia-mcp-env готов"
 # 4. NODE.JS ЗАВИСИМОСТИ
 # ═══════════════════════════════════════
 
-echo ">>> 4/11 tldraw MCP..."
+echo ">>> 4/12 tldraw MCP..."
 cd "$STACK_DIR/tldraw-mcp"
 npm install
 npm run build
@@ -98,7 +98,7 @@ npm run build
 # 5. GLOBAЛЬНЫЕ CLI
 # ═══════════════════════════════════════
 
-echo ">>> 5/11 CLI инструменты..."
+echo ">>> 5/12 CLI инструменты..."
 
 echo "  Firecrawl CLI..."
 npx -y firecrawl-cli@latest init -y --browser || echo "  Firecrawl: init пропущен (выполни вручную: firecrawl init)"
@@ -110,7 +110,7 @@ npm install -g --allow-scripts=puppeteer @kitschpatrol/tldraw-cli
 # 6. BROWSER ДЛЯ RENDERS
 # ═══════════════════════════════════════
 
-echo ">>> 6/11 Browser для render-visual и tldraw export..."
+echo ">>> 6/12 Browser для render-visual и tldraw export..."
 echo "  Installing Playwright Chromium..."
 npx -y playwright install chromium 2>/dev/null || echo "  Playwright: установи вручную (npx playwright install chromium)"
 echo "  Installing Puppeteer Chrome..."
@@ -122,22 +122,46 @@ else
 fi
 
 # ═══════════════════════════════════════
-# 7. SKILLS
+# 7. VS CODE РАСШИРЕНИЯ
 # ═══════════════════════════════════════
 
-echo ">>> 7/11 Skills..."
+echo ">>> 7/12 VS Code расширения..."
+if command -v code &>/dev/null; then
+    # Расширения стека: просмотр файлов (.tldr, .ipynb, .tex, .wl, .jl, .py)
+    # и языковая поддержка. code --install-extension идемпотентен.
+    for ext in \
+        tldraw-org.tldraw-vscode \
+        ms-python.python \
+        ms-toolsai.jupyter \
+        julialang.language-julia \
+        wolframresearch.wolfram \
+        james-yu.latex-workshop; do
+        code --install-extension "$ext" --force >/dev/null 2>&1 \
+            && echo "  $ext: ✅" \
+            || echo "  $ext: ⚠️ не установилось (проверь VS Code CLI)"
+    done
+else
+    echo "  VS Code CLI (code) не найден — пропускаю (установи VS Code и повтори)"
+fi
+echo ""
+
+# ═══════════════════════════════════════
+# 8. SKILLS
+# ═══════════════════════════════════════
+
+echo ">>> 8/12 Skills..."
 mkdir -p "$HOME/.config/opencode/skills"
 
-# 7a. Firecrawl skills (28) — уже установлены через firecrawl-cli init
+# 8a. Firecrawl skills (28) — уже установлены через firecrawl-cli init
 
-# 7b. ARIS skills (14) — из списка aris-skills.txt через sync-aris.sh
+# 8b. ARIS skills (14) — из списка aris-skills.txt через sync-aris.sh
 if [ -d "$STACK_DIR/aris-research-repo" ]; then
     bash "$STACK_DIR/sync-aris.sh" || echo "  ARIS: синхронизация пропущена"
 else
     echo "  ARIS: клон не найден, пропускаю"
 fi
 
-# 7c. tldraw-skill — из GitHub (или из skills/ если репо недоступен)
+# 8c. tldraw-skill — из GitHub (или из skills/ если репо недоступен)
 if [ ! -d "$HOME/.config/opencode/skills/tldraw-skill" ]; then
     if git clone --depth 1 https://github.com/Agents365-ai/tldraw-skill.git /tmp/tldraw-skill-repo 2>/dev/null; then
         cp -r /tmp/tldraw-skill-repo "$HOME/.config/opencode/skills/tldraw-skill"
@@ -153,30 +177,31 @@ else
     echo "  tldraw-skill уже существует"
 fi
 
-# 7d. Standalone skills (8) — из репозитория
+# 8d. Standalone skills (8) — из репозитория
 cp -r "$STACK_DIR/skills/"* "$HOME/.config/opencode/skills/"
 echo "  Standalone skills скопированы"
 
 # ═══════════════════════════════════════
-# 8. JULIA ПАКЕТЫ
+# 9. JULIA ПАКЕТЫ
 # ═══════════════════════════════════════
 
-echo ">>> 8/11 Julia пакеты..."
+echo ">>> 9/12 Julia пакеты..."
 julia -e '
 using Pkg
 Pkg.add([
     "LinearAlgebra", "SparseArrays", "Plots", "DifferentialEquations",
     "StaticArrays", "Optim", "JuMP", "IJulia", "Flux", "Turing",
     "DataFrames", "CSV", "ForwardDiff", "SymPy", "SpecialFunctions",
-    "StatsBase", "Distributions", "Polynomials", "FFTW", "IterativeSolvers"
+    "StatsBase", "Distributions", "Polynomials", "FFTW", "IterativeSolvers",
+    "LanguageServer"
 ])
 ' 2>/dev/null || echo "  Julia: установка пакетов пропущена (повтори вручную: julia → Pkg.add(...))"
 
 # ═══════════════════════════════════════
-# 9. OPENCODE КОНФИГ
+# 10. OPENCODE КОНФИГ
 # ═══════════════════════════════════════
 
-echo ">>> 9/11 Генерация opencode.jsonc..."
+echo ">>> 10/12 Генерация opencode.jsonc..."
 mkdir -p "$HOME/.config/opencode"
 
 python3 << 'PYEOF'
@@ -188,6 +213,7 @@ stack = os.path.join(home, "stack")
 config = {
     "$schema": "https://opencode.ai/config.json",
     "plugin": ["opencode-firecrawl"],
+    "lsp": True,
     "mcp": {
         "Wolfram": {
             "type": "local",
@@ -239,10 +265,10 @@ print(f"  Written to {path}")
 PYEOF
 
 # ═══════════════════════════════════════
-# 10. АЛИАСЫ В .zshrc
+# 11. АЛИАСЫ В .zshrc
 # ═══════════════════════════════════════
 
-echo ">>> 10/11 Алиасы..."
+echo ">>> 11/12 Алиасы..."
 if ! grep -q "Stack Aliases" "$HOME/.zshrc" 2>/dev/null; then
     cat >> "$HOME/.zshrc" << 'ALIASES'
 
@@ -260,11 +286,11 @@ else
 fi
 
 # ═══════════════════════════════════════
-# 11. ПРОВЕРКА
+# 12. ПРОВЕРКА
 # ═══════════════════════════════════════
 
 echo ""
-echo ">>> 11/11 Проверка стека..."
+echo ">>> 12/12 Проверка стека..."
 bash "$STACK_DIR/check-all.sh"
 
 echo ""

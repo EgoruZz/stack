@@ -3,7 +3,9 @@
 # Читает реестр из ~/stack/projects.txt (по одному пути на строку)
 # Заменяет ТОЛЬКО содержимое между STACK:START и STACK:END
 # Проект-специфичное содержимое сохраняется
-# Запуск: cd ~/stack && bash sync-agents.sh
+# Использование:
+#   bash sync-agents.sh              # синхронизация + подсказка о перезапуске
+#   bash sync-agents.sh --no-hint    # без подсказки (для вызова из update-all.sh)
 
 set -uo pipefail
 
@@ -143,6 +145,10 @@ echo "  Синхронизировано: $SYNCED"
 echo "  Создано: $CREATED"
 echo "  Пропущено (нет маркеров): $SKIPPED"
 echo "  Не найдено (папка удалена): $MISSING"
-echo ""
-echo "ВАЖНО: Перезапусти OpenCode для применения изменений!"
-echo "  Закрой все открытые сессии OpenCode и запусти заново."
+
+# Подсказка о перезапуске (скрывается флагом --no-hint для update-all.sh)
+if [ "${1:-}" != "--no-hint" ]; then
+    echo ""
+    echo "ВАЖНО: Перезапусти OpenCode для применения изменений!"
+    echo "  Закрой все открытые сессии OpenCode и запусти заново."
+fi
