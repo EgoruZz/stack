@@ -31,7 +31,16 @@ if [ -d "$ARIS_REPO/skills" ] && [ -f "$ARIS_LIST" ]; then
     done < "$ARIS_LIST"
 fi
 
-# ── 3. tldraw-skill (GitHub или перенос из глобального) ──
+# ── 3. tldraw-скиллы ──
+# tldraw-offline: канонический источник — ~/skills/tldraw-offline (ставится
+# приложением tldraw Desktop вместе с хелпером tq.mjs; SKILL.md ссылается
+# именно на этот путь).
+if [ -d "$HOME/skills/tldraw-offline" ]; then
+    rsync -aL "$HOME/skills/tldraw-offline/" "$STORE/tldraw-offline/" 2>/dev/null
+elif [ ! -d "$STORE/tldraw-offline" ] && [ -d "$HOME/.config/opencode/skills/tldraw-offline" ]; then
+    mv "$HOME/.config/opencode/skills/tldraw-offline" "$STORE/tldraw-offline"
+fi
+# tldraw-skill: GitHub или перенос из глобального
 if [ ! -d "$STORE/tldraw-skill" ]; then
     if [ -d "$HOME/.config/opencode/skills/tldraw-skill" ]; then
         mv "$HOME/.config/opencode/skills/tldraw-skill" "$STORE/tldraw-skill"

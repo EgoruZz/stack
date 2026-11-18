@@ -6,6 +6,31 @@
 Весь стэк находится в ~/stack/
 Запускай OpenCode отсюда: `cd ~/stack && opencode`
 
+### Карта репозитория ~/stack
+
+| Файл / папка | Назначение |
+|--------------|-----------|
+| `AGENTS.md` | Инструкции агента (этот файл — источник для проектов) |
+| `README.md` | Документация для людей (обзор, оглавление) |
+| `STACK.md` | Полная документация: хоткеи, примеры, ссылки |
+| `workflow.txt` | Правила git-workflow (ветка → PR → merge) |
+| `setup.sh` | Установка на чистую macOS (12 шагов) |
+| `update-all.sh` | Полное обновление стека (13 шагов) |
+| `check-all.sh` | Проверка работоспособности всех компонентов |
+| `new-project.sh` | Создать/зарегистрировать проект (AGENTS.md + конфиг) |
+| `sync-agents.sh` | Синхронизация AGENTS.md + конфигов во все проекты |
+| `gen-opencode-config.sh` | Генератор `.opencode/opencode.json` (MCP/LSP/skills) |
+| `sync-aris.sh` | ARIS-скиллы → skills-store (список из aris-skills.txt) |
+| `consolidate-skills.sh` | Сборка skills-store + очистка глобальных каталогов |
+| `chrome-version.sh` | Версия Chrome под пин tldraw-cli |
+| `check-wolfram-license.sh` | Срок лицензии Wolfram |
+| `projects.txt` | Реестр проектов (по одному пути на строку) |
+| `aris-skills.txt` | Список из 14 ARIS-скиллов |
+| `skills/` | 8 standalone-скиллов (источник) |
+| `skills-store/` | Runtime-хранилище ~61 скилла (gitignored, генерируется) |
+| `WolframLanguage/` | Пользовательские Wolfram-пакеты |
+| `paraview-mcp/`, `manim-mcp/`, `julia-mcp/`, `tldraw-mcp/`, `aris-research-repo/`, `WolframLanguageForJupyter/` | Клонированные внешние репозитории (gitignored) |
+
 ### Wolfram Language
 - **Wolfram Engine** — бесплатная лицензия для разработчиков
 - Запуск: `wolframscript`

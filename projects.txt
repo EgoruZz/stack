@@ -4,3 +4,4 @@
 
 /Users/egorsergeev/learn
 /Users/egorsergeev/projects/project1
+/Users/egorsergeev/business-modeling
