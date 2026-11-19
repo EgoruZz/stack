@@ -50,7 +50,7 @@ else
     echo "📄 AGENTS.md уже существует (синхронизация обновит stack-секцию)"
 fi
 
-# Генерируем конфиг OpenCode (.opencode/opencode.json) — MCP/LSP стека
+# Генерируем конфиг OpenCode (.opencode/opencode.json) — MCP/skills стека
 bash "$STACK_DIR/gen-opencode-config.sh" "$PROJECT_DIR"
 echo "🔧 Конфиг OpenCode сгенерирован (стек поднимется в этом проекте)"
 

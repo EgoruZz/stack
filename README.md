@@ -8,7 +8,6 @@
 ![скиллы](https://img.shields.io/badge/скиллы-60-E16F24)
 ![VS_Code](https://img.shields.io/badge/расширения_VS_Code-6-8250DF)
 ![CLI](https://img.shields.io/badge/CLI--инструменты-10-0969DA)
-![обновление](https://img.shields.io/badge/обновление-update--all.sh-D29922)
 
 [![AGENTS.md](https://img.shields.io/badge/🤖_карта_и_конвенции-AGENTS.md-1F6FEB)](AGENTS.md)
 [![STACK.md](https://img.shields.io/badge/📖_полная_дока-STACK.md-1F6FEB)](STACK.md)
@@ -66,7 +65,7 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | `jupyter-env` — JupyterLab, numpy, pandas, sympy, plotly… | pip venv | шаг 5 |
 | `paraview-mcp-env`, `julia-mcp-env` — MCP SDK | pip venv | шаг 5 |
 | Playwright Chromium · Puppeteer Chrome *(headless, версия авто)* | `npx … install` | шаг 6 |
-| Julia + 21 пакет *(вкл. LanguageServer для LSP)* | `juliaup` + `Pkg.add` | шаг 9 |
+| Julia + 21 пакет | `juliaup` + `Pkg.add` | шаг 9 |
 | Wolfram AgentTools (paclet) | `PacletInstall` | шаг 10 |
 | 6 внешних репозиториев MCP | `git clone --depth 1` | шаг 3 |
 | сборка `tldraw-mcp` | `npm install && npm run build` | шаг 4 |
@@ -146,33 +145,33 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | Файл | Содержимое |
 |------|-----------|
 | `AGENTS.md` | Инструкции агента: карта стека, MCP-инструменты, конвенции |
-| `.opencode/opencode.json` | `mcp` ×5 · `lsp: true` · `skills.paths` → skills-store |
+| `.opencode/opencode.json` | `mcp` ×5 · `skills.paths` → skills-store |
 
 | Факт | Детали |
 |------|--------|
 | 🔌 **Переносимость** | Пути в конфиге через `{env:HOME}` — файл переносим между машинами и коммитобезопасен |
 | 📋 **Реестр проектов** | `~/stack/projects.txt` — по одному пути на строку |
 | 🔁 **Синхронизация** | `bash ~/stack/sync-agents.sh` перегенерирует AGENTS.md + конфиги во всех проектах (входит в `update-all.sh`, шаг 12); проект-специфичный контент AGENTS.md **вне маркеров** `<!-- STACK:START -->…<!-- STACK:END -->` сохраняется |
-| 🧠 **LSP включён** | При открытии файла OpenCode поднимает языковой сервер и получает ошибки в свой цикл: `pyright` (`.py`), `bash-language-server` (`.sh`), `julials` (`.jl`), typescript и др. Отключение: убрать поле `lsp` · Проверка: `opencode debug lsp diagnostics <файл>` · [docs](https://opencode.ai/docs/lsp) |
-| 🚫 **Вне проектов** | Ни MCP, ни скиллов, ни LSP. Глобальный каталог `~/.config/opencode/` пуст (OpenCode сам создаёт там лишь 2 файла-стаба) |
+| 🧠 **Диагностика — через запуск** | OpenCode v2 не имеет LSP: агент получает ошибки кода, запуская линтеры/компиляторы/тесты напрямую (`bash -n`, `python`, `npm run build`, `pdflatex`) — честные ошибки сборки |
+| 🚫 **Вне проектов** | Ни MCP, ни скиллов. Глобальный каталог `~/.config/opencode/` пуст (OpenCode сам создаёт там лишь 2 файла-стаба) |
 | 🚫 **Без поля `plugin`** | Пакет `opencode-firecrawl` не существует на npm (404); раньше его строка разворачивала ~62 МБ зависимостей в глобальном каталоге. Понадобится плагинный уровень — есть сторонний `opencode-firecrawl-ng` |
 
 ## 👀 Файлы: пользователь vs ИИ-агент
 
-Стек даёт **двойной контроль** над файлами, и эти два мира не конфликтуют: LSP VS Code (Pylance) и LSP OpenCode (pyright) — независимые процессы для разных потребителей.
+Стек даёт **двойной контроль** над файлами. Ты — через расширения VS Code (с их LSP: Pylance и др.), агент — через чтение файлов и запуск инструментов.
 
 | Файл | 👤 Ты — в VS Code | 🤖 Агент — в OpenCode |
 |------|-------------------|------------------------|
 | `.tldr` | Рисуешь на холсте во вкладке | Читает JSON; создаёт через tldraw MCP; рендерит `tldraw export` |
-| `.py` | Pylance: ошибки и автодополнение | pyright LSP + запуск кода |
-| `.sh` | Терминал: `bash -n` | bash-language-server + `bash -n` |
-| `.jl` | Julia LS | julials LSP + запуск `julia` |
-| `.ts` | Встроенный TypeScript | typescript LSP + `npm run build` |
+| `.py` | Pylance: ошибки и автодополнение | Запуск кода; диагностика через линтеры |
+| `.sh` | Терминал: `bash -n` | `bash -n` + запуск |
+| `.jl` | Julia LS | Запуск `julia` |
+| `.ts` | Встроенный TypeScript | `npm run build` |
 | `.ipynb` | Запуск ячеек в GUI | Читает JSON ячеек; запускает `jupyter` |
 | `.tex` | Компиляция + PDF-превью | Пишет `.tex`, запускает `pdflatex`, читает лог |
 | `.wl` | Подсветка + wolframscript | Проверяет через `wolframscript` |
 
-> 💡 Для `.tex` и `.wl` агент намеренно использует **компиляторы**, а не LSP — `pdflatex` и `wolframscript` дают честные ошибки сборки.
+> 💡 Агент проверяет правки **компиляторами и линтерами** — они дают честные ошибки сборки.
 
 ## 🛠 Использование
 
@@ -238,14 +237,3 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | [`STACK.md`](STACK.md) | 👤 Человек | Хоткеи, примеры кода, ссылки по каждому инструменту |
 | [`workflow.txt`](workflow.txt) | 👤🤖 | Git-workflow: ветка → коммит → PR → merge |
 
----
-
-<div align="center">
-
-![OpenCode](https://img.shields.io/badge/работает_на-OpenCode-1F6FEB?style=for-the-badge&logo=opencode&logoColor=white)
-![macOS](https://img.shields.io/badge/платформа-macOS-000000?style=for-the-badge&logo=apple&logoColor=white)
-![Bash](https://img.shields.io/badge/CLI-Bash-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white)
-
-**Stack** · MCP ×5 · скиллы 60 · обновляется одной командой 🔄
-
-</div>

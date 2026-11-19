@@ -67,7 +67,7 @@ while IFS= read -r project || [ -n "$project" ]; do
         continue
     fi
 
-    # Конфиг OpenCode (.opencode/opencode.json) — MCP/LSP стека для проекта.
+    # Конфиг OpenCode (.opencode/opencode.json) — MCP/skills стека для проекта.
     # Стек поднимается только там, где сгенерирован этот файл.
     if bash "$STACK_DIR/gen-opencode-config.sh" "$project" >/dev/null 2>&1; then
         CONFIGURED=$((CONFIGURED + 1))

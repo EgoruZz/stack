@@ -19,7 +19,7 @@
 | `check-all.sh` | Проверка работоспособности всех компонентов |
 | `new-project.sh` | Создать/зарегистрировать проект (AGENTS.md + конфиг) |
 | `sync-agents.sh` | Синхронизация AGENTS.md + конфигов во все проекты |
-| `gen-opencode-config.sh` | Генератор `.opencode/opencode.json` (MCP/LSP/skills) |
+| `gen-opencode-config.sh` | Генератор `.opencode/opencode.json` (MCP/skills) |
 | `sync-aris.sh` | ARIS-скиллы → skills-store (список из aris-skills.txt) |
 | `consolidate-skills.sh` | Сборка skills-store + очистка глобальных каталогов |
 | `chrome-version.sh` | Версия Chrome под пин tldraw-cli |
@@ -106,10 +106,10 @@
 - Конфиг: ~/Library/Application Support/Code/User/settings.json
 
 ### OpenCode
-- Конфиг MCP: .opencode/opencode.json проекта (генерируется gen-opencode-config.sh; глобально стек не поднимается — MCP/LSP живут только в проектах из projects.txt)
-- **Версия:** стек тестировался на OpenCode **1.19.x (v1)**. Не переходи на 2.0 без проверки: v2 **не запускает LSP-серверы** (поле `lsp` принимается, но диагностики нет), убраны переменные `OPENCODE_DISABLE_*_SKILLS`, MCP-конфиг нормализуется иначе (`mcp.servers`, `enabled`→`disabled`). Обновление: `opencode upgrade --major`, formula brew — `anomalyco/tap/opencode-v2`.
-- LSP включён (`"lsp": true`): диагностика pyright (.py), bash-language-server (.sh), julials (.jl) — ошибки кода приходят в цикл агента. Отключается удалением поля "lsp" из конфига.
-- Skills: ARIS research pipeline, Firecrawl, render-visual, xlsx, data-analysis, grill-me, epistemic-rigor, deep-mind, dag-hallucination-detector, и др. (~61 скилл, хранилище: ~/stack/skills-store (проектные, через skills.paths))
+- Конфиг MCP: .opencode/opencode.json проекта (генерируется gen-opencode-config.sh; глобально стек не поднимается — MCP и скиллы живут только в проектах из projects.txt)
+- **Версия:** OpenCode **v2** (brew `anomalyco/tap/opencode-v2`, v1 удалён). Жертвы v2: LSP-серверов нет (поле `lsp` игнорируется), переменных `OPENCODE_DISABLE_*_SKILLS` нет. MCP-конфиг v1-формы нормализуется автоматически.
+- **Диагностика кода:** через запуск линтеров/компиляторов/тестов напрямую — `bash -n` (.sh), `python` (.py), `npm run build` (.ts), `julia` (.jl), `pdflatex` (.tex). Проверяй правки компилятором до того, как заявить результат.
+- Skills: ARIS research pipeline, Firecrawl, render-visual, xlsx, data-analysis, grill-me, epistemic-rigor, deep-mind, dag-hallucination-detector, и др. (60 скиллов, хранилище: ~/stack/skills-store (проектные, через skills.paths))
 - ARIS работает в local-only режиме: внешние Codex/Oracle/manual-review MCP не используются и не считаются доступными.
 - Для многораундовой проверки используются локальные OpenCode subagents; результат нельзя называть независимой cross-model экспертизой.
 - Для исследовательских утверждений явно разделять verified, inferred и unknown; отсутствие источника не считать подтверждением.

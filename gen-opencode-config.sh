@@ -1,5 +1,5 @@
 #!/bin/bash
-# Генерирует .opencode/opencode.json — конфиг стека (MCP + LSP + plugin)
+# Генерирует .opencode/opencode.json — конфиг стека (MCP + skills)
 # для указанной директории (по умолчанию ~/stack).
 #
 # Стек работает ТОЛЬКО в проектах, где сгенерирован этот файл.
@@ -21,7 +21,6 @@ mkdir -p "$TARGET/.opencode"
 cat > "$TARGET/.opencode/opencode.json" << 'CONF'
 {
   "$schema": "https://opencode.ai/config.json",
-  "lsp": true,
   "skills": {
     "paths": ["{env:HOME}/stack/skills-store"]
   },

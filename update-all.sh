@@ -28,7 +28,7 @@ echo ""
 
 echo ">>> 2/13 Homebrew (только стек-пакеты)..."
 brew update
-brew upgrade node python@3.12 gh ffmpeg anomalyco/tap/opencode 2>/dev/null || echo "  brew: часть пакетов обновлена"
+brew upgrade node python@3.12 gh ffmpeg anomalyco/tap/opencode-v2 2>/dev/null || echo "  brew: часть пакетов обновлена"
 echo ""
 
 # ═══════════════════════════════════════

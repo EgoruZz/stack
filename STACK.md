@@ -499,7 +499,7 @@ MCP скриншоты не доступны. Договорённость:
 - `dag-hallucination-detector` — проверка цитат, URL, статистики и противоречий
 - `aris-research-pipeline` — research pipeline в local-only режиме
 - `firecrawl-*` — live web research, scraping и workflow deliverables
-- Хранилище: `ls ~/stack/skills-store` (~61 скилл, проектные)
+- Хранилище: `ls ~/stack/skills-store` (60 скиллов, проектные)
 
 ### Ограничения research pipeline
 - Codex CLI/MCP намеренно не установлен: он не нужен для обычной работы и может требовать отдельную оплату/авторизацию.
