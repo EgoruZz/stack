@@ -25,6 +25,16 @@ brew install python@3.12 node gh ffmpeg juliaup
 juliaup add release 2>/dev/null || echo "  Julia release уже установлен"
 juliaup default release 2>/dev/null || echo "  Julia default уже настроен"
 
+# Wolfram AgentTools (paclet) — сразу, если Wolfram Engine уже установлен;
+# иначе поставится update-all.sh (шаг 10) после ручной установки Wolfram.
+if command -v wolframscript &>/dev/null; then
+    wolframscript -code 'PacletInstall["Wolfram/AgentTools"]' >/dev/null 2>&1 \
+        && echo "  Wolfram AgentTools: установлен" \
+        || echo "  Wolfram AgentTools: не установился (повтори через update-all.sh)"
+else
+    echo "  Wolfram Engine ещё не установлен — AgentTools поставится в update-all.sh"
+fi
+
 # ═══════════════════════════════════════
 # 2. ВНЕШНИЕ MCP РЕПОЗИТОРИИ
 # ═══════════════════════════════════════
