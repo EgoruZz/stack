@@ -1,9 +1,7 @@
 <div align="center">
 
-# Stack
-
 ![платформа](https://img.shields.io/badge/платформа-macOS-black)
-![агент](https://img.shields.io/badge/AI--агент-OpenCode-1F6FEB)
+![агент](https://img.shields.io/badge/AI--агент-OpenCode_v2-1F6FEB)
 ![MCP](https://img.shields.io/badge/MCP--серверы-5-2EA043)
 ![скиллы](https://img.shields.io/badge/скиллы-60-E16F24)
 ![VS_Code](https://img.shields.io/badge/расширения_VS_Code-6-8250DF)
@@ -32,14 +30,47 @@
 
 ## 🗺 Оглавление
 
+- [📁 Структура репозитория](#-структура-репозитория)
 - [🚀 Быстрый старт](#-быстрый-старт)
 - [📦 Что внутри](#-что-внутри)
 - [🖐 Ручные шаги](#-ручные-шаги)
 - [⚡ Стек в проекте](#-стек-в-проекте)
 - [👀 Файлы: пользователь vs ИИ-агент](#-файлы-пользователь-vs-ии-агент)
 - [🛠 Использование](#-использование)
-- [📁 Структура репозитория](#-структура-репозитория)
 - [📚 Документация](#-документация)
+
+## 📁 Структура репозитория
+
+Все `*.sh` — **CLI-инструменты** (запуск: `bash ~/stack/<имя>.sh`):
+
+```
+~/stack/
+├── README.md                    # 📘 Этот файл
+├── AGENTS.md                    # 🤖 Инструкции агента (с картой репозитория)
+├── STACK.md                     # 📖 Полная документация: хоткеи, примеры
+├── workflow.txt                 # 🔀 Правила git-workflow
+│
+├── setup.sh                     # 🚀 Установка (12 шагов)
+├── update-all.sh                # 🔄 Обновление всего (13 шагов)
+├── check-all.sh                 # ✅ Проверка работоспособности
+│
+├── new-project.sh               # ➕ Подключить проект
+├── sync-agents.sh               # 🔁 AGENTS.md + конфиги → все проекты
+├── gen-opencode-config.sh       # ⚙️ Генератор .opencode/opencode.json
+├── sync-aris.sh                 # 📚 ARIS-скиллы → skills-store
+├── consolidate-skills.sh        # 🎯 Сборка skills-store + чистка глобальных
+├── chrome-version.sh            # 🧩 Версия Chrome под пин tldraw
+├── check-wolfram-license.sh     # 📄 Срок лицензии Wolfram
+│
+├── projects.txt                 # 📋 Реестр проектов
+├── aris-skills.txt              # 📚 Список 14 ARIS-скиллов
+├── skills/                      # 🎯 8 standalone-скиллов (источник)
+├── skills-store/                # 🗃 Собранные 60 скиллов (gitignored)
+├── WolframLanguage/             # 🐺 Пользовательские Wolfram-пакеты
+│
+└── paraview-mcp/ · manim-mcp/ · julia-mcp/ · tldraw-mcp/ ·      # 🌐 клонированные
+    aris-research-repo/ · WolframLanguageForJupyter/             #    репозитории
+```
 
 ## 🚀 Быстрый старт
 
@@ -49,7 +80,6 @@ cd ~/stack
 bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, скиллы, конфиги
 ```
 
-- 12 шагов: brew · репозитории · venv · CLI · браузеры · скиллы · конфиги
 - Пароль спрашивается только там, где его требует система
 - В конце запускается автопроверка — все компоненты должны быть ✅
 
@@ -59,7 +89,8 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 
 | Что | Как ставится | Обновляется |
 |-----|--------------|-------------|
-| Python 3.12 · Node.js · gh · ffmpeg · OpenCode | `brew install` | `update-all.sh`, шаг 2 |
+| Python 3.12 · Node.js · gh · ffmpeg | `brew install` | `update-all.sh`, шаг 2 |
+| OpenCode | вручную ([opencode.ai](https://opencode.ai)) | `update-all.sh`, шаг 2 |
 | `firecrawl-cli` · `tldraw-cli` | `npm install -g` | шаг 6 |
 | `manim-env` — Manim + ManimGL | pip venv | шаг 5 |
 | `jupyter-env` — JupyterLab, numpy, pandas, sympy, plotly… | pip venv | шаг 5 |
@@ -67,7 +98,7 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | Playwright Chromium · Puppeteer Chrome *(headless, версия авто)* | `npx … install` | шаг 6 |
 | Julia + 20 пакетов | `juliaup` + `Pkg.add` | шаг 9 |
 | Wolfram AgentTools (paclet) | `PacletInstall` | шаг 10 |
-| 6 внешних репозиториев MCP | `git clone --depth 1` | шаг 3 |
+| 6 внешних репозиториев | `git clone --depth 1` | шаг 3 |
 | сборка `tldraw-mcp` | `npm install && npm run build` | шаг 4 |
 
 > 💡 **Manim vs ManimGL:** `manim` (community) — рендерит headless, его использует MCP-сервер. `manimgl` (3Blue1Brown) — интерактивный GUI-инструмент для тебя, ни один MCP его не использует.
@@ -95,7 +126,7 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 
 ### 🎯 Скиллы OpenCode (60)
 
-Собираются в хранилище `~/stack/skills-store/` и подключаются к проектам через `skills.paths` — **вне проектов агент видит только 1 встроенный скилл**: `customize-opencode` ( `<built-in>` — вшит в сам OpenCode, учит агента безопасно править его конфигурацию: `opencode.json`, агенты, скиллы, плагины). В OpenCode v2 к нему добавляется `report` (репорты багов) — на нашей версии его нет.
+Собираются в хранилище `~/stack/skills-store/` и подключаются к проектам через `skills` в конфиге — **вне проектов агент видит только встроенные скиллы самого OpenCode** (`customize-opencode` — учит агента безопасно править его конфигурацию; начиная с v2 — также `report` для репортов багов).
 
 | Группа | ~Кол-во | Источник |
 |--------|---------|----------|
@@ -145,7 +176,7 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | Файл | Содержимое |
 |------|-----------|
 | `AGENTS.md` | Инструкции агента: карта стека, MCP-инструменты, конвенции |
-| `.opencode/opencode.json` | `mcp` ×5 · `skills.paths` → skills-store |
+| `.opencode/opencode.json` | `mcp` ×5 · `skills` → skills-store |
 
 | Факт | Детали |
 |------|--------|
@@ -154,8 +185,8 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | 🔁 **Синхронизация** | `bash ~/stack/sync-agents.sh` перегенерирует AGENTS.md + конфиги во всех проектах (входит в `update-all.sh`, шаг 12); проект-специфичный контент AGENTS.md **вне маркеров** `<!-- STACK:START -->…<!-- STACK:END -->` сохраняется |
 | ⚠️ **Конфиг — без маркеров** | `.opencode/opencode.json` перегенерируется **целиком** при каждом `sync-agents.sh` / `new-project.sh`: ручные правки конфига в проекте будут затёрты. Правь шаблон в `~/stack/gen-opencode-config.sh` — он единый источник для стека и всех проектов |
 | 🧠 **Диагностика — через запуск** | OpenCode v2 не имеет LSP: агент получает ошибки кода, запуская линтеры/компиляторы/тесты напрямую (`bash -n`, `python`, `npm run build`, `pdflatex`) — честные ошибки сборки |
-| 🚫 **Вне проектов** | Ни MCP, ни скиллов. Глобальный каталог `~/.config/opencode/` пуст (OpenCode сам создаёт там лишь 2 файла-стаба) |
-| 🚫 **Без поля `plugin`** | Пакет `opencode-firecrawl` не существует на npm (404); раньше его строка разворачивала ~62 МБ зависимостей в глобальном каталоге. Понадобится плагинный уровень — есть сторонний `opencode-firecrawl-ng` |
+| 🚫 **Вне проектов** | Ни MCP, ни скиллов. В `~/.config/opencode/` нет конфига стека — только клиентские настройки (`cli.json`) |
+| 🔌 **Расширения — без плагинов** | OpenCode v2 умеет подключать плагины (код, расширяющий tools/команды/TUI: поле `plugins` в конфиге или `.opencode/plugins/`). Стек их сознательно не использует: все расширения идут через MCP-серверы (внешние процессы) и скиллы (промпты) — конфиг стека не содержит поля `plugins` |
 
 ## 👀 Файлы: пользователь vs ИИ-агент
 
@@ -178,57 +209,14 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 
 | Задача | Команда |
 |--------|---------|
-| 🔄 **Обновить весь стек** | `cd ~/stack && bash update-all.sh` — 13 шагов, затем перезапусти OpenCode |
+| 🔄 **Обновить весь стек** | `cd ~/stack && bash update-all.sh` — 13 шагов, затем `/reload` или перезапуск OpenCode |
 | ✅ **Проверить работоспособность** | `bash ~/stack/check-all.sh` |
 | ➕ **Подключить проект** | `~/stack/new-project.sh <путь>` |
 | 🔁 **Синхронизировать все проекты** | `bash ~/stack/sync-agents.sh` |
 | 📄 **Срок лицензии Wolfram** | `bash ~/stack/check-wolfram-license.sh` |
 | 🧩 **Версия Chrome под tldraw** | `bash ~/stack/chrome-version.sh` |
 
-**Алиасы** (добавляются в `.zshrc`):
-
-| Алиас | Действие |
-|-------|---------|
-| `stack` | перейти в `~/stack` |
-| `manim-activate` | активировать manim-env |
-| `jupyter-jlab` | запустить JupyterLab |
-| `jupyter-wolfram` | Jupyter с Wolfram kernel |
-| `new-project` | подключить проект |
-
-> ⚠️ После любого обновления **перезапусти OpenCode** — MCP, скиллы и конфиги читаются только при старте сессии.
-
-## 📁 Структура репозитория
-
-Все `*.sh` — **CLI-инструменты** (запуск: `bash ~/stack/<имя>.sh`; алиасы — см. «Использование»):
-
-```
-~/stack/
-├── README.md                    # 📘 Этот файл
-├── AGENTS.md                    # 🤖 Инструкции агента (с картой репозитория)
-├── STACK.md                     # 📖 Полная документация: хоткеи, примеры
-├── workflow.txt                 # 🔀 Правила git-workflow
-│
-├── setup.sh                     # 🚀 Установка (12 шагов)
-├── update-all.sh                # 🔄 Обновление всего (13 шагов)
-├── check-all.sh                 # ✅ Проверка работоспособности
-│
-├── new-project.sh               # ➕ Подключить проект
-├── sync-agents.sh               # 🔁 AGENTS.md + конфиги → все проекты
-├── gen-opencode-config.sh       # ⚙️ Генератор .opencode/opencode.json
-├── sync-aris.sh                 # 📚 ARIS-скиллы → skills-store
-├── consolidate-skills.sh        # 🎯 Сборка skills-store + чистка глобальных
-├── chrome-version.sh            # 🧩 Версия Chrome под пин tldraw
-├── check-wolfram-license.sh     # 📄 Срок лицензии Wolfram
-│
-├── projects.txt                 # 📋 Реестр проектов
-├── aris-skills.txt              # 📚 Список 14 ARIS-скиллов
-├── skills/                      # 🎯 8 standalone-скиллов (источник)
-├── skills-store/                # 🗃 Собранные 60 скиллов (gitignored)
-├── WolframLanguage/             # 🐺 Пользовательские Wolfram-пакеты
-│
-└── paraview-mcp/ · manim-mcp/ · julia-mcp/ · tldraw-mcp/ ·      # 🌐 клонированные
-    aris-research-repo/ · WolframLanguageForJupyter/             #    репозитории
-```
+> ⚠️ Конфиги OpenCode v2 перечитываются на лету (`/reload`); после обновления самих компонентов (MCP-бинарники, venv, скиллы) надёжнее перезапустить OpenCode.
 
 ## 📚 Документация
 
@@ -237,4 +225,3 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | [`AGENTS.md`](AGENTS.md) | 🤖 Агент | Карта репозитория, MCP-инструменты, конвенции |
 | [`STACK.md`](STACK.md) | 👤 Человек | Хоткеи, примеры кода, ссылки по каждому инструменту |
 | [`workflow.txt`](workflow.txt) | 👤🤖 | Git-workflow: ветка → коммит → PR → merge |
-
