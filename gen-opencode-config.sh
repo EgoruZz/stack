@@ -21,9 +21,7 @@ mkdir -p "$TARGET/.opencode"
 cat > "$TARGET/.opencode/opencode.json" << 'CONF'
 {
   "$schema": "https://opencode.ai/config.json",
-  "skills": {
-    "paths": ["{env:HOME}/stack/skills-store"]
-  },
+  "skills": ["{env:HOME}/stack/skills-store"],
   "mcp": {
     "Wolfram": {
       "type": "local",

@@ -222,7 +222,7 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 ├── projects.txt                 # 📋 Реестр проектов
 ├── aris-skills.txt              # 📚 Список 14 ARIS-скиллов
 ├── skills/                      # 🎯 8 standalone-скиллов (источник)
-├── skills-store/                # 🗃 Собранные ~61 скилл (gitignored)
+├── skills-store/                # 🗃 Собранные 60 скиллов (gitignored)
 ├── WolframLanguage/             # 🐺 Пользовательские Wolfram-пакеты
 │
 └── paraview-mcp/ · manim-mcp/ · julia-mcp/ · tldraw-mcp/ ·      # 🌐 клонированные

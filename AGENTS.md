@@ -27,7 +27,7 @@
 | `projects.txt` | Реестр проектов (по одному пути на строку) |
 | `aris-skills.txt` | Список из 14 ARIS-скиллов |
 | `skills/` | 8 standalone-скиллов (источник) |
-| `skills-store/` | Runtime-хранилище ~61 скилла (gitignored, генерируется) |
+| `skills-store/` | Runtime-хранилище 60 скиллов (gitignored, генерируется) |
 | `WolframLanguage/` | Пользовательские Wolfram-пакеты |
 | `paraview-mcp/`, `manim-mcp/`, `julia-mcp/`, `tldraw-mcp/`, `aris-research-repo/`, `WolframLanguageForJupyter/` | Клонированные внешние репозитории (gitignored) |
 
