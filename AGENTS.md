@@ -107,6 +107,7 @@
 
 ### OpenCode
 - Конфиг MCP: .opencode/opencode.json проекта (генерируется gen-opencode-config.sh; глобально стек не поднимается — MCP/LSP живут только в проектах из projects.txt)
+- **Версия:** стек тестировался на OpenCode **1.19.x (v1)**. Не переходи на 2.0 без проверки: v2 **не запускает LSP-серверы** (поле `lsp` принимается, но диагностики нет), убраны переменные `OPENCODE_DISABLE_*_SKILLS`, MCP-конфиг нормализуется иначе (`mcp.servers`, `enabled`→`disabled`). Обновление: `opencode upgrade --major`, formula brew — `anomalyco/tap/opencode-v2`.
 - LSP включён (`"lsp": true`): диагностика pyright (.py), bash-language-server (.sh), julials (.jl) — ошибки кода приходят в цикл агента. Отключается удалением поля "lsp" из конфига.
 - Skills: ARIS research pipeline, Firecrawl, render-visual, xlsx, data-analysis, grill-me, epistemic-rigor, deep-mind, dag-hallucination-detector, и др. (~61 скилл, хранилище: ~/stack/skills-store (проектные, через skills.paths))
 - ARIS работает в local-only режиме: внешние Codex/Oracle/manual-review MCP не используются и не считаются доступными.
