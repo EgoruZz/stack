@@ -18,7 +18,12 @@ if ! command -v brew &>/dev/null; then
 fi
 
 echo ">>> Homebrew пакеты..."
-brew install python@3.12 node julia
+brew install python@3.12 node gh ffmpeg juliaup
+
+# Julia — через juliaup (не brew-julia: вся документация и check-all.sh
+# рассчитаны на ~/.juliaup/bin). release = актуальная стабильная версия.
+juliaup add release 2>/dev/null || echo "  Julia release уже установлен"
+juliaup default release 2>/dev/null || echo "  Julia default уже настроен"
 
 # ═══════════════════════════════════════
 # 2. ВНЕШНИЕ MCP РЕПОЗИТОРИИ
@@ -171,8 +176,7 @@ Pkg.add([
     "LinearAlgebra", "SparseArrays", "Plots", "DifferentialEquations",
     "StaticArrays", "Optim", "JuMP", "IJulia", "Flux", "Turing",
     "DataFrames", "CSV", "ForwardDiff", "SymPy", "SpecialFunctions",
-    "StatsBase", "Distributions", "Polynomials", "FFTW", "IterativeSolvers",
-    "LanguageServer"
+    "StatsBase", "Distributions", "Polynomials", "FFTW", "IterativeSolvers"
 ])
 ' 2>/dev/null || echo "  Julia: установка пакетов пропущена (повтори вручную: julia → Pkg.add(...))"
 

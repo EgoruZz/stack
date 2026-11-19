@@ -35,7 +35,6 @@ echo ""
 SYNCED=0
 CREATED=0
 CONFIGURED=0
-SKIPPED=0
 MISSING=0
 SEEN=$(mktemp)
 
@@ -158,7 +157,6 @@ echo "=== Готово! ==="
 echo "  Синхронизировано AGENTS.md: $SYNCED"
 echo "  Создано AGENTS.md: $CREATED"
 echo "  Сгенерировано конфигов OpenCode: $CONFIGURED"
-echo "  Пропущено (нет маркеров): $SKIPPED"
 echo "  Не найдено (папка удалена): $MISSING"
 
 # Подсказка о перезапуске (скрывается флагом --no-hint для update-all.sh)

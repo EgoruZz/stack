@@ -19,7 +19,13 @@ fi
 echo -n "ParaView: "
 PVAPP=$(ls -d /Applications/ParaView-*.app 2>/dev/null | head -1)
 if [ -n "$PVAPP" ] && [ -x "$PVAPP/Contents/bin/pvpython" ]; then
-    echo "✅ $("$PVAPP/Contents/bin/pvpython" --version 2>/dev/null)"
+    PV_VER=$("$PVAPP/Contents/bin/pvpython" --version 2>/dev/null)
+    if [ -n "$PV_VER" ]; then
+        echo "✅ $PV_VER"
+    else
+        # pvpython может не поддерживать --version — сам факт наличия бинаря достаточен
+        echo "✅ $(basename "$PVAPP")"
+    fi
 else
     echo "❌ не найден"
 fi

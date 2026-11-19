@@ -172,6 +172,13 @@ juliaup update 2>/dev/null
 JULIA_VER=$(julia -e 'println(VERSION.major, ".", VERSION.minor)' 2>/dev/null)
 NEW_ENV="$HOME/.julia/environments/v$JULIA_VER"
 
+# Гарантируем существование нового окружения: после juliaup update директория
+# v$JULIA_VER ещё не создана — без этого миграция молча пропускалась бы.
+mkdir -p "$NEW_ENV"
+if [ ! -f "$NEW_ENV/Project.toml" ]; then
+    printf '\n' > "$NEW_ENV/Project.toml"   # пустой манифест (без секции [deps])
+fi
+
 # Если окружение новое (пустое) — мигрируем пакеты из старого
 if [ -d "$NEW_ENV" ] && [ -n "$OLD_ENV" ] && [ "$OLD_ENV" != "$NEW_ENV" ]; then
     if grep -q "^\[" "$NEW_ENV/Project.toml" 2>/dev/null; then

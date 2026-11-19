@@ -2,7 +2,9 @@
 # Консолидация всех скиллов в ~/stack/skills-store (единое хранилище)
 # Скиллы подключаются к проектам через skills.paths в .opencode/opencode.json —
 # глобальные каталоги (~/.config/opencode/skills, ~/.claude/skills,
-# ~/.agents/skills) опустошаются, чтобы скиллы не были видны вне проектов.
+# ~/.config/opencode/skills опустошается полностью; ~/.claude/skills и
+# ~/.agents/skills чистятся выборочно — переносятся только скиллы, уже
+# существующие в хранилище (чужие скиллы других инструментов не затрагиваются).
 #
 # Вызывается setup.sh и update-all.sh. Безопасно запускать повторно.
 #
@@ -41,16 +43,28 @@ elif [ ! -d "$STORE/tldraw-offline" ] && [ -d "$HOME/.config/opencode/skills/tld
     mv "$HOME/.config/opencode/skills/tldraw-offline" "$STORE/tldraw-offline"
 fi
 # ── 4. Перенос скиллов из глобальных каталогов (напр. после firecrawl init) ──
-# firecrawl-cli ставит скиллы в ~/.config/opencode/skills, ~/.claude/skills
-# и ~/.agents/skills (часть — симлинки). -L разыменовывает их в реальные файлы.
-for gdir in "$HOME/.config/opencode/skills" "$HOME/.claude/skills" "$HOME/.agents/skills"; do
-    [ -d "$gdir" ] && rsync -aL "$gdir/" "$STORE/" 2>/dev/null
+# ~/.config/opencode/skills — собственный каталог OpenCode: копируем всё и
+# полностью очищаем (скиллы не должны быть видны вне проектов).
+# ~/.claude/skills и ~/.agents/skills — каталоги ДРУГИХ AI-инструментов:
+# обновляем и удаляем только те скиллы, что уже живут в skills-store
+# (известные источники: firecrawl, ARIS, standalone, tldraw). Чужие/неизвестные
+# скиллы не трогаем — не втягиваем их в хранилище и не удаляем из глобальных.
+gdir="$HOME/.config/opencode/skills"
+[ -d "$gdir" ] && rsync -aL "$gdir/" "$STORE/" 2>/dev/null
+
+for gdir in "$HOME/.claude/skills" "$HOME/.agents/skills"; do
+    [ -d "$gdir" ] || continue
+    while IFS= read -r name; do
+        [ -n "$name" ] || continue
+        if [ -d "$STORE/$name" ]; then
+            rsync -aL "$gdir/$name/" "$STORE/$name/" 2>/dev/null
+            rm -rf "$gdir/$name"
+        fi
+    done < <(ls "$gdir" 2>/dev/null)
 done
 
-# ── 5. Очистка глобальных каталогов (скиллы не должны быть видны вне проектов) ──
-rm -rf "$HOME/.config/opencode/skills" \
-       "$HOME/.claude/skills" \
-       "$HOME/.agents/skills"
+# ── 5. Очистка глобального каталога OpenCode ──
+rm -rf "$HOME/.config/opencode/skills"
 
 COUNT=$(ls "$STORE" 2>/dev/null | wc -l | tr -d ' ')
 echo "  Хранилище скиллов: $STORE ($COUNT скиллов), глобальные каталоги очищены"
