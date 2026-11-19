@@ -65,7 +65,7 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | `jupyter-env` — JupyterLab, numpy, pandas, sympy, plotly… | pip venv | шаг 5 |
 | `paraview-mcp-env`, `julia-mcp-env` — MCP SDK | pip venv | шаг 5 |
 | Playwright Chromium · Puppeteer Chrome *(headless, версия авто)* | `npx … install` | шаг 6 |
-| Julia + 21 пакет | `juliaup` + `Pkg.add` | шаг 9 |
+| Julia + 20 пакетов | `juliaup` + `Pkg.add` | шаг 9 |
 | Wolfram AgentTools (paclet) | `PacletInstall` | шаг 10 |
 | 6 внешних репозиториев MCP | `git clone --depth 1` | шаг 3 |
 | сборка `tldraw-mcp` | `npm install && npm run build` | шаг 4 |
@@ -152,6 +152,7 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | 🔌 **Переносимость** | Пути в конфиге через `{env:HOME}` — файл переносим между машинами и коммитобезопасен |
 | 📋 **Реестр проектов** | `~/stack/projects.txt` — по одному пути на строку |
 | 🔁 **Синхронизация** | `bash ~/stack/sync-agents.sh` перегенерирует AGENTS.md + конфиги во всех проектах (входит в `update-all.sh`, шаг 12); проект-специфичный контент AGENTS.md **вне маркеров** `<!-- STACK:START -->…<!-- STACK:END -->` сохраняется |
+| ⚠️ **Конфиг — без маркеров** | `.opencode/opencode.json` перегенерируется **целиком** при каждом `sync-agents.sh` / `new-project.sh`: ручные правки конфига в проекте будут затёрты. Правь шаблон в `~/stack/gen-opencode-config.sh` — он единый источник для стека и всех проектов |
 | 🧠 **Диагностика — через запуск** | OpenCode v2 не имеет LSP: агент получает ошибки кода, запуская линтеры/компиляторы/тесты напрямую (`bash -n`, `python`, `npm run build`, `pdflatex`) — честные ошибки сборки |
 | 🚫 **Вне проектов** | Ни MCP, ни скиллов. Глобальный каталог `~/.config/opencode/` пуст (OpenCode сам создаёт там лишь 2 файла-стаба) |
 | 🚫 **Без поля `plugin`** | Пакет `opencode-firecrawl` не существует на npm (404); раньше его строка разворачивала ~62 МБ зависимостей в глобальном каталоге. Понадобится плагинный уровень — есть сторонний `opencode-firecrawl-ng` |

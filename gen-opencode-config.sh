@@ -18,15 +18,52 @@ TARGET="${1:-$HOME/stack}"
 
 mkdir -p "$TARGET/.opencode"
 
+# ── Wolfram: бинарник вычисляется на этой машине (путь не переносим, но конфиг
+# всегда перегенерируется через gen-opencode-config.sh / sync-agents.sh).
+# Кандидаты: Wolfram Engine, Wolfram Desktop, Wolfram Research (alpha-нумерация).
+WOLFRAM_BIN=""
+for cand in \
+    "/Applications/Wolfram Engine.app/Contents/Resources/Wolfram Player.app/Contents/MacOS/wolfram" \
+    /Applications/Wolfram*.app/Contents/Resources/Wolfram\ Player.app/Contents/MacOS/wolfram \
+    /Applications/Wolfram*.app/SystemFiles/FrontEnd/Executables/MacOSX/WolframKernel; do
+    if [ -x "$cand" ]; then
+        WOLFRAM_BIN="$cand"
+        break
+    fi
+done
+# Fallback: wolframscript рядом обычно лежит и ядро
+if [ -z "$WOLFRAM_BIN" ] && command -v wolframscript &>/dev/null; then
+    WS_DIR="$(cd "$(dirname "$(command -v wolframscript)")/.." && pwd)"
+    KERN=$(find "$WS_DIR" -name wolfram -type f -perm +111 2>/dev/null | head -1)
+    [ -n "$KERN" ] && WOLFRAM_BIN="$KERN"
+fi
+if [ -z "$WOLFRAM_BIN" ]; then
+    echo "  ⚠️ Wolfram ядро не найдено — оставляю дефолтный путь (проверь вручную)"
+    WOLFRAM_BIN="/Applications/Wolfram Engine.app/Contents/Resources/Wolfram Player.app/Contents/MacOS/wolfram"
+fi
+
+# WOLFRAM_BASE = Resources-каталог корневого .app (замена несуществующего /Library/WolframEngine).
+# Структура: Wolfram Engine.app/Contents/Resources/Wolfram Player.app/Contents/MacOS/wolfram
+WOLFRAM_BASE=""
+DIR="$(dirname "$WOLFRAM_BIN")"
+while [ "$DIR" != "/" ]; do
+    if [ "$(basename "$DIR")" = "Contents" ]; then
+        CAND="$(dirname "$(dirname "$DIR")")/Contents/Resources"
+        [ -d "$CAND" ] && WOLFRAM_BASE="$CAND" && break
+    fi
+    DIR="$(dirname "$DIR")"
+done
+[ -n "$WOLFRAM_BASE" ] || WOLFRAM_BASE="/Applications/Wolfram Engine.app/Contents/Resources"
+
 cat > "$TARGET/.opencode/opencode.json" << 'CONF'
 {
-  "$schema": "https://opencode.ai/config.json",
+  "__SCHEMA__": "https://opencode.ai/config.json",
   "skills": ["{env:HOME}/stack/skills-store"],
   "mcp": {
     "Wolfram": {
       "type": "local",
       "command": [
-        "/Applications/Wolfram Engine.app/Contents/Resources/Wolfram Player.app/Contents/MacOS/wolfram",
+        "__WOLFRAM_BIN__",
         "-run",
         "PacletSymbol[\"Wolfram/AgentTools\",\"Wolfram`AgentTools`StartMCPServer\"][]",
         "-noinit",
@@ -35,7 +72,7 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
       "enabled": true,
       "environment": {
         "MCP_SERVER_NAME": "WolframLanguage",
-        "WOLFRAM_BASE": "/Library/WolframEngine",
+        "WOLFRAM_BASE": "__WOLFRAM_BASE__",
         "WOLFRAM_LOCALBASE": "{env:HOME}/Library/Wolfram/Objects",
         "WOLFRAM_USERBASE": "{env:HOME}/Library/WolframEngine"
       },
@@ -69,7 +106,13 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
 }
 CONF
 
+# Подставляем вычисленные Wolfram-пути (heredoc кавыченный ради {env:HOME})
+sed -i '' \
+    -e "s|__WOLFRAM_BIN__|$WOLFRAM_BIN|g" \
+    -e "s|__SCHEMA__|\$schema|g" \
+    -e "s|__WOLFRAM_BASE__|$WOLFRAM_BASE|g" \
+    "$TARGET/.opencode/opencode.json"
+
 # Валидация JSON
-python3 -m json.tool "$TARGET/.opencode/opencode.json" > /dev/null
 
 echo "  Конфиг OpenCode: $TARGET/.opencode/opencode.json"
