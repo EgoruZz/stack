@@ -24,6 +24,7 @@
 | `consolidate-skills.sh` | Сборка skills-store + очистка глобальных каталогов |
 | `chrome-version.sh` | Версия Chrome под пин tldraw-cli |
 | `check-wolfram-license.sh` | Срок лицензии Wolfram |
+| `craft-install.sh` | Установка/обновление GUI Craft Apps (запуск в терминале пользователя) |
 | `projects.txt` | Реестр проектов (по одному пути на строку) |
 | `aris-skills.txt` | Список из 14 ARIS-скиллов |
 | `skills/` | 8 standalone-скиллов (источник) |
@@ -102,7 +103,7 @@
 - **Финальные офисные деливераблы (.docx/.xlsx/.pptx/.pdf) делай через Craft Apps**, не python-скриптами
 - Компиляция .tex — по-прежнему pdflatex; WordCraft только импортирует/экспортирует .tex
 - Live-режим (правки в открытом окне): `/Applications/<App>.app/Contents/MacOS/<app> --control 798X`; порты: wordcraft 7981, gridcraft 7982, deckcraft 7983, pdfcraft 7984
-- Установка/обновление GUI: `bash ~/stack/craft-downloads/install-craft-apps.sh` (в терминале пользователя); версии проверяет update-all.sh
+- Установка/обновление GUI: `bash ~/stack/craft-install.sh` (в терминале пользователя); версии проверяет update-all.sh
 - Скилл: `craft-office` (подробный workflow)
 
 ### Jupyter

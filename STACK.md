@@ -523,7 +523,7 @@ CHROME_PATH="$HOME/Library/Caches/ms-playwright/chromium_headless_shell-1234/chr
 
 ## 8b. Craft Apps — офисные документы (ArtCraft)
 
-Word/Excel/PowerPoint/PDF как нативные open-source Rust-приложения из [ArtCraft](https://getartcraft.com). GUI ставится/обновляется скриптом `bash ~/stack/craft-downloads/install-craft-apps.sh` в своём терминале (аналог Launcher без GUI); headless-CLI — автоматически в `~/stack/craft-cli/` (setup.sh, шаг 7).
+Word/Excel/PowerPoint/PDF как нативные open-source Rust-приложения из [ArtCraft](https://getartcraft.com). GUI ставится/обновляется скриптом `bash ~/stack/craft-install.sh` в своём терминале (аналог Launcher без GUI); headless-CLI — автоматически в `~/stack/craft-cli/` (setup.sh, шаг 7).
 
 | Приложение | Формат | CLI | MCP-сервер |
 |---|---|---|---|
@@ -545,7 +545,7 @@ Word/Excel/PowerPoint/PDF как нативные open-source Rust-прилож�
 # MCP-команда агента: ~/stack/craft-cli/wordcraft-cli mcp --connect 127.0.0.1:7981
 # порты: wordcraft 7981 · gridcraft 7982 · deckcraft 7983 · pdfcraft 7984
 
-# Обновление GUI-приложений: bash ~/stack/craft-downloads/install-craft-apps.sh (сам находит свежие версии)
+# Обновление GUI-приложений: bash ~/stack/craft-install.sh (сам находит свежие версии)
 ```
 
 Важно: приложения в статусе alpha — сложные файлы из MS Office могут отображаться не идеально; храни копии важных документов. Компиляция .tex остаётся за pdflatex. Подробный workflow для агента — скилл `craft-office`.
