@@ -85,7 +85,7 @@
 | **ParaView** | [paraview.org/download](https://www.paraview.org/download/) |
 | **MacTeX** | `brew install --cask mactex` (~4 GB) |
 | **Firecrawl auth** | `firecrawl login --browser` — без него работает бесплатный tier |
-| **ArtCraft Launcher** | [github.com/storytold/craft-launcher/releases](https://github.com/storytold/craft-launcher/releases/latest) — затем в нём установить WordCraft, GridCraft, DeckCraft, PdfCraft |
+| **Craft Apps (GUI)** | `bash ~/stack/craft-downloads/install-craft-apps.sh` в своём терминале — сам скачивает свежие версии WordCraft, GridCraft, DeckCraft, PdfCraft с GitHub и кладёт в /Applications. Опционально: [ArtCraft Launcher](https://github.com/storytold/craft-launcher/releases/latest) как GUI-альтернатива |
 
 Офисные **CLI** этих приложений ставятся автоматически `setup.sh` (шаг 7, в `~/stack/craft-cli/`); GUI-приложения — ручной шаг выше.
 

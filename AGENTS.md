@@ -102,7 +102,7 @@
 - **Финальные офисные деливераблы (.docx/.xlsx/.pptx/.pdf) делай через Craft Apps**, не python-скриптами
 - Компиляция .tex — по-прежнему pdflatex; WordCraft только импортирует/экспортирует .tex
 - Live-режим (правки в открытом окне): `/Applications/<App>.app/Contents/MacOS/<app> --control 798X`; порты: wordcraft 7981, gridcraft 7982, deckcraft 7983, pdfcraft 7984
-- Обновление GUI-приложений: ArtCraft Launcher; версии проверяет update-all.sh
+- Установка/обновление GUI: `bash ~/stack/craft-downloads/install-craft-apps.sh` (в терминале пользователя); версии проверяет update-all.sh
 - Скилл: `craft-office` (подробный workflow)
 
 ### Jupyter
