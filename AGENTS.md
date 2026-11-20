@@ -14,7 +14,7 @@
 | `README.md` | Документация для людей (обзор, оглавление) |
 | `STACK.md` | Полная документация: хоткеи, примеры, ссылки |
 | `workflow.txt` | Правила git-workflow (ветка → PR → merge) |
-| `setup.sh` | Установка на чистую macOS (12 шагов) |
+| `setup.sh` | Установка на чистую macOS (13 шагов) |
 | `update-all.sh` | Полное обновление стека (13 шагов) |
 | `check-all.sh` | Проверка работоспособности всех компонентов |
 | `new-project.sh` | Создать/зарегистрировать проект (AGENTS.md + конфиг) |
@@ -28,6 +28,8 @@
 | `aris-skills.txt` | Список из 14 ARIS-скиллов |
 | `skills/` | 8 standalone-скиллов (источник) |
 | `skills-store/` | Runtime-хранилище 60 скиллов (gitignored, генерируется) |
+| `craft-cli/` | Headless-CLI офисных Craft Apps (gitignored, ставится setup.sh) |
+| `craft-downloads/` | Загруженные DMG/zip установщиков Craft Apps (gitignored) |
 | `WolframLanguage/` | Пользовательские Wolfram-пакеты |
 | `paraview-mcp/`, `manim-mcp/`, `julia-mcp/`, `tldraw-mcp/`, `aris-research-repo/`, `WolframLanguageForJupyter/` | Клонированные внешние репозитории (gitignored) |
 
@@ -92,6 +94,16 @@
 - Инструменты: create_geo, create_text, create_arrow, create_note, create_frame, move_shapes, group_shapes, set_camera, save_document, load_document и др.
 - Экспорт: `.tldr` → PNG/SVG через `@kitschpatrol/tldraw-cli`; после обновления CLI нужно проверять совместимость схемы MCP-файлов.
 - Текущий MCP надёжно создаёт/сохраняет `.tldr` и редактирует документ; live-синхронизация с уже открытым desktop canvas не гарантируется.
+
+### Craft Apps (офисные документы, ArtCraft)
+- **WordCraft / GridCraft / DeckCraft / PdfCraft** — Word/Excel/PowerPoint/PDF, установлены в /Applications/ (alpha-версии)
+- MCP серверы: `wordcraft`, `gridcraft`, `deckcraft`, `pdfcraft` (в .opencode/opencode.json проекта)
+- Headless CLI: `~/stack/craft-cli/<name>-cli` — convert, run, inspect, info, commands
+- **Финальные офисные деливераблы (.docx/.xlsx/.pptx/.pdf) делай через Craft Apps**, не python-скриптами
+- Компиляция .tex — по-прежнему pdflatex; WordCraft только импортирует/экспортирует .tex
+- Live-режим (правки в открытом окне): `/Applications/<App>.app/Contents/MacOS/<app> --control 798X`; порты: wordcraft 7981, gridcraft 7982, deckcraft 7983, pdfcraft 7984
+- Обновление GUI-приложений: ArtCraft Launcher; версии проверяет update-all.sh
+- Скилл: `craft-office` (подробный workflow)
 
 ### Jupyter
 - **JupyterLab** окружение: ~/stack/jupyter-env

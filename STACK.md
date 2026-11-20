@@ -432,6 +432,10 @@ brew upgrade --cask mactex
 | Manim | ✅ | Генерация анимаций (headless) |
 | ParaView | ✅ | Визуализация данных (через TCP-мост) |
 | tldraw | ✅ | Управление canvas, диаграммы (30 инструментов) |
+| wordcraft | ✅ | Word-документы: .docx создание/правки/конвертация |
+| gridcraft | ✅ | Excel-файлы: .xlsx, формулы, PivotTables |
+| deckcraft | ✅ | Презентации: .pptx сборка и экспорт |
+| pdfcraft | ✅ | PDF: объединение, разделение, защита |
 
 ### tldraw MCP — инструменты
 | Инструмент | Описание |
@@ -514,6 +518,37 @@ CHROME_PATH="$HOME/Library/Caches/ms-playwright/chromium_headless_shell-1234/chr
 
 # tldraw CLI
 ```
+
+---
+
+## 8b. Craft Apps — офисные документы (ArtCraft)
+
+Word/Excel/PowerPoint/PDF как нативные open-source Rust-приложения из [ArtCraft](https://getartcraft.com). GUI ставится через [ArtCraft Launcher](https://github.com/storytold/craft-launcher/releases/latest) (ручной шаг); headless-CLI — автоматически в `~/stack/craft-cli/` (setup.sh, шаг 7).
+
+| Приложение | Формат | CLI | MCP-сервер |
+|---|---|---|---|
+| WordCraft | .docx (+.odt/.rtf/.html/.md/.tex/.txt, PDF-экспорт, цитирования APA/MLA/Chicago/IEEE, Zotero) | `~/stack/craft-cli/wordcraft-cli` | `wordcraft` |
+| GridCraft | .xlsx (+.csv; PivotTables, 500+ функций, графики) | `~/stack/craft-cli/gridcraft-cli` | `gridcraft` |
+| DeckCraft | .pptx (+.potx, экспорт PDF/PNG/GIF) | `~/stack/craft-cli/deckcraft-cli` | `deckcraft` |
+| PdfCraft | .pdf (объединение/разделение/защита/комментарии) | `~/stack/craft-cli/pdfcraft-cli` | `pdfcraft` |
+
+```bash
+# CLI без окна (головной режим — по умолчанию для агента)
+~/stack/craft-cli/wordcraft-cli convert report.docx report.pdf
+~/stack/craft-cli/deckcraft-cli convert deck.pptx deck.pdf
+~/stack/craft-cli/wordcraft-cli inspect report.docx        # структура как JSON
+~/stack/craft-cli/wordcraft-cli commands --json            # все команды приложения
+~/stack/craft-cli/wordcraft-cli run --file report.docx --cmd 'select.text={"text":"X"}' --cmd format.bold --save out.docx
+
+# Live-режим: агент правит документ в открытом окне (ты видишь в реальном времени)
+/Applications/WordCraft.app/Contents/MacOS/wordcraft --control 7981
+# MCP-команда агента: ~/stack/craft-cli/wordcraft-cli mcp --connect 127.0.0.1:7981
+# порты: wordcraft 7981 · gridcraft 7982 · deckcraft 7983 · pdfcraft 7984
+
+# Обновление GUI-приложений — через ArtCraft Launcher; версии проверяет update-all.sh
+```
+
+Важно: приложения в статусе alpha — сложные файлы из MS Office могут отображаться не идеально; храни копии важных документов. Компиляция .tex остаётся за pdflatex. Подробный workflow для агента — скилл `craft-office`.
 
 ---
 

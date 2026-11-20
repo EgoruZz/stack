@@ -101,6 +101,30 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
       "command": ["node", "{env:HOME}/stack/tldraw-mcp/dist/index.js"],
       "enabled": true,
       "timeout": 60000
+    },
+    "wordcraft": {
+      "type": "local",
+      "command": ["{env:HOME}/stack/craft-cli/wordcraft-cli", "mcp"],
+      "enabled": true,
+      "timeout": 120000
+    },
+    "gridcraft": {
+      "type": "local",
+      "command": ["{env:HOME}/stack/craft-cli/gridcraft-cli", "mcp"],
+      "enabled": true,
+      "timeout": 120000
+    },
+    "deckcraft": {
+      "type": "local",
+      "command": ["{env:HOME}/stack/craft-cli/deckcraft-cli", "mcp"],
+      "enabled": true,
+      "timeout": 120000
+    },
+    "pdfcraft": {
+      "type": "local",
+      "command": ["{env:HOME}/stack/craft-cli/pdfcraft-cli", "mcp"],
+      "enabled": true,
+      "timeout": 120000
     }
   }
 }

@@ -54,16 +54,38 @@ gdir="$HOME/.config/opencode/skills"
 
 for gdir in "$HOME/.claude/skills" "$HOME/.agents/skills"; do
     [ -d "$gdir" ] || continue
-    while IFS= read -r name; do
+    ls "$gdir" 2>/dev/null | while IFS= read -r name; do
         [ -n "$name" ] || continue
-        if [ -d "$STORE/$name" ]; then
+        # Известные источники: уже в хранилище, либо скиллы firecrawl
+        if [ -d "$STORE/$name" ] || [ "$name" = "firecrawl" ] || [ "${name#firecrawl-}" != "$name" ]; then
             rsync -aL "$gdir/$name/" "$STORE/$name/" 2>/dev/null
             rm -rf "$gdir/$name"
         fi
-    done < <(ls "$gdir" 2>/dev/null)
+    done
 done
 
-# ── 5. Очистка глобального каталога OpenCode ──
+# ── 5. Сборка мусора в хранилище (ДО чистки глобальных каталогов!) ──
+# Удаляем из skills-store всё, что больше не существует ни в одном источнике
+# (напр. переименованные/удалённые standalone-скиллы). Имена из глобальных
+# каталогов учитываются здесь, потому что сами каталоги удаляются в шаге 6.
+KEEP=$(mktemp)
+{ ls "$STACK_DIR/skills" 2>/dev/null;
+  grep -v '^\s*#' "$ARIS_LIST" 2>/dev/null | tr -d ' ';
+  echo tldraw-offline;
+  ls "$HOME/.config/opencode/skills" 2>/dev/null;
+  ls "$HOME/.claude/skills" 2>/dev/null;
+  ls "$HOME/.agents/skills" 2>/dev/null; } | sort -u > "$KEEP"
+for d in "$STORE"/*; do
+    name=$(basename "$d")
+    # firecrawl-скиллы — известный источник, остаются всегда
+    if grep -qxF "$name" "$KEEP" || [ "$name" = "firecrawl" ] || [ "${name#firecrawl-}" != "$name" ]; then
+        continue
+    fi
+    rm -rf "$d"
+done
+rm -f "$KEEP"
+
+# ── 6. Очистка глобального каталога OpenCode ──
 rm -rf "$HOME/.config/opencode/skills"
 
 COUNT=$(ls "$STORE" 2>/dev/null | wc -l | tr -d ' ')
