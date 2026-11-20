@@ -260,9 +260,9 @@ for repo in wordcraft gridcraft deckcraft pdfcraft; do
     LATEST=$(curl -s --max-time 20 "https://api.github.com/repos/storytold/$repo/releases/latest" \
         | grep -o '"tag_name": "[^"]*"' | cut -d'"' -f4 | sed 's/^v//')
     if [ -z "$INSTALLED" ]; then
-        echo "  $APP_NAME: не установлен (ставится: bash ~/stack/craft-downloads/install-craft-apps.sh)"
+        echo "  $APP_NAME: не установлен (ставится: bash ~/stack/craft-install.sh)"
     elif [ -n "$LATEST" ] && [ "$INSTALLED" != "$LATEST" ]; then
-        echo "  $APP_NAME: $INSTALLED → $LATEST доступна — обнови: bash ~/stack/craft-downloads/install-craft-apps.sh"
+        echo "  $APP_NAME: $INSTALLED → $LATEST доступна — обнови: bash ~/stack/craft-install.sh"
     else
         echo "  $APP_NAME: $INSTALLED актуальна"
     fi

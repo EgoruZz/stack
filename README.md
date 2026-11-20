@@ -5,7 +5,7 @@
 ![MCP](https://img.shields.io/badge/MCP--серверы-9-2EA043)
 ![скиллы](https://img.shields.io/badge/скиллы-60-E16F24)
 ![VS_Code](https://img.shields.io/badge/расширения_VS_Code-6-8250DF)
-![CLI](https://img.shields.io/badge/CLI--инструменты-10-0969DA)
+![CLI](https://img.shields.io/badge/CLI--инструменты-11-0969DA)
 
 [![AGENTS.md](https://img.shields.io/badge/🤖_карта_и_конвенции-AGENTS.md-1F6FEB)](AGENTS.md)
 [![STACK.md](https://img.shields.io/badge/📖_полная_дока-STACK.md-1F6FEB)](STACK.md)
@@ -13,7 +13,7 @@
 
 </div>
 
-**Персональный набор инструментов для macOS** — MCP-серверы, AI-скиллы, 10 CLI-инструментов и расширения VS Code для полноценной AI-разработки через [OpenCode](https://opencode.ai).
+**Персональный набор инструментов для macOS** — MCP-серверы, AI-скиллы, 11 CLI-инструментов и расширения VS Code для полноценной AI-разработки через [OpenCode](https://opencode.ai).
 
 ИИ-агент? Начни с [`AGENTS.md`](AGENTS.md) — карта репозитория и конвенции.
 
@@ -61,6 +61,7 @@
 ├── consolidate-skills.sh        # Сборка skills-store + чистка глобальных
 ├── chrome-version.sh            # Версия Chrome под пин tldraw
 ├── check-wolfram-license.sh     # Срок лицензии Wolfram
+├── craft-install.sh             # Установка/обновление Craft Apps (GUI)
 │
 ├── projects.txt                 # Реестр проектов
 ├── aris-skills.txt              # Список 14 ARIS-скиллов
@@ -85,7 +86,7 @@
 | **ParaView** | [paraview.org/download](https://www.paraview.org/download/) |
 | **MacTeX** | `brew install --cask mactex` (~4 GB) |
 | **Firecrawl auth** | `firecrawl login --browser` — без него работает бесплатный tier |
-| **Craft Apps (GUI)** | `bash ~/stack/craft-downloads/install-craft-apps.sh` в своём терминале — сам скачивает свежие версии WordCraft, GridCraft, DeckCraft, PdfCraft с GitHub и кладёт в /Applications. Опционально: [ArtCraft Launcher](https://github.com/storytold/craft-launcher/releases/latest) как GUI-альтернатива |
+| **Craft Apps (GUI)** | `bash ~/stack/craft-install.sh` в своём терминале — сам скачивает свежие версии WordCraft, GridCraft, DeckCraft, PdfCraft с GitHub и кладёт в /Applications. Опционально: [ArtCraft Launcher](https://github.com/storytold/craft-launcher/releases/latest) как GUI-альтернатива |
 
 Офисные **CLI** этих приложений ставятся автоматически `setup.sh` (шаг 7, в `~/stack/craft-cli/`); GUI-приложения — ручной шаг выше.
 
