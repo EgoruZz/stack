@@ -28,3 +28,7 @@ __pycache__/
 
 # Skills runtime store (assembled from skills/, ARIS clone, firecrawl)
 skills-store/
+
+# Craft Apps (ArtCraft office suite)
+craft-cli/
+craft-downloads/

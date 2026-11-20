@@ -243,6 +243,32 @@ else
 fi
 echo ""
 
+# Craft Apps (WordCraft, GridCraft, DeckCraft, PdfCraft): сравниваем
+# установленную версию с последним GitHub-релизом. GUI-обновления идут
+# через ArtCraft Launcher — здесь только проверка и подсказка.
+echo "  Craft Apps..."
+for repo in wordcraft gridcraft deckcraft pdfcraft; do
+    case "$repo" in
+        wordcraft) APP_NAME="WordCraft" ;;
+        gridcraft) APP_NAME="GridCraft" ;;
+        deckcraft) APP_NAME="DeckCraft" ;;
+        pdfcraft)  APP_NAME="PdfCraft" ;;
+    esac
+    INSTALLED=""
+    [ -d "/Applications/$APP_NAME.app" ] && \
+        INSTALLED=$(defaults read "/Applications/$APP_NAME.app/Contents/Info.plist" CFBundleShortVersionString 2>/dev/null)
+    LATEST=$(curl -s --max-time 20 "https://api.github.com/repos/storytold/$repo/releases/latest" \
+        | grep -o '"tag_name": "[^"]*"' | cut -d'"' -f4 | sed 's/^v//')
+    if [ -z "$INSTALLED" ]; then
+        echo "  $APP_NAME: не установлен (ставится через ArtCraft Launcher)"
+    elif [ -n "$LATEST" ] && [ "$INSTALLED" != "$LATEST" ]; then
+        echo "  $APP_NAME: $INSTALLED → $LATEST доступна — обнови в ArtCraft Launcher"
+    else
+        echo "  $APP_NAME: $INSTALLED актуальна"
+    fi
+done
+echo ""
+
 # ═══════════════════════════════════════
 # 11. ПРОВЕРКА
 # ═══════════════════════════════════════

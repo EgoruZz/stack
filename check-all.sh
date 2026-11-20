@@ -144,6 +144,22 @@ else
     echo "❌ не найден"
 fi
 
+# Craft Apps (ArtCraft office suite)
+echo -n "Craft Apps: "
+CRAFT_OK=0; CRAFT_ALL=4
+for app in WordCraft GridCraft DeckCraft PdfCraft; do
+    if [ -d "/Applications/$app.app" ]; then CRAFT_OK=$((CRAFT_OK+1)); fi
+done
+CLI_OK=0
+for cli in wordcraft-cli gridcraft-cli deckcraft-cli pdfcraft-cli; do
+    [ -x ~/stack/craft-cli/$cli ] && CLI_OK=$((CLI_OK+1))
+done
+if [ "$CRAFT_OK" -eq "$CRAFT_ALL" ] && [ "$CLI_OK" -eq "$CRAFT_ALL" ]; then
+    echo "✅ 4/4 apps, 4/4 CLI"
+else
+    echo "⚠️ apps $CRAFT_OK/4, CLI $CLI_OK/4 — установи через ArtCraft Launcher, CLI в ~/stack/craft-cli/"
+fi
+
 # Хранилище скиллов
 echo -n "Skills store: "
 if [ -d ~/stack/skills-store ]; then

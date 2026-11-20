@@ -2,7 +2,7 @@
 
 ![платформа](https://img.shields.io/badge/платформа-macOS-black)
 ![агент](https://img.shields.io/badge/AI--агент-OpenCode_v2-1F6FEB)
-![MCP](https://img.shields.io/badge/MCP--серверы-5-2EA043)
+![MCP](https://img.shields.io/badge/MCP--серверы-9-2EA043)
 ![скиллы](https://img.shields.io/badge/скиллы-60-E16F24)
 ![VS_Code](https://img.shields.io/badge/расширения_VS_Code-6-8250DF)
 ![CLI](https://img.shields.io/badge/CLI--инструменты-10-0969DA)
@@ -50,7 +50,7 @@
 ├── STACK.md                     # Полная документация: хоткеи, примеры
 ├── workflow.txt                 # Правила git-workflow
 │
-├── setup.sh                     # Установка (12 шагов)
+├── setup.sh                     # Установка (13 шагов)
 ├── update-all.sh                # Обновление всего (13 шагов)
 ├── check-all.sh                 # Проверка работоспособности
 │
@@ -66,6 +66,8 @@
 ├── aris-skills.txt              # Список 14 ARIS-скиллов
 ├── skills/                      # 8 standalone-скиллов (источник)
 ├── skills-store/                # Собранные 60 скиллов (gitignored)
+├── craft-cli/                   # Headless-CLI офисных Craft Apps (gitignored)
+├── craft-downloads/             # Установщики Craft Apps (gitignored)
 ├── WolframLanguage/             # Пользовательские Wolfram-пакеты
 │
 └── paraview-mcp/ · manim-mcp/ · julia-mcp/ · tldraw-mcp/ ·      # клонированные
@@ -83,6 +85,9 @@
 | **ParaView** | [paraview.org/download](https://www.paraview.org/download/) |
 | **MacTeX** | `brew install --cask mactex` (~4 GB) |
 | **Firecrawl auth** | `firecrawl login --browser` — без него работает бесплатный tier |
+| **ArtCraft Launcher** | [github.com/storytold/craft-launcher/releases](https://github.com/storytold/craft-launcher/releases/latest) — затем в нём установить WordCraft, GridCraft, DeckCraft, PdfCraft |
+
+Офисные **CLI** этих приложений ставятся автоматически `setup.sh` (шаг 7, в `~/stack/craft-cli/`); GUI-приложения — ручной шаг выше.
 
 Всё остальное ставится автоматически.
 
@@ -91,7 +96,7 @@
 ```bash
 git clone https://github.com/EgoruZz/stack.git ~/stack
 cd ~/stack
-bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, скиллы, конфиги
+bash setup.sh        # 13 шагов: brew, репозитории, venv, CLI, скиллы, конфиги
 ```
 
 - Пароль спрашивается только там, где его требует система
@@ -143,6 +148,10 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | `wolframresearch.wolfram` | `.wl` |
 | `james-yu.latex-workshop` | `.tex` — компиляция + PDF-превью |
 
+### Офисные документы — Craft Apps (4)
+
+Нативные macOS-приложения [ArtCraft](https://getartcraft.com) (open source, Rust): **WordCraft** (.docx, цитирования APA/MLA/Chicago/IEEE, Zotero), **GridCraft** (.xlsx, PivotTables, 500+ функций), **DeckCraft** (.pptx, экспорт PDF/GIF), **PdfCraft** (объединение/разделение/защита PDF). GUI — ручной шаг; headless-CLI ставится автоматически и поднимает 4 MCP-сервера (`wordcraft`, `gridcraft`, `deckcraft`, `pdfcraft`). Подробный workflow — скилл `craft-office`.
+
 ### Скиллы OpenCode (60)
 
 Собираются автоматически (`consolidate-skills.sh` в составе `setup.sh`) в хранилище `~/stack/skills-store/` и подключаются к проектам через `skills` в конфиге — **вне проектов агент видит только встроенные скиллы самого OpenCode** (`customize-opencode` — учит агента безопасно править его конфигурацию; начиная с v2 — также `report` для репортов багов).
@@ -161,7 +170,7 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 |-------|-----------|
 | `render-visual` | Полированные PNG/SVG/PDF, слайды, схемы, GIF |
 | `data-analysis` | EDA, визуализация данных, отчёты, гипотезы |
-| `xlsx` | Excel/CSV/TSV: формулы, проверка, конвертация |
+| `xlsx` → заменён на `craft-office` | Office-файлы: Word/Excel/PowerPoint/PDF через Craft Apps |
 | `deep-mind` | Глубокое критическое мышление |
 | `epistemic-rigor` | Anti-sycophancy, честная оценка гипотез |
 | `grill-me` | Стресс-тест планов и решений |
@@ -183,7 +192,7 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | Файл | Содержимое |
 |------|-----------|
 | `AGENTS.md` | Инструкции агента: карта стека, MCP-инструменты, конвенции |
-| `.opencode/opencode.json` | `mcp` ×5 · `skills` → skills-store |
+| `.opencode/opencode.json` | `mcp` ×9 · `skills` → skills-store |
 
 | Факт | Детали |
 |------|--------|
@@ -209,6 +218,10 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | `.ipynb` | Запуск ячеек в GUI | Читает JSON ячеек; запускает `jupyter` |
 | `.tex` | Компиляция + PDF-превью | Пишет `.tex`, запускает `pdflatex`, читает лог |
 | `.wl` | Подсветка + wolframscript | Проверяет через `wolframscript` |
+| `.docx` | WordCraft | WordCraft MCP/CLI: создание, правки, конвертация |
+| `.xlsx` | GridCraft | GridCraft MCP/CLI: формулы, PivotTables, графики |
+| `.pptx` | DeckCraft | DeckCraft MCP/CLI: сборка и экспорт презентаций |
+| `.pdf` | PdfCraft | PdfCraft MCP/CLI: объединение, разделение, защита |
 
 > Агент проверяет правки **компиляторами и линтерами** — они дают честные ошибки сборки.
 
