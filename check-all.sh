@@ -157,7 +157,7 @@ done
 if [ "$CRAFT_OK" -eq "$CRAFT_ALL" ] && [ "$CLI_OK" -eq "$CRAFT_ALL" ]; then
     echo "✅ 4/4 apps, 4/4 CLI"
 else
-    echo "⚠️ apps $CRAFT_OK/4, CLI $CLI_OK/4 — установи через ArtCraft Launcher, CLI в ~/stack/craft-cli/"
+    echo "⚠️ apps $CRAFT_OK/4, CLI $CLI_OK/4 — GUI: bash ~/stack/craft-downloads/install-craft-apps.sh, CLI уже в ~/stack/craft-cli/"
 fi
 
 # Хранилище скиллов

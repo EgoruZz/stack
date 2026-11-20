@@ -245,7 +245,7 @@ echo ""
 
 # Craft Apps (WordCraft, GridCraft, DeckCraft, PdfCraft): сравниваем
 # установленную версию с последним GitHub-релизом. GUI-обновления идут
-# через ArtCraft Launcher — здесь только проверка и подсказка.
+# через install-craft-apps.sh (аналог Launcher без GUI) — здесь только проверка.
 echo "  Craft Apps..."
 for repo in wordcraft gridcraft deckcraft pdfcraft; do
     case "$repo" in
@@ -260,9 +260,9 @@ for repo in wordcraft gridcraft deckcraft pdfcraft; do
     LATEST=$(curl -s --max-time 20 "https://api.github.com/repos/storytold/$repo/releases/latest" \
         | grep -o '"tag_name": "[^"]*"' | cut -d'"' -f4 | sed 's/^v//')
     if [ -z "$INSTALLED" ]; then
-        echo "  $APP_NAME: не установлен (ставится через ArtCraft Launcher)"
+        echo "  $APP_NAME: не установлен (ставится: bash ~/stack/craft-downloads/install-craft-apps.sh)"
     elif [ -n "$LATEST" ] && [ "$INSTALLED" != "$LATEST" ]; then
-        echo "  $APP_NAME: $INSTALLED → $LATEST доступна — обнови в ArtCraft Launcher"
+        echo "  $APP_NAME: $INSTALLED → $LATEST доступна — обнови: bash ~/stack/craft-downloads/install-craft-apps.sh"
     else
         echo "  $APP_NAME: $INSTALLED актуальна"
     fi
