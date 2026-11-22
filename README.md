@@ -237,6 +237,8 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | **Синхронизировать все проекты** | `bash ~/stack/sync-agents.sh` |
 | **Срок лицензии Wolfram** | `bash ~/stack/check-wolfram-license.sh` |
 | **Версия Chrome под tldraw** | `bash ~/stack/chrome-version.sh` |
+| **Кредиты Firecrawl** | `firecrawl credits` |
+| **Срок подписки прокси** | `bash ~/stack/check-proxy-expiry.sh` |
 
 > Конфиги OpenCode v2 перечитываются на лету (`/reload`); после обновления самих компонентов (MCP-бинарники, venv, скиллы) надёжнее перезапустить OpenCode.
 
