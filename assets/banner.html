@@ -2,30 +2,47 @@
 <html><head><meta charset="utf-8"><style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { width:1500px; height:500px; overflow:hidden; position:relative;
-    background: linear-gradient(180deg,#ffffff 0%,#f6f8fa 60%,#eef2f6 100%);
-    display:flex; align-items:center; justify-content:center;
-    font-family:-apple-system,'SF Pro Display',sans-serif; }
-  .mark { display:flex; gap:14px; justify-content:center; margin-bottom:30px; }
-  .block { width:56px; height:56px; border-radius:14px; box-shadow:0 10px 30px rgba(2,6,23,.12); }
-  .b1 { background:#1F6FEB; transform:translateY(6px); }
-  .b2 { background:#2EA043; transform:translateY(-2px); }
-  .b3 { background:#EA4AAA; transform:translateY(6px); }
-  h1 { text-align:center; font-size:150px; font-weight:800; letter-spacing:-1px;
-    color:#1f2328; margin:0; }
-  .bar { width:380px; height:5px; margin:22px auto 20px; border-radius:3px;
-    background:linear-gradient(90deg,#1F6FEB,#2EA043,#EA4AAA); }
-  .tag { text-align:center; font-size:25px; color:#656d76; letter-spacing:3.5px;
-    text-transform:uppercase; }
-  .tag b { color:#1F6FEB; font-weight:600; }
-  .hair { position:absolute; width:100%; height:1px; background:linear-gradient(90deg,transparent,#d0d7de,transparent); }
-  .h1 { top:14%; } .h2 { bottom:14%; }
+    background: radial-gradient(1200px 700px at 20% 10%, #eef2ff 0%, #f8fafc 55%, #ecfdf5 100%);
+    display:flex; align-items:center; font-family:-apple-system,'SF Pro Display',sans-serif; }
+  .glow { position:absolute; width:420px; height:420px; border-radius:50%;
+    background:radial-gradient(circle,#6366f122,transparent 70%); top:-120px; right:6%; }
+  .glow2 { position:absolute; width:360px; height:360px; border-radius:50%;
+    background:radial-gradient(circle,#14b8a622,transparent 70%); bottom:-140px; left:38%; }
+  .tui { width:880px; margin-left:56px; background:#101418; border-radius:12px;
+    border:1px solid #2a3138; box-shadow:0 24px 60px rgba(15,23,42,.35);
+    font-family:"SF Mono",ui-monospace,Menlo,monospace; font-size:19px; overflow:hidden; }
+  .hdr { display:flex; align-items:center; gap:14px; padding:13px 20px;
+    background:#161c22; border-bottom:1px solid #232a31; color:#9aa7b4; }
+  .hdr .logo { color:#7dd3fc; font-weight:700; }
+  .hdr .path { margin-left:auto; }
+  .body { padding:22px 26px 26px; line-height:2.1; color:#c7d0d9; }
+  .role { display:inline-block; min-width:72px; color:#5f6b78; }
+  .user .txt { color:#e6edf3; }
+  .ag .txt { color:#7dd3fc; }
+  .ag .dim { color:#5f6b78; }
+  .sep { border-top:1px dashed #2a3138; margin:12px 0; }
+  .foot { padding:11px 20px; background:#161c22; border-top:1px solid #232a31;
+    color:#586371; font-size:16px; display:flex; justify-content:space-between; }
+  .side { margin-left:58px; position:relative; z-index:2; }
+  h1 { font-size:116px; font-weight:800; color:#0f172a; letter-spacing:-1px; margin:0 0 14px; }
+  .tag { font-size:24px; color:#475569; line-height:1.6; }
+  .tag b { color:#4f46e5; font-weight:600; }
 </style></head>
 <body>
-  <div class="hair h1"></div><div class="hair h2"></div>
-  <div class="wrap">
-    <div class="mark"><div class="block b1"></div><div class="block b2"></div><div class="block b3"></div></div>
+  <div class="glow"></div><div class="glow2"></div>
+  <div class="tui">
+    <div class="hdr"><span class="logo">✻ opencode</span><span>glm-4.6</span><span class="path">~/stack · main</span></div>
+    <div class="body">
+      <div class="user"><span class="role">user</span><span class="txt">подключи стек к этому проекту</span></div>
+      <div class="ag"><span class="role">agent</span><span class="txt">готово — AGENTS.md + конфиг: <span class="dim">10 mcp · 60 skills</span></span></div>
+      <div class="sep"></div>
+      <div class="user"><span class="role">user</span><span class="txt">сделай отчёт в Word</span></div>
+      <div class="ag"><span class="role">agent</span><span class="txt">отчёт.docx → <span class="dim">wordcraft ✓</span></span></div>
+    </div>
+    <div class="foot"><span>session: stack</span><span>wolfram · julia · manim · paraview · tldraw · craft</span></div>
+  </div>
+  <div class="side">
     <h1>Stack</h1>
-    <div class="bar"></div>
-    <div class="tag">personal <b>AI dev</b> environment · macOS</div>
+    <div class="tag">персональная AI-среда<br>для <b>OpenCode</b> · macOS</div>
   </div>
 </body></html>

@@ -629,7 +629,8 @@ cd ~/stack && bash update-all.sh
 - Wolfram paclets
 - AGENTS.md синхронизация (все проекты)
 
-> **После обновления перезапусти OpenCode** для применения изменений MCP и skills.
+> [!IMPORTANT]
+> После обновления перезапусти OpenCode — для применения изменений MCP и skills.
 
 ### Проверить что всё работает
 ```bash

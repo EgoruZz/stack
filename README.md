@@ -21,7 +21,7 @@ MCP servers, skills, CLI tools and office apps — one command to attach to a pr
 
 ---
 
-<h2 align="center">🎯 Why</h2>
+<h2 align="center">🧠 Why</h2>
 
 Research and development need many things at once: computation, data visualization, web research, deliverables in familiar office formats, interface mockups — **in one place, driven by an AI agent**. The stack assembles official open-source tools and attaches them to OpenCode through every available channel: **MCP servers** (interactive compute and editing), **skills** (step-by-step agent workflows), **headless CLIs** (scripted commands without a window) and **control CLI scripts** (checks, updates, expiry tracking) — and it is available **only in projects where it is explicitly attached**: the global OpenCode config stays empty, and outside those projects the agent sees none of it.
 
@@ -33,9 +33,9 @@ Research and development need many things at once: computation, data visualizati
 | **Portability** | Paths in configs go through `{env:HOME}`; a fresh machine = `git clone` + `setup.sh` |
 | **Routing** | Local stack traffic always goes direct; external web traffic goes through the configured ISP proxy (`proxy.sh`, personal values in `~/.stack-secrets.sh`) |
 
-<h2 align="center">🔖 Table of contents</h2>
+<h2 align="center">🗂️ Table of contents</h2>
 
-- [🌍 Repository structure](#-repository-structure)
+- [🗺️ Repository structure](#-repository-structure)
 - [🖐 Manual steps](#-manual-steps)
 - [🚀 Quick start](#-quick-start)
 - [📦 What's inside](#-whats-inside)
@@ -43,7 +43,7 @@ Research and development need many things at once: computation, data visualizati
 - [🤝 Files: human vs AI agent](#-files-human-vs-ai-agent)
 - [🛠 Usage](#-usage)
 
-<h2 align="center">🌍 Repository structure</h2>
+<h2 align="center">🗺️ Repository structure</h2>
 
 All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`):
 
@@ -93,14 +93,15 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`):
 | **Wolfram activation** | license for the MCP (renew every ~40 days) | `wolframscript` — sign in with a Wolfram ID; check: `bash ~/stack/check-wolfram-license.sh` |
 | **Firecrawl auth** *(optional)* | Firecrawl works per account: without signing in only a minimal anonymous quota is available, the free tier is enough | `firecrawl login --browser`; check: `firecrawl --status` |
 
+> [!NOTE]
 > `check-all.sh` verifies the presence of every component — ✅ or ❌ per row.
 
 <h2 align="center">🚀 Quick start</h2>
 
-```bash
-git clone https://github.com/EgoruZz/stack.git ~/stack
-cd ~/stack
-bash setup.sh        # 12 steps: brew + casks, repos, venvs, CLIs, skills, configs
+```shell
+$ git clone https://github.com/EgoruZz/stack.git ~/stack
+$ cd ~/stack
+$ bash setup.sh        # 12 steps: brew + casks, repos, venvs, CLIs, skills, configs
 ```
 
 - It asks for a password only where the system requires one
@@ -130,6 +131,7 @@ Everything is installed automatically by `setup.sh`:
 | `tldraw-mcp` build | `npm install && npm run build` |
 | Craft Apps headless CLIs ×5 | GitHub releases → `~/stack/craft-cli/` |
 
+> [!TIP]
 > **Manim vs ManimGL:** `manim` (community) renders headless and is what the MCP server uses. `manimgl` (3Blue1Brown) is an interactive GUI tool for you — no MCP uses it.
 
 ### MCP servers (10)
@@ -153,8 +155,8 @@ Configs are generated automatically (`gen-opencode-config.sh`); for ParaView sta
 
 Native macOS apps by [ArtCraft](https://getartcraft.com) (open source, pure Rust) — each with a headless CLI and an MCP. The GUI is installed/updated by a script:
 
-```bash
-bash ~/stack/craft-install.sh
+```shell
+$ bash ~/stack/craft-install.sh
 ```
 
 | App | Official status |
@@ -162,6 +164,7 @@ bash ~/stack/craft-install.sh
 | WordCraft · GridCraft · DeckCraft | In development |
 | PdfCraft · FigCraft | Early alpha |
 
+> [!WARNING]
 > ⚠️ All apps are pre-release: complex files from MS Office and .fig files open best-effort and may not look perfect — **keep backups of important documents**.
 
 ### VS Code extensions (6)
@@ -197,8 +200,8 @@ Assembled automatically (`consolidate-skills.sh`) into `~/stack/skills-store/` a
 
 <h2 align="center">🔌 Attaching to a project</h2>
 
-```bash
-~/stack/new-project.sh ~/work/my-project    # create new / register existing
+```shell
+$ ~/stack/new-project.sh ~/work/my-project    # create new / register existing
 ```
 
 The project receives **two files**:
@@ -249,5 +252,6 @@ You — in VS Code (the stack's extensions provide language servers: autocomplet
 | **Firecrawl credits** | `firecrawl credits` |
 | **Chrome version for tldraw** | `bash ~/stack/chrome-version.sh` |
 
+> [!NOTE]
 > OpenCode v2 hot-reloads configs (`/reload`); after updating the components themselves (MCP binaries, venvs, skills) an OpenCode restart is safer.
 
