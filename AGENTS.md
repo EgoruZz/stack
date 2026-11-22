@@ -25,6 +25,7 @@
 | `chrome-version.sh` | Версия Chrome под пин tldraw-cli |
 | `check-wolfram-license.sh` | Срок лицензии Wolfram |
 | `craft-install.sh` | Установка/обновление GUI Craft Apps (запуск в терминале пользователя) |
+| `proxy.sh` | Маршрутизация трафика через ISP-прокси (status / git on-off / test) |
 | `projects.txt` | Реестр проектов (по одному пути на строку) |
 | `aris-skills.txt` | Список из 14 ARIS-скиллов |
 | `skills/` | 8 standalone-скиллов (источник) |
