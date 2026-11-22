@@ -1,36 +1,31 @@
-# Python venv
-manim-env/
-jupyter-env/
-paraview-mcp-env/
-julia-mcp-env/
 
-# Node
-tldraw-mcp/node_modules/
-tldraw-mcp/dist/
-
-# External repos (cloned by setup.sh)
-paraview-mcp/
-manim-mcp/
-julia-mcp/
-tldraw-mcp/
-aris-research-repo/
-WolframLanguageForJupyter/
-
-# macOS
-.DS_Store
-
-# Python
 __pycache__/
-*.pyc
-
-# OpenCode local config
+.DS_Store
 .opencode/
-
-# Skills runtime store (assembled from skills/, ARIS clone, firecrawl)
-skills-store/
-
+.stack-secrets.sh
+*.pyc
 # Craft Apps (ArtCraft office suite)
+# External repos (cloned by setup.sh)
+# macOS
+# Node
+# OpenCode local config
+# Python
+# Python venv
+# Skills runtime store (assembled from skills/, ARIS clone, firecrawl)
+aris-research-repo/
 craft-cli/
 craft-downloads/
-.stack-secrets.sh
+first-start.txt
+julia-mcp-env/
+julia-mcp/
+jupyter-env/
+manim-env/
+manim-mcp/
+paraview-mcp-env/
+paraview-mcp/
 projects.txt
+skills-store/
+tldraw-mcp/
+tldraw-mcp/dist/
+tldraw-mcp/node_modules/
+WolframLanguageForJupyter/
