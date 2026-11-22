@@ -15,7 +15,7 @@ MCP servers, skills, CLI tools and office apps — one command to attach to a pr
 ![Skills](https://img.shields.io/badge/Skills-60-E16F24?style=for-the-badge)
 ![Craft_Apps](https://img.shields.io/badge/Craft_Apps-5-EA4AAA?style=for-the-badge)
 ![CLI_tools](https://img.shields.io/badge/CLI_tools-13-0969DA?style=for-the-badge)
-![Version](https://img.shields.io/badge/version-v1.1.1-8250DF?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-v1.0.0-8250DF?style=for-the-badge)
 
 </div>
 
