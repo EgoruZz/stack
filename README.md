@@ -21,7 +21,7 @@ MCP servers, skills, CLI tools and office apps — one command to attach to a pr
 
 ---
 
-<h2 align="center">🧠 Why</h2>
+<h2 align="center">🎯 Why</h2>
 
 Research and development need many things at once: computation, data visualization, web research, deliverables in familiar office formats, interface mockups — **in one place, driven by an AI agent**. The stack assembles official open-source tools and attaches them to OpenCode through every available channel: **MCP servers** (interactive compute and editing), **skills** (step-by-step agent workflows), **headless CLIs** (scripted commands without a window) and **control CLI scripts** (checks, updates, expiry tracking) — and it is available **only in projects where it is explicitly attached**: the global OpenCode config stays empty, and outside those projects the agent sees none of it.
 
@@ -33,17 +33,17 @@ Research and development need many things at once: computation, data visualizati
 | **Portability** | Paths in configs go through `{env:HOME}`; a fresh machine = `git clone` + `setup.sh` |
 | **Routing** | Local stack traffic always goes direct; external web traffic goes through the configured ISP proxy (`proxy.sh`, personal values in `~/.stack-secrets.sh`) |
 
-<h2 align="center">🗂️ Table of contents</h2>
+<h2 align="center">🔖 Table of contents</h2>
 
-- [Repository structure](#-repository-structure)
-- [Manual steps](#-manual-steps)
-- [Quick start](#-quick-start)
-- [What's inside](#-whats-inside)
-- [Attaching to a project](#-attaching-to-a-project)
-- [Files: human vs AI agent](#-files-human-vs-ai-agent)
-- [Usage](#-usage)
+- [🌍 Repository structure](#-repository-structure)
+- [🖐 Manual steps](#-manual-steps)
+- [🚀 Quick start](#-quick-start)
+- [📦 What's inside](#-whats-inside)
+- [🔌 Attaching to a project](#-attaching-to-a-project)
+- [🤝 Files: human vs AI agent](#-files-human-vs-ai-agent)
+- [🛠 Usage](#-usage)
 
-<h2 align="center">🗺️ Repository structure</h2>
+<h2 align="center">🌍 Repository structure</h2>
 
 All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`):
 
@@ -195,7 +195,7 @@ Assembled automatically (`consolidate-skills.sh`) into `~/stack/skills-store/` a
 
 </details>
 
-<h2 align="center">⚡ Attaching to a project</h2>
+<h2 align="center">🔌 Attaching to a project</h2>
 
 ```bash
 ~/stack/new-project.sh ~/work/my-project    # create new / register existing
