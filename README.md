@@ -6,15 +6,9 @@
 MCP servers, skills, CLI tools and office apps — one command to attach to a project, one command to update everything.
 
 
-| | |
-|---|---|
-| 🖥 Platform | macOS |
-| 🤖 Agent | [OpenCode](https://opencode.ai) v2 |
-| 🔌 MCP servers | 10 |
-| 🎯 Skills | 60 |
-| 🧩 Craft Apps | 5 |
-| 🛠 CLI tools | 13 |
-| 🏷 Version | v1.0.0 |
+| 🖥 Platform | 🤖 Agent | 🔌 MCP servers | 🎯 Skills | 🛠 CLI tools | 🏷 Version |
+|---|---|---|---|---|---|
+| macOS | [OpenCode](https://opencode.ai) v2 | 10 | 60 | 13 | v1.0.0 |
 
 </div>
 

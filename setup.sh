@@ -37,6 +37,17 @@ for pair in "wolfram-engine Wolfram" "paraview ParaView-" "mactex TeX" "tldraw t
     fi
 done
 
+# VS Code: официальный каск, если CLI `code` недоступен (нужен для расширений стека)
+if ! command -v code &>/dev/null; then
+    if brew install --cask visual-studio-code >/dev/null 2>&1; then
+        echo "  visual-studio-code: ✅"
+    else
+        echo "  visual-studio-code: ⚠️ поставь вручную: brew install --cask visual-studio-code"
+    fi
+else
+    echo "  vscode: уже установлен"
+fi
+
 # OpenCode — официальный tap (update-all.sh обновляет этот же пакет)
 if ! command -v opencode &>/dev/null; then
     brew tap anomalyco/tap >/dev/null 2>&1
