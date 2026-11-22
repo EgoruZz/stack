@@ -7,23 +7,27 @@
 **Персональная AI-разработка среда для macOS: человек + ИИ-ассистент в OpenCode.**
 MCP-серверы, скиллы, CLI-инструменты и офисные приложения — всё подключается к проекту одной командой и обновляется одной командой.
 
-![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)
-![OpenCode v2](https://img.shields.io/badge/OpenCode_v2-1F6FEB?logo=opencollective&logoColor=white)
+![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white&style=for-the-badge)
+![OpenCode v2](https://img.shields.io/badge/OpenCode_v2-1F6FEB?style=for-the-badge)
 
-![MCP-серверы](https://img.shields.io/badge/MCP--серверы-10-2EA043)
-![Скиллы](https://img.shields.io/badge/Скиллы-60-E16F24)
-![Craft_Apps](https://img.shields.io/badge/Craft_Apps-5-EA4AAA)
-![CLI--инструменты](https://img.shields.io/badge/CLI--инструменты-12-0969DA)
-![Status](https://img.shields.io/badge/status-v1.0--ready-8250DF)
+![MCP--серверы](https://img.shields.io/badge/MCP--серверы-10-2EA043?style=for-the-badge)
+![Скиллы](https://img.shields.io/badge/Скиллы-60-E16F24?style=for-the-badge)
+![Craft_Apps](https://img.shields.io/badge/Craft_Apps-5-EA4AAA?style=for-the-badge)
+![CLI--инструменты](https://img.shields.io/badge/CLI--инструменты-13-0969DA?style=for-the-badge)
+![Версия](https://img.shields.io/badge/версия-v1.0.0-8250DF?style=for-the-badge)
 
 > [!NOTE]
-> 🤖 **ИИ-агент?** Начни с [`AGENTS.md`](AGENTS.md) — карта репозитория и конвенции. Для человека — [`STACK.md`](STACK.md) (полная документация) и [`workflow.txt`](workflow.txt) (git-правила).
+> 🤖 **ИИ-агенту:** начать с [`AGENTS.md`](AGENTS.md) — карта репозитория и конвенции.
+>
+> 👤 **Человеку:** [`STACK.md`](STACK.md) — полная документация: хоткеи, примеры, ссылки.
+>
+> 🤝 **ИИ + человеку:** [`workflow.txt`](workflow.txt) — правила git-workflow (ветка → PR → merge).
 
 </div>
 
 ---
 
-## 🧭 Зачем
+<h2 align="center">🧭 Зачем</h2>
 
 Research и разработка требуют вычислений (Wolfram, Julia), визуализации (ParaView, Manim), веб-исследований (Firecrawl), документов-деливераблов (Word/Excel/PowerPoint/PDF) и интерфейсных мокапов (FigCraft) — **в одном месте и под управлением ИИ-агента**. Стек собирает официальные open-source инструменты и подключает их к OpenCode всеми возможными каналами: **MCP-серверы** (интерактивные вычисления и редактирование), **скиллы** (пошаговые workflow для агента), **headless-CLI** (скриптовое применение команд без окна) и **CLI-скрипты контроля** (проверки, обновления, срок-контроль) — и делает всё это доступным **только в проектах, где он явно включён**: глобальный конфиг OpenCode остаётся пустым, вне проектов агент их не видит.
 
@@ -38,15 +42,14 @@ Research и разработка требуют вычислений (Wolfram, J
 ## Оглавление
 
 - [Структура репозитория](#-структура-репозитория)
-- [Ручные шаги (выполнить до setup.sh)](#-ручные-шаги-выполни-до-setupsh)
+- [Ручные шаги](#-ручные-шаги)
 - [Быстрый старт](#-быстрый-старт)
 - [Что внутри](#-что-внутри)
 - [Стек в проекте](#-стек-в-проекте)
 - [Файлы: человек vs ИИ-агент](#-файлы-человек-vs-ии-агент)
 - [Использование](#-использование)
-- [Документация](#-документация)
 
-## 📁 Структура репозитория
+<h2 align="center">📁 Структура репозитория</h2>
 
 Все `*.sh` — CLI-инструменты (запуск: `bash ~/stack/<имя>.sh`):
 
@@ -67,10 +70,12 @@ Research и разработка требуют вычислений (Wolfram, J
 ├── sync-aris.sh                 # ARIS-скиллы → skills-store
 ├── consolidate-skills.sh        # Сборка skills-store + чистка глобальных
 ├── craft-install.sh             # Установка/обновление Craft Apps (GUI)
+├── apply-first-start.sh         # Форма первого старта → личные конфиги
 ├── proxy.sh                     # Сеть: env-прокси + CLI (status/expiry/git/test)
 ├── chrome-version.sh            # Версия Chrome под пин tldraw
 ├── check-wolfram-license.sh     # Срок лицензии Wolfram
 │
+├── first-start.template.txt     # Шаблон формы первого старта
 ├── projects.txt                 # Реестр проектов
 ├── aris-skills.txt              # Список 14 ARIS-скиллов
 ├── skills/                      # 8 standalone-скиллов (источник)
@@ -83,35 +88,32 @@ Research и разработка требуют вычислений (Wolfram, J
     aris-research-repo/ · WolframLanguageForJupyter/             # репозитории
 ```
 
-## 🖐 Ручные шаги (выполни до setup.sh)
+<h2 align="center">🖐 Ручные шаги</h2>
 
-Что CLI **не** ставят — по независимым причинам (лицензии, GUI-приложения):
+brew-каски ставят почти всё автоматически — включая то, что раньше было ручным (OpenCode, Wolfram Engine, ParaView, MacTeX, tldraw Desktop). Руками остаётся только:
 
-| Компонент | Как установить |
-|-----------|---------------|
-| **OpenCode** | [opencode.ai](https://opencode.ai) |
-| **Wolfram Engine** | `brew install --cask wolfram-engine`, затем `wolframscript` — активация лицензии (продлевать каждые ~40 дней: [проверка](#-использование)) |
-| **ParaView** | [paraview.org/download](https://www.paraview.org/download/) |
-| **MacTeX** | `brew install --cask mactex` (~4 GB) |
-| **Firecrawl auth** | `firecrawl login --browser` — без него работает бесплатный tier |
+| Шаг | Зачем | Как |
+|-----|-------|-----|
+| **Форма первого старта** | прокси, Wolfram ID, git identity | `cp ~/stack/first-start.template.txt ~/stack/first-start.txt` → заполнить → `bash ~/stack/apply-first-start.sh` |
+| **Активация Wolfram** | лицензия MCP (продлевать каждые ~40 дней) | `wolframscript` — войти с Wolfram ID; проверка: `bash ~/stack/check-wolfram-license.sh` |
+| **Firecrawl auth** *(опционально)* | полный тариф вместо free | `firecrawl login --browser`; проверка: `firecrawl --status` |
 
-Всё остальное ставится автоматически. Секреты (прокси, ключи) живут в `~/.zshrc` и `~/.stack-secrets.sh` — **не** в репозитории.
+> Наличие компонентов проверяет `check-all.sh` — по каждому ✅ или ❌.
 
-> Наличие ручных компонентов проверяет `check-all.sh` (Wolfram, ParaView, MacTeX/LaTeX, OpenCode, VS Code — с ✅/❌). Единственное исключение — Firecrawl auth: проверяй вручную `firecrawl --status`.
-
-## 🚀 Быстрый старт
+<h2 align="center">🚀 Быстрый старт</h2>
 
 ```bash
 git clone https://github.com/EgoruZz/stack.git ~/stack
 cd ~/stack
-bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, скиллы, конфиги
+bash setup.sh        # 12 шагов: brew+каски, репозитории, venv, CLI, скиллы, конфиги
 ```
 
 - Пароль спрашивается только там, где его требует система
 - В конце запускается автопроверка — все компоненты должны быть ✅
-- Проекты подключаются после: `~/stack/new-project.sh <путь>`
+- Форма первого старта применяется автоматически, если `first-start.txt` заполнен
+- Проекты подключаются: `~/stack/new-project.sh <путь>`
 
-## 📦 Что внутри
+<h2 align="center">📦 Что внутри</h2>
 
 ### Терминальные и CLI-инструменты
 
@@ -120,6 +122,8 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | Что | Как ставится |
 |-----|--------------|
 | Python 3.12 · Node.js · gh · ffmpeg · juliaup | `brew install` |
+| Wolfram Engine · ParaView · MacTeX · tldraw Desktop | `brew install --cask` |
+| OpenCode | `brew install anomalyco/tap/opencode-v2` |
 | `firecrawl-cli` · `tldraw-cli` | `npm install -g` |
 | `manim-env` — Manim + ManimGL | pip venv |
 | `jupyter-env` — JupyterLab, numpy, pandas, sympy, plotly… | pip venv |
@@ -148,11 +152,11 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | **gridcraft** | Excel: .xlsx, 500+ функций, PivotTables, графики |
 | **deckcraft** | PowerPoint: .pptx, темы, Morph, экспорт PDF/GIF |
 | **pdfcraft** | PDF: объединение, разделение, защита, комментарии |
-| **figcraft** | UI-дизайн: frames, auto-layout, прототипы; формат .figcraft (.fig — best-effort), экспорт PNG/JPEG/WebP/SVG/PDF |
+| **figcraft** | UI-дизайн: frames, auto-layout, прототипы |
 
 ### Craft Apps (5)
 
-Нативные macOS-приложения [ArtCraft](https://getartcraft.com) (open source, pure Rust) — у каждого есть headless-CLI и MCP. GUI ставится/обновляется скриптом в *своём* терминале:
+Нативные macOS-приложения [ArtCraft](https://getartcraft.com) (open source, pure Rust) — у каждого есть headless-CLI и MCP. GUI ставится/обновляется скриптом:
 
 ```bash
 bash ~/stack/craft-install.sh
@@ -196,7 +200,7 @@ bash ~/stack/craft-install.sh
 
 </details>
 
-## ⚡ Стек в проекте
+<h2 align="center">⚡ Стек в проекте</h2>
 
 ```bash
 ~/stack/new-project.sh ~/work/my-project    # создать новый / зарегистрировать существующий
@@ -219,9 +223,9 @@ bash ~/stack/craft-install.sh
 | **Вне проектов** | Ни MCP, ни скиллов; в `~/.config/opencode/` только клиентские настройки |
 | **Расширения — без плагинов** | Все расширения через MCP (внешние процессы) и скиллы (промпты); конфиг не содержит поля `plugins` |
 
-## 👀 Файлы: человек vs ИИ-агент
+<h2 align="center">🤝 Файлы: человек vs ИИ-агент</h2>
 
-Ты — в VS Code (с LSP), агент — в OpenCode (через MCP/CLI и запуск линтеров):
+Ты — в VS Code (расширения стека дают языковые серверы: автодополнение и ошибки при печати), агент — в OpenCode (через MCP/CLI и запуск компиляторов/линтеров напрямую):
 
 | Файл | Человек — в VS Code | Агент — в OpenCode |
 |------|---------------------|--------------------|
@@ -236,7 +240,7 @@ bash ~/stack/craft-install.sh
 | `.docx` `.xlsx` `.pptx` `.pdf` | Craft Apps GUI | Craft Apps MCP/CLI (headless или live-режим) |
 | `.figcraft` | FigCraft | FigCraft MCP/CLI: frames, прототипы, экспорт PNG/SVG/PDF |
 
-## 🛠 Использование
+<h2 align="center">🛠 Использование</h2>
 
 | Задача | Команда |
 |--------|---------|
@@ -244,18 +248,10 @@ bash ~/stack/craft-install.sh
 | **Проверить работоспособность** | `bash ~/stack/check-all.sh` |
 | **Подключить проект** | `~/stack/new-project.sh <путь>` |
 | **Синхронизировать проекты** | `bash ~/stack/sync-agents.sh` |
-| **Установить/обновить Craft Apps** | `bash ~/stack/craft-install.sh` (в своём терминале) |
+| **Установить/обновить Craft Apps** | `bash ~/stack/craft-install.sh` |
 | **Сеть: статус / тест / git** | `bash ~/stack/proxy.sh status` · `test` · `git on\|off` |
 | **Сроки: прокси / Wolfram** | `bash ~/stack/proxy.sh expiry` · `bash ~/stack/check-wolfram-license.sh` |
 | **Кредиты Firecrawl** | `firecrawl credits` |
 | **Версия Chrome под tldraw** | `bash ~/stack/chrome-version.sh` |
 
 > Конфиги OpenCode v2 перечитываются на лету (`/reload`); после обновления самих компонентов (бинарники MCP, venv, скиллы) надёжнее перезапустить OpenCode.
-
-## 📚 Документация
-
-| Файл | Для кого | О чём |
-|------|----------|-------|
-| [`AGENTS.md`](AGENTS.md) | Агент | Карта репозитория, MCP-инструменты, конвенции |
-| [`STACK.md`](STACK.md) | Человек | Хоткеи, примеры кода, ссылки по каждому инструменту |
-| [`workflow.txt`](workflow.txt) | Оба | Git-workflow: ветка → коммит → PR → merge |
