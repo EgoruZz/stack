@@ -16,12 +16,11 @@ MCP-серверы, скиллы, CLI-инструменты и офисные �
 ![CLI--инструменты](https://img.shields.io/badge/CLI--инструменты-13-0969DA?style=for-the-badge)
 ![Версия](https://img.shields.io/badge/версия-v1.0.0-8250DF?style=for-the-badge)
 
-> [!NOTE]
 > 🤖 **ИИ-агенту:** начать с [`AGENTS.md`](AGENTS.md) — карта репозитория и конвенции.
 >
 > 👤 **Человеку:** [`STACK.md`](STACK.md) — полная документация: хоткеи, примеры, ссылки.
 >
-> 🤝 **ИИ + человеку:** [`workflow.txt`](workflow.txt) — правила git-workflow.
+> 🤝 **ИИ + человеку:** [`workflow.txt`](workflow.txt) — правила git-workflow · [`CONTRIBUTING.md`](CONTRIBUTING.md) — как предлагать изменения.
 
 </div>
 
