@@ -32,3 +32,4 @@ skills-store/
 # Craft Apps (ArtCraft office suite)
 craft-cli/
 craft-downloads/
+.stack-secrets.sh

@@ -18,13 +18,19 @@
 # и переопределяются из ~/.stack-secrets.sh — см. конец файла).
 # ═══════════════════════════════════════════════════════════════
 
-PROXY_HOST_DEFAULT="212.68.182.64"
-PROXY_USER_DEFAULT="cl0pmb4J"
-PROXY_PASS_DEFAULT="7sU0M2hqyI"
+PROXY_HOST_DEFAULT=""
+PROXY_USER_DEFAULT=""
+PROXY_PASS_DEFAULT=""
 PROXY_HTTP_PORT="50100"
 PROXY_SOCKS_PORT="50101"
-# Срок подписки (истекает 22.12.2026 13:30 MSK); проверка: bash proxy.sh expiry
-PROXY_EXPIRES_DEFAULT="2026-12-22 13:30 +0300"
+# Срок подписки; проверка: bash proxy.sh expiry
+PROXY_EXPIRES_DEFAULT=""
+
+# ═══ Секреты — НЕ в этом файле! ═══
+# Персональные значения задаются в ~/.stack-secrets.sh (gitignored):
+#   PROXY_HOST="..."  PROXY_USER="..."  PROXY_PASS="..."
+#   PROXY_EXPIRES="2026-12-22 13:30 +0300"
+# Файл создаётся вручную один раз; шаблон — в STACK.md.
 
 # Личный конфиг поверх дефолтов (секреты, не для репозитория):
 # ~/.stack-secrets.sh может переопределять PROXY_HOST/USER/PASS/EXPIRES.
