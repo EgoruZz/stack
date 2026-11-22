@@ -2,41 +2,43 @@
 <html><head><meta charset="utf-8"><style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { width:1500px; height:500px; overflow:hidden; position:relative;
-    background: linear-gradient(120deg,#312e81 0%,#4338ca 40%,#0e7490 100%);
-    display:flex; align-items:center; font-family:"SF Mono",ui-monospace,Menlo,monospace; }
-  .dots { position:absolute; top:16px; left:24px; }
-  .dots span { display:inline-block; width:12px;height:12px;border-radius:50%; margin-right:8px; }
-  .win { width:860px; margin-left:70px; background:#0f172a; border-radius:14px;
-    box-shadow:0 30px 80px rgba(0,0,0,.45); border:1px solid rgba(148,163,184,.25); overflow:hidden; }
-  .bar { height:38px; background:#1e293b; display:flex; align-items:center; padding-left:16px; }
-  .prompt { padding:26px 30px; font-size:26px; line-height:1.75; color:#94a3b8; }
-  .u { color:#4ade80; } .p { color:#22d3ee; } .c { color:#c4b5fd; } .dim { color:#64748b; }
-  .cur { display:inline-block; width:13px; height:26px; background:#4ade80; vertical-align:-4px;
-    animation:none; }
-  .side { margin-left:64px; color:#e0e7ff; position:relative; z-index:2; }
-  h1 { font-family:-apple-system,"SF Pro Display",sans-serif; font-size:120px; font-weight:800;
-    color:#ffffff; letter-spacing:1px; margin:0 0 10px; text-shadow:0 8px 40px rgba(0,0,0,.35); }
-  .tag { font-size:24px; color:#c7d2fe; line-height:1.7; max-width:420px; }
-  .tag b { color:#67e8f9; font-weight:600; }
-  .chips { margin-top:22px; }
-  .chip { display:inline-block; padding:7px 16px; margin:0 10px 10px 0; border-radius:999px;
-    font-size:19px; border:1px solid rgba(199,210,254,.45); color:#e0e7ff; background:rgba(255,255,255,.07); }
+    background: linear-gradient(115deg,#1e1b4b 0%,#3730a3 55%,#155e75 100%);
+    display:flex; align-items:center; font-family:-apple-system,'SF Pro Display',sans-serif; }
+  .tui { width:980px; margin-left:56px; background:#0b1220; border-radius:10px;
+    border:1px solid rgba(148,163,184,.28); box-shadow:0 24px 70px rgba(2,6,23,.55);
+    font-family:"SF Mono",ui-monospace,Menlo,monospace; font-size:20px; overflow:hidden; }
+  .hdr { display:flex; justify-content:space-between; padding:14px 22px;
+    background:#101a30; border-bottom:1px solid rgba(148,163,184,.18);
+    color:#93a5c4; font-size:18px; }
+  .hdr .l { color:#7dd3fc; }
+  .body { padding:24px 26px 30px; line-height:2.05; color:#cbd5e1; }
+  .role { display:inline-block; min-width:76px; color:#64748b; }
+  .user .txt { color:#e2e8f0; }
+  .ag   .txt { color:#7dd3fc; }
+  .ag .dim { color:#5b6b85; }
+  .sep { border-top:1px dashed rgba(148,163,184,.22); margin:14px 0; }
+  .foot { padding:10px 22px; background:#101a30; border-top:1px solid rgba(148,163,184,.14);
+    color:#475569; font-size:16px; display:flex; justify-content:space-between; }
+  .side { margin-left:56px; color:#fff; position:relative; z-index:2; }
+  h1 { font-size:118px; font-weight:800; letter-spacing:1px; margin:0 0 12px;
+    color:#f8fafc; }
+  .tag { font-size:25px; color:#c7d2fe; line-height:1.65; }
+  .tag b { color:#7dd3fc; font-weight:600; }
 </style></head>
 <body>
-  <div class="win">
-    <div class="bar"><div class="dots">
-      <span style="background:#f87171"></span><span style="background:#fbbf24"></span><span style="background:#34d399"></span>
-    </div></div>
-    <div class="prompt">
-      <div><span class="u">you@project</span> <span class="dim">$</span> <span class="c">opencode</span></div>
-      <div><span class="p">agent</span> <span class="dim">&gt;</span> ready — <span class="dim">10 mcp · 60 skills · 5 craft apps</span><span class="cur"></span></div>
+  <div class="tui">
+    <div class="hdr"><span class="l">✻ opencode</span><span>~/stack · main</span></div>
+    <div class="body">
+      <div class="user"><span class="role">user</span><span class="txt">подключи стек к этому проекту</span></div>
+      <div class="ag"><span class="role">agent</span><span class="txt">готово — AGENTS.md + конфиг: <span class="dim">10 mcp · 60 skills</span></span></div>
+      <div class="sep"></div>
+      <div class="user"><span class="role">user</span><span class="txt">сделай отчёт в Word</span></div>
+      <div class="ag"><span class="role">agent</span><span class="txt">отчёт.docx → <span class="dim">wordcraft ✓</span></span></div>
     </div>
+    <div class="foot"><span>session: stack</span><span>wolfram · julia · manim · paraview · tldraw · craft</span></div>
   </div>
   <div class="side">
     <h1>Stack</h1>
-    <div class="tag">кастомизация сессии <b>OpenCode</b>:<br>инструменты, скиллы, документы —<br>только там, где подключён</div>
-    <div class="chips">
-      <span class="chip">setup.sh</span><span class="chip">update-all.sh</span><span class="chip">new-project.sh</span>
-    </div>
+    <div class="tag">персональная AI-среда<br>для <b>OpenCode</b> · macOS</div>
   </div>
 </body></html>
