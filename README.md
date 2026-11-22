@@ -7,22 +7,23 @@
 **Персональная AI-разработка среда для macOS: человек + ИИ-ассистент в OpenCode.**
 MCP-серверы, скиллы, CLI-инструменты и офисные приложения — всё подключается к проекту одной командой и обновляется одной командой.
 
-![платформа](https://img.shields.io/badge/платформа-macOS-black)
-![агент](https://img.shields.io/badge/агент-OpenCode_v2-1F6FEB)
-![MCP](https://img.shields.io/badge/MCP--серверы-10-2EA043)
-![скиллы](https://img.shields.io/badge/скиллы-60-E16F24)
-![Craft_Apps](https://img.shields.io/badge/Craft_Apps-5-EA4AAA)
-![CLI](https://img.shields.io/badge/CLI--инструменты-12-0969DA)
+![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white)
+![OpenCode v2](https://img.shields.io/badge/OpenCode_v2-1F6FEB?logo=opencollective&logoColor=white)
 
-[![AGENTS.md](https://img.shields.io/badge/🤖_агенту_начать_отсюда-AGENTS.md-1F6FEB)](AGENTS.md)
-[![STACK.md](https://img.shields.io/badge/📖_полная_документация-STACK.md-1F6FEB)](STACK.md)
-[![workflow.txt](https://img.shields.io/badge/🔀_git--workflow-workflow.txt-1F6FEB)](workflow.txt)
+![MCP-серверы](https://img.shields.io/badge/MCP--серверы-10-2EA043)
+![Скиллы](https://img.shields.io/badge/Скиллы-60-E16F24)
+![Craft_Apps](https://img.shields.io/badge/Craft_Apps-5-EA4AAA)
+![CLI--инструменты](https://img.shields.io/badge/CLI--инструменты-12-0969DA)
+![Status](https://img.shields.io/badge/status-v1.0--ready-8250DF)
+
+> [!NOTE]
+> 🤖 **ИИ-агент?** Начни с [`AGENTS.md`](AGENTS.md) — карта репозитория и конвенции. Для человека — [`STACK.md`](STACK.md) (полная документация) и [`workflow.txt`](workflow.txt) (git-правила).
 
 </div>
 
 ---
 
-## Зачем
+## 🧭 Зачем
 
 Research и разработка требуют вычислений (Wolfram, Julia), визуализации (ParaView, Manim), веб-исследований (Firecrawl), документов-деливераблов (Word/Excel/PowerPoint/PDF) и интерфейсных мокапов (FigCraft) — **в одном месте и под управлением ИИ-агента**. Стек собирает официальные open-source инструменты и подключает их к OpenCode всеми возможными каналами: **MCP-серверы** (интерактивные вычисления и редактирование), **скиллы** (пошаговые workflow для агента), **headless-CLI** (скриптовое применение команд без окна) и **CLI-скрипты контроля** (проверки, обновления, срок-контроль) — и делает всё это доступным **только в проектах, где он явно включён**: глобальный конфиг OpenCode остаётся пустым, вне проектов агент их не видит.
 
@@ -36,16 +37,16 @@ Research и разработка требуют вычислений (Wolfram, J
 
 ## Оглавление
 
-- [Структура репозитория](#структура-репозитория)
-- [Ручные шаги (до setup.sh)](#ручные-шаги-выполни-до-setupsh)
-- [Быстрый старт](#быстрый-старт)
-- [Что внутри](#что-внутри)
-- [Стек в проекте](#стек-в-проекте)
-- [Файлы: человек vs ИИ-агент](#файлы-человек-vs-ии-агент)
-- [Использование](#использование)
-- [Документация](#документация)
+- [Структура репозитория](#-структура-репозитория)
+- [Ручные шаги (выполнить до setup.sh)](#-ручные-шаги-выполни-до-setupsh)
+- [Быстрый старт](#-быстрый-старт)
+- [Что внутри](#-что-внутри)
+- [Стек в проекте](#-стек-в-проекте)
+- [Файлы: человек vs ИИ-агент](#-файлы-человек-vs-ии-агент)
+- [Использование](#-использование)
+- [Документация](#-документация)
 
-## Структура репозитория
+## 📁 Структура репозитория
 
 Все `*.sh` — CLI-инструменты (запуск: `bash ~/stack/<имя>.sh`):
 
@@ -82,14 +83,14 @@ Research и разработка требуют вычислений (Wolfram, J
     aris-research-repo/ · WolframLanguageForJupyter/             # репозитории
 ```
 
-## Ручные шаги (выполни до setup.sh)
+## 🖐 Ручные шаги (выполни до setup.sh)
 
 Что CLI **не** ставят — по независимым причинам (лицензии, GUI-приложения):
 
 | Компонент | Как установить |
 |-----------|---------------|
 | **OpenCode** | [opencode.ai](https://opencode.ai) |
-| **Wolfram Engine** | `brew install --cask wolfram-engine`, затем `wolframscript` — активация лицензии (продлевать каждые ~40 дней: [проверка](#использование)) |
+| **Wolfram Engine** | `brew install --cask wolfram-engine`, затем `wolframscript` — активация лицензии (продлевать каждые ~40 дней: [проверка](#-использование)) |
 | **ParaView** | [paraview.org/download](https://www.paraview.org/download/) |
 | **MacTeX** | `brew install --cask mactex` (~4 GB) |
 | **Firecrawl auth** | `firecrawl login --browser` — без него работает бесплатный tier |
@@ -98,7 +99,7 @@ Research и разработка требуют вычислений (Wolfram, J
 
 > Наличие ручных компонентов проверяет `check-all.sh` (Wolfram, ParaView, MacTeX/LaTeX, OpenCode, VS Code — с ✅/❌). Единственное исключение — Firecrawl auth: проверяй вручную `firecrawl --status`.
 
-## Быстрый старт
+## 🚀 Быстрый старт
 
 ```bash
 git clone https://github.com/EgoruZz/stack.git ~/stack
@@ -110,7 +111,7 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 - В конце запускается автопроверка — все компоненты должны быть ✅
 - Проекты подключаются после: `~/stack/new-project.sh <путь>`
 
-## Что внутри
+## 📦 Что внутри
 
 ### Терминальные и CLI-инструменты
 
@@ -195,7 +196,7 @@ bash ~/stack/craft-install.sh
 
 </details>
 
-## Стек в проекте
+## ⚡ Стек в проекте
 
 ```bash
 ~/stack/new-project.sh ~/work/my-project    # создать новый / зарегистрировать существующий
@@ -218,7 +219,7 @@ bash ~/stack/craft-install.sh
 | **Вне проектов** | Ни MCP, ни скиллов; в `~/.config/opencode/` только клиентские настройки |
 | **Расширения — без плагинов** | Все расширения через MCP (внешние процессы) и скиллы (промпты); конфиг не содержит поля `plugins` |
 
-## Файлы: человек vs ИИ-агент
+## 👀 Файлы: человек vs ИИ-агент
 
 Ты — в VS Code (с LSP), агент — в OpenCode (через MCP/CLI и запуск линтеров):
 
@@ -235,7 +236,7 @@ bash ~/stack/craft-install.sh
 | `.docx` `.xlsx` `.pptx` `.pdf` | Craft Apps GUI | Craft Apps MCP/CLI (headless или live-режим) |
 | `.figcraft` | FigCraft | FigCraft MCP/CLI: frames, прототипы, экспорт PNG/SVG/PDF |
 
-## Использование
+## 🛠 Использование
 
 | Задача | Команда |
 |--------|---------|
@@ -251,7 +252,7 @@ bash ~/stack/craft-install.sh
 
 > Конфиги OpenCode v2 перечитываются на лету (`/reload`); после обновления самих компонентов (бинарники MCP, venv, скиллы) надёжнее перезапустить OpenCode.
 
-## Документация
+## 📚 Документация
 
 | Файл | Для кого | О чём |
 |------|----------|-------|
