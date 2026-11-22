@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/banner.png" alt="Stack — personal AI dev environment" width="100%">
+
 # Stack
 
 **Персональная AI-разработка среда для macOS: человек + ИИ-ассистент в OpenCode.**
