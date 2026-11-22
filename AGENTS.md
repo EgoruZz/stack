@@ -97,7 +97,13 @@
 - Экспорт: `.tldr` → PNG/SVG через `@kitschpatrol/tldraw-cli`; после обновления CLI нужно проверять совместимость схемы MCP-файлов.
 - Текущий MCP надёжно создаёт/сохраняет `.tldr` и редактирует документ; live-синхронизация с уже открытым desktop canvas не гарантируется.
 
-### Craft Apps (ArtCraft)
+### Первый старт (сообщи пользователю, если стек ещё не настроен)
+- Персональные данные (прокси, Wolfram ID, git identity) живут вне репозитория
+- Если `~/.stack-secrets.sh` отсутствует: попроси пользователя заполнить
+  `~/stack/first-start.txt` (шаблон: `first-start.template.txt`) и запустить
+  `bash ~/stack/apply-first-start.sh`; после этого `bash ~/stack/proxy.sh test`
+
+### Craft Apps (офисные документы, ArtCraft)
 - **WordCraft / GridCraft / DeckCraft / PdfCraft / FigCraft** — Word/Excel/PowerPoint/PDF/UI-дизайн, установлены в /Applications/ (alpha-версии)
 - MCP серверы: `wordcraft`, `gridcraft`, `deckcraft`, `pdfcraft`, `figcraft` (в .opencode/opencode.json проекта)
 - Headless CLI: `~/stack/craft-cli/<name>-cli` — convert, run, inspect, info, commands
