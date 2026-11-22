@@ -10,8 +10,22 @@ SECRETS="$HOME/.stack-secrets.sh"
 
 [ -f "$FORM" ] || { echo "Форма не найдена: $FORM"; echo "Скопируй шаблон: cp ~/stack/first-start.template.txt ~/stack/first-start.txt и заполни."; exit 1; }
 
-# Загружаем форму
-source "$FORM" 2>/dev/null || { echo "❌ Ошибка синтаксиса в форме (проверь запятые/кавычки)"; exit 1; }
+# Парсим форму строка за строкой (не source!): пробелы в значениях и
+# пропущенные кавычки не должны ломать разбор; хвостовые # комментарии срезаем.
+FORM_VARS=""
+while IFS= read -r line || [ -n "$line" ]; do
+    line="${line%%#*}"            # срезаем комментарий
+    line="${line%"${line##*[![:space:]]}"}"   # trim right
+    case "$line" in
+        [A-Z_]*=*) ;;
+        *) continue ;;
+    esac
+    key="${line%%=*}"; val="${line#*=}"
+    val="${val%\"}"; val="${val#\"}"      # обрезаем опциональные кавычки
+    val="${val%\'}"; val="${val#\'}"
+    eval "$key=\$val"
+    export "$key"
+done < "$FORM"
 
 MISSING=""
 for v in PROXY_HOST PROXY_USER PROXY_PASS PROXY_EXPIRES GIT_NAME GIT_EMAIL WOLFRAM_ID WOLFRAM_PASS; do
