@@ -61,3 +61,13 @@ git pull origin main
 14. Удаляешь ветку (опционально)
 git branch -d working
 git push origin --delete working
+
+15. Release (ОПЦИОНАЛЬНО — не на каждый commit/PR, а когда решаешь сам)
+Release = тег + заметки на странице Releases репозитория (GitHub).
+Пользователи стека видят: что нового и нужен ли повторный setup.sh.
+Команда:
+git tag vX.Y.Z && git push origin vX.Y.Z
+gh release create vX.Y.Z --title "vX.Y.Z" --notes "- изменения...
+Повторный setup.sh: да/нет (bash ~/stack/setup.sh — идемпотентен)"
+Правило: патч (X.Y.+1) — обычный update-all.sh; минор/мажор (X.+1.Y,
++1.0.0) — после update-all.sh выполнить setup.sh, затем перезапустить OpenCode.

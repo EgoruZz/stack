@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1500px; height:500px; overflow:hidden;
+    background: linear-gradient(135deg,#0d1117 0%,#101826 55%,#0b1220 100%);
+    display:flex; align-items:center; justify-content:center; position:relative;
+    font-family:-apple-system,'SF Pro Display',Helvetica,sans-serif; }
+  .grid { position:absolute; inset:0; opacity:.14;
+    background-image:linear-gradient(#1F6FEB22 1px,transparent 1px),linear-gradient(90deg,#1F6FEB22 1px,transparent 1px);
+    background-size:46px 46px; }
+  .node { position:absolute; border-radius:50%; }
+  .n1 { width:14px;height:14px;background:#1F6FEB; box-shadow:0 0 26px #1F6FEB; left:12%; top:24%; opacity:.8; }
+  .n2 { width:9px;height:9px;background:#2EA043; box-shadow:0 0 20px #2EA043; right:16%; top:30%; opacity:.75; }
+  .n3 { width:7px;height:7px;background:#E16F24; box-shadow:0 0 18px #E16F24; left:22%; bottom:26%; opacity:.7; }
+  .n4 { width:10px;height:10px;background:#2EA043; box-shadow:0 0 22px #2EA043; right:9%; bottom:20%; opacity:.6; }
+  .line { position:absolute; height:1px; background:linear-gradient(90deg,transparent,#1F6FEB55,transparent); width:34%; left:6%; top:28%; }
+  .line2 { position:absolute; height:1px; background:linear-gradient(90deg,transparent,#2EA04355,transparent); width:30%; right:5%; bottom:24%; }
+  .wrap { text-align:center; position:relative; z-index:2; }
+  h1 { font-size:150px; font-weight:800; letter-spacing:2px; color:#f0f6fc;
+    text-shadow:0 0 60px #1F6FEB33; }
+  .bar { width:420px; height:4px; margin:6px auto 16px; border-radius:2px;
+    background:linear-gradient(90deg,#1F6FEB,#2EA043); }
+  .tag { font-size:26px; color:#8b949e; letter-spacing:4px; text-transform:uppercase; }
+  .tag b { color:#58a6ff; font-weight:600; }
+</style></head>
+<body>
+  <div class="grid"></div>
+  <div class="line"></div><div class="line2"></div>
+  <div class="node n1"></div><div class="node n2"></div><div class="node n3"></div><div class="node n4"></div>
+  <div class="wrap">
+    <h1>Stack</h1>
+    <div class="bar"></div>
+    <div class="tag">personal <b>AI dev</b> environment · macOS</div>
+  </div>
+</body></html>
