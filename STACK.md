@@ -566,6 +566,29 @@ bash ~/stack/proxy.sh test      # живой тест + внешний IP
 
 Если сеть недоступна из терминала — VPN-клиент (fake-IP) или мёртвый прокси; сначала `proxy.sh test`, затем проверь VPN.
 
+## Первый старт нового пользователя (чек-лист данных)
+
+После `setup.sh` стеку не хватает **персональных** данных — они принципиально не входят в репозиторий:
+
+| Что | Зачем | Как задать |
+|---|---|---|
+| Прокси (host/user/pass/expiry) | маршрутизация внешнего трафика | создать `~/.stack-secrets.sh` (шаблон ниже); проверить: `bash ~/stack/proxy.sh test` |
+| OpenCode + провайдеры/ключи моделей | агент без моделей не отвечает | установить с opencode.ai, `opencode auth` (или env-ключи) |
+| Wolfram Engine + лицензия | Wolfram MCP | `brew install --cask wolfram-engine`, `wolframscript` — логин Wolfram ID; продление каждые ~40 дней |
+| Firecrawl auth | полный тариф вместо free | `firecrawl login --browser` (опционально) |
+| git identity | коммиты/PR | `git config --global user.name/email` |
+| ParaView, MacTeX | визуализация, LaTeX | ручные шаги из README |
+| Личные сессии (`~/.opencode-sessions`) | функция `os()` в личном `.zshrc` | персонально, не часть стека |
+
+Шаблон `~/.stack-secrets.sh` (chmod 600, gitignored):
+
+```bash
+PROXY_HOST="..."
+PROXY_USER="..."
+PROXY_PASS="..."
+PROXY_EXPIRES="YYYY-MM-DD HH:MM +ZZZZ"
+```
+
 ## Общие команды
 
 ### Обновить всё (одной командой)
