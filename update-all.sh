@@ -267,6 +267,19 @@ for repo in wordcraft gridcraft deckcraft pdfcraft; do
         echo "  $APP_NAME: $INSTALLED актуальна"
     fi
 done
+# ── Firecrawl: кредиты учётки (обновляются раз в месяц) ──
+echo "  Firecrawl кредиты..."
+FC=$(firecrawl credits 2>/dev/null | grep -m1 "Remaining Credits" | grep -o "[0-9,]\+" | tr -d ',')
+if [ -n "$FC" ]; then
+    echo "  Firecrawl: осталось $FC кредитов"
+    [ "$FC" -lt 100 ] 2>/dev/null && echo "  ⚠️ кредиты кончаются — без логина работает бесплатный tier"
+else
+    echo "  Firecrawl кредиты: не удалось получить (нет логина?)"
+fi
+
+# ── Срок подписки ISP-прокси ──
+echo "  Прокси..."
+bash "$STACK_DIR/check-proxy-expiry.sh" 2>/dev/null || echo "  ⚠️ проверка прокси не прошла (STACK_PROXY_EXPIRES задан?)"
 echo ""
 
 # ═══════════════════════════════════════
