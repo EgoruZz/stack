@@ -12,7 +12,7 @@ echo ""
 # 1. СИСТЕМНЫЕ ЗАВИСИМОСТИ
 # ═══════════════════════════════════════
 
-echo ">>> 1/13 Homebrew..."
+echo ">>> 1/12 Homebrew..."
 if ! command -v brew &>/dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
@@ -39,7 +39,7 @@ fi
 # 2. ВНЕШНИЕ MCP РЕПОЗИТОРИИ
 # ═══════════════════════════════════════
 
-echo ">>> 2/13 Клонирование MCP серверов..."
+echo ">>> 2/12 Клонирование MCP серверов..."
 cd "$STACK_DIR"
 
 clone_if_missing() {
@@ -62,7 +62,7 @@ clone_if_missing https://github.com/WolframResearch/WolframLanguageForJupyter.gi
 # 3. PYTHON VENV
 # ═══════════════════════════════════════
 
-echo ">>> 3/13 Python venv..."
+echo ">>> 3/12 Python venv..."
 
 create_venv() {
     local name=$1; shift
@@ -104,7 +104,7 @@ echo "  julia-mcp-env готов"
 # 4. NODE.JS ЗАВИСИМОСТИ
 # ═══════════════════════════════════════
 
-echo ">>> 4/13 tldraw MCP..."
+echo ">>> 4/12 tldraw MCP..."
 cd "$STACK_DIR/tldraw-mcp"
 npm install
 npm run build
@@ -113,7 +113,7 @@ npm run build
 # 5. GLOBAЛЬНЫЕ CLI
 # ═══════════════════════════════════════
 
-echo ">>> 5/13 CLI инструменты..."
+echo ">>> 5/12 CLI инструменты..."
 
 echo "  Firecrawl CLI..."
 npx -y firecrawl-cli@latest init -y --browser || echo "  Firecrawl: init пропущен (выполни вручную: firecrawl init)"
@@ -125,7 +125,7 @@ npm install -g --allow-scripts=puppeteer @kitschpatrol/tldraw-cli
 # 6. BROWSER ДЛЯ RENDERS
 # ═══════════════════════════════════════
 
-echo ">>> 6/13 Browser для render-visual и tldraw export..."
+echo ">>> 6/12 Browser для render-visual и tldraw export..."
 echo "  Installing Playwright Chromium..."
 npx -y playwright install chromium 2>/dev/null || echo "  Playwright: установи вручную (npx playwright install chromium)"
 echo "  Installing Puppeteer Chrome..."
@@ -140,7 +140,7 @@ fi
 # 7. CRAFT APPS CLI (офисные документы)
 # ═══════════════════════════════════════
 
-echo ">>> 7/13 Craft Apps CLI (headless, для MCP-серверов wordcraft/gridcraft/deckcraft/pdfcraft)..."
+echo ">>> 7/12 Craft Apps CLI (headless, для MCP-серверов wordcraft/gridcraft/deckcraft/pdfcraft)..."
 mkdir -p "$STACK_DIR/craft-cli"
 CRAFT_CLI_VERSIONS="wordcraft=0.18.1 gridcraft=0.19.1 deckcraft=0.18.1 pdfcraft=0.21.1"
 for kv in $CRAFT_CLI_VERSIONS; do
@@ -168,7 +168,7 @@ echo ""
 # 8. VS CODE РАСШИРЕНИЯ
 # ═══════════════════════════════════════
 
-echo ">>> 8/13 VS Code расширения..."
+echo ">>> 8/12 VS Code расширения..."
 if command -v code &>/dev/null; then
     # Расширения стека: просмотр файлов (.tldr, .ipynb, .tex, .wl, .jl, .py)
     # и языковая поддержка. code --install-extension идемпотентен.
@@ -192,7 +192,7 @@ echo ""
 # 8. SKILLS (хранилище ~/stack/skills-store)
 # ═══════════════════════════════════════
 
-echo ">>> 9/13 Skills (консолидация в ~/stack/skills-store)..."
+echo ">>> 9/12 Skills (консолидация в ~/stack/skills-store)..."
 # Firecrawl-скиллы поставлены firecrawl-cli init (шаг 5) — переносятся
 # в хранилище. Глобальные каталоги скиллов опустошаются: скиллы видны
 # только в проектах (подключаются через skills.paths в конфиге).
@@ -207,7 +207,7 @@ bash "$STACK_DIR/consolidate-skills.sh"
 # 9. JULIA ПАКЕТЫ
 # ═══════════════════════════════════════
 
-echo ">>> 10/13 Julia пакеты..."
+echo ">>> 10/12 Julia пакеты..."
 julia -e '
 using Pkg
 Pkg.add([
@@ -222,39 +222,18 @@ Pkg.add([
 # 10. OPENCODE КОНФИГ (проектный)
 # ═══════════════════════════════════════
 
-echo ">>> 11/13 Генерация конфига OpenCode..."
+echo ">>> 11/12 Генерация конфига OpenCode..."
 # Стек поднимается ТОЛЬКО в проектах: конфиг пишется в .opencode/opencode.json
 # папки стека. Проекты получают такой же конфиг через sync-agents.sh
 # и new-project.sh. Глобальный ~/.config/opencode стек не использует.
 bash "$STACK_DIR/gen-opencode-config.sh" "$STACK_DIR"
 
 # ═══════════════════════════════════════
-# 11. АЛИАСЫ В .zshrc
-# ═══════════════════════════════════════
-
-echo ">>> 12/13 Алиасы..."
-if ! grep -q "Stack Aliases" "$HOME/.zshrc" 2>/dev/null; then
-    cat >> "$HOME/.zshrc" << 'ALIASES'
-
-# === Stack Aliases ===
-alias manim-activate="source ~/stack/manim-env/bin/activate"
-alias jupyter-jlab="source ~/stack/jupyter-env/bin/activate && jupyter-lab"
-alias jupyter-wolfram='source ~/stack/jupyter-env/bin/activate && jupyter-lab --NotebookApp.kernel_manager_class='"'"'jupyter_client.manager.KernelManager'"'"' --NotebookApp.kernel_name=wolframlanguage15'
-alias stack="cd ~/stack"
-alias new-project="~/stack/new-project.sh"
-# === End Stack Aliases ===
-ALIASES
-    echo "  Алиасы добавлены в .zshrc"
-else
-    echo "  Алиасы уже есть в .zshrc"
-fi
-
-# ═══════════════════════════════════════
 # 12. ПРОВЕРКА
 # ═══════════════════════════════════════
 
 echo ""
-echo ">>> 13/13 Проверка стека..."
+echo ">>> 12/12 Проверка стека..."
 bash "$STACK_DIR/check-all.sh"
 
 echo ""
