@@ -1,21 +1,20 @@
 <div align="center">
 
-<img src="assets/banner.png" alt="Stack — personal AI dev environment" width="100%">
-
 # Stack
 
 **A personal AI development environment for macOS: a human working alongside an AI assistant in [OpenCode](https://opencode.ai).**
 MCP servers, skills, CLI tools and office apps — one command to attach to a project, one command to update everything.
 
 
-![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white&style=for-the-badge)
-![OpenCode_v2](https://img.shields.io/badge/OpenCode_v2-1F6FEB?style=for-the-badge)
-
-![MCP_servers](https://img.shields.io/badge/MCP_servers-10-2EA043?style=for-the-badge)
-![Skills](https://img.shields.io/badge/Skills-60-E16F24?style=for-the-badge)
-![Craft_Apps](https://img.shields.io/badge/Craft_Apps-5-EA4AAA?style=for-the-badge)
-![CLI_tools](https://img.shields.io/badge/CLI_tools-13-0969DA?style=for-the-badge)
-![Version](https://img.shields.io/badge/version-v1.0.0-8250DF?style=for-the-badge)
+| | |
+|---|---|
+| 🖥 Platform | macOS |
+| 🤖 Agent | [OpenCode](https://opencode.ai) v2 |
+| 🔌 MCP servers | 10 |
+| 🎯 Skills | 60 |
+| 🧩 Craft Apps | 5 |
+| 🛠 CLI tools | 13 |
+| 🏷 Version | v1.0.0 |
 
 </div>
 
@@ -85,7 +84,7 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`):
 
 <h2 align="center">🖐 Manual steps</h2>
 
-`setup.sh` automates almost everything — including the former manual items (OpenCode, Wolfram Engine, ParaView, MacTeX, tldraw Desktop) via official brew casks and the official OpenCode tap. Only three things stay manual:
+Only three things stay manual:
 
 | Step | Why | How |
 |-----|-----|-----|
@@ -105,9 +104,8 @@ $ bash setup.sh        # 12 steps: brew + casks, repos, venvs, CLIs, skills, con
 ```
 
 - It asks for a password only where the system requires one
-- At the end a health check runs — every component must be ✅
+- At the end a health check runs — every component must be ✅ — not ❌
 - The first-start form is applied automatically if `first-start.txt` is filled in
-- Attach projects with: `~/stack/new-project.sh <path>`
 
 <h2 align="center">📦 What's inside</h2>
 
@@ -165,7 +163,7 @@ $ bash ~/stack/craft-install.sh
 | PdfCraft · FigCraft | Early alpha |
 
 > [!WARNING]
-> ⚠️ All apps are pre-release: complex files from MS Office and .fig files open best-effort and may not look perfect — **keep backups of important documents**.
+> All apps are pre-release: complex files from MS Office and .fig files open best-effort and may not look perfect — **keep backups of important documents**.
 
 ### VS Code extensions (6)
 
