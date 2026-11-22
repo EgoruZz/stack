@@ -155,7 +155,7 @@ for cli in wordcraft-cli gridcraft-cli deckcraft-cli pdfcraft-cli figcraft-cli; 
     [ -x ~/stack/craft-cli/$cli ] && CLI_OK=$((CLI_OK+1))
 done
 if [ "$CRAFT_OK" -eq "$CRAFT_ALL" ] && [ "$CLI_OK" -eq "$CRAFT_ALL" ]; then
-    echo "✅ 4/4 apps, 4/4 CLI"
+    echo "✅ 5/5 apps, 5/5 CLI"
 else
     echo "⚠️ apps $CRAFT_OK/5, CLI $CLI_OK/5 — GUI: bash ~/stack/craft-install.sh, CLI уже в ~/stack/craft-cli/"
 fi

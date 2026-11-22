@@ -74,8 +74,8 @@ for name in $APPS; do
     else
         echo "── $name: установка v$VER"
     fi
-    if [ ! -f "$DMG" ]; then
-        curl -sL --max-time 600 -O \
+    if [ ! -f "$DIR/$DMG" ]; then
+        curl -sL --max-time 600 -o "$DIR/$DMG" \
             "https://github.com/storytold/$name/releases/download/v$VER/$DMG" \
             || { echo "   ❌ скачивание не удалось"; continue; }
     fi
