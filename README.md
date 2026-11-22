@@ -50,7 +50,7 @@
 ├── STACK.md                     # Полная документация: хоткеи, примеры
 ├── workflow.txt                 # Правила git-workflow
 │
-├── setup.sh                     # Установка (13 шагов)
+├── setup.sh                     # Установка (12 шагов)
 ├── update-all.sh                # Обновление всего (13 шагов)
 ├── check-all.sh                 # Проверка работоспособности
 │
@@ -97,7 +97,7 @@
 ```bash
 git clone https://github.com/EgoruZz/stack.git ~/stack
 cd ~/stack
-bash setup.sh        # 13 шагов: brew, репозитории, venv, CLI, скиллы, конфиги
+bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, скиллы, конфиги
 ```
 
 - Пароль спрашивается только там, где его требует система

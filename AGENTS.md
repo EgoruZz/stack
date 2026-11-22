@@ -14,7 +14,7 @@
 | `README.md` | Документация для людей (обзор, оглавление) |
 | `STACK.md` | Полная документация: хоткеи, примеры, ссылки |
 | `workflow.txt` | Правила git-workflow (ветка → PR → merge) |
-| `setup.sh` | Установка на чистую macOS (13 шагов) |
+| `setup.sh` | Установка на чистую macOS (12 шагов) |
 | `update-all.sh` | Полное обновление стека (13 шагов) |
 | `check-all.sh` | Проверка работоспособности всех компонентов |
 | `new-project.sh` | Создать/зарегистрировать проект (AGENTS.md + конфиг) |
@@ -48,7 +48,7 @@
 - **Manim** (community edition) — основная версия для анимаций
 - **ManimGL** (3Blue1Brown) — OpenGL версия
 - Окружение: ~/stack/manim-env (Python 3.12)
-- Активация: `source ~/stack/manim-env/bin/activate` или `manim-activate`
+- Активация: `source ~/stack/manim-env/bin/activate`
 - Запуск (community): `manim script.py SceneName`
 - Запуск (GL): `manimgl script.py SceneName`
 - MCP сервер: `manim` (в .opencode/opencode.json проекта)
@@ -109,7 +109,6 @@
 ### Jupyter
 - **JupyterLab** окружение: ~/stack/jupyter-env
 - Запуск: `source ~/stack/jupyter-env/bin/activate && jupyter-lab`
-- Или: `jupyter-jlab`
 - Kernel: Python 3.12 + Wolfram Language 15
 - Пакеты: numpy, matplotlib, pandas, sympy, plotly, ipywidgets
 - XLSX support: openpyxl, markitdown
@@ -133,11 +132,6 @@
 - Если нужен data chart из числового набора, использовать `data-analysis`/matplotlib/plotly, а не schematic `render-visual` charts.
 - Если запрос неоднозначен между tldraw и render-visual, сначала уточнить нужный результат: редактируемый canvas или финальная картинка.
 
-## Алиасы (в .zshrc)
-- `manim-activate` — активировать окружение manim-env
-- `jupyter-jlab` — запустить JupyterLab
-- `jupyter-wolfram` — запустить Jupyter с Wolfram kernel
-- `stack` — перейти в ~/stack/
 
 ## STACK.md — справка по ситуации
 

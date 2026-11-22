@@ -63,7 +63,7 @@ wolframscript -code 'PacletInstall["Wolfram/AgentTools"]'
 # Активация окружения
 source ~/stack/manim-env/bin/activate
 # Или
-manim-activate
+source ~/stack/manim-env/bin/activate
 
 # Community edition (рекомендуется)
 manim my_animation.py CircleToSquare
@@ -301,8 +301,7 @@ juliaup update
 # Запуск
 source ~/stack/jupyter-env/bin/activate && jupyter-lab
 
-# Или через alias
-jupyter-jlab
+source ~/stack/jupyter-env/bin/activate && jupyter-lab
 
 # Остановка: Ctrl+C в терминале
 ```
