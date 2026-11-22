@@ -7,7 +7,6 @@
 **A personal AI development environment for macOS: a human working alongside an AI assistant in [OpenCode](https://opencode.ai).**
 MCP servers, skills, CLI tools and office apps — one command to attach to a project, one command to update everything.
 
-**🇬🇧 English** (primary) · 🇷🇺 [Русская версия — внизу страницы](#russian-version)
 
 ![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white&style=for-the-badge)
 ![OpenCode_v2](https://img.shields.io/badge/OpenCode_v2-1F6FEB?style=for-the-badge)
@@ -252,61 +251,3 @@ You — in VS Code (the stack's extensions provide language servers: autocomplet
 
 > OpenCode v2 hot-reloads configs (`/reload`); after updating the components themselves (MCP binaries, venvs, skills) an OpenCode restart is safer.
 
----
-
-<a id="russian-version"></a>
-<details>
-<summary><b>🇷🇺 Русская версия</b></summary>
-
-# Stack
-
-**Персональная AI-разработка среда для macOS: человек + ИИ-ассистент в [OpenCode](https://opencode.ai).**
-MCP-серверы, скиллы, CLI-инструменты и офисные приложения — всё подключается к проекту одной командой и обновляется одной командой.
-
-## Зачем
-
-Research и разработка требуют многого сразу: вычислений, визуализации данных, веб-исследований, документов-деливераблов в привычных офисных форматах, интерфейсных мокапов — **в одном месте и под управлением ИИ-агента**. Стек собирает официальные open-source инструменты и подключает их к OpenCode всеми возможными каналами: **MCP-серверы** (интерактивные вычисления и редактирование), **скиллы** (пошаговые workflow для агента), **headless-CLI** (скриптовое применение команд без окна) и **CLI-скрипты контроля** (проверки, обновления, срок-контроль) — и делает всё это доступным **только в проектах, где он явно включён**: глобальный конфиг OpenCode остаётся пустым, вне проектов агент их не видит.
-
-| Принцип | Что значит |
-|---------|-----------|
-| **Проектность** | Стек поднимается только в проектах, где подключён |
-| **Один источник** | Шаблон конфига, списки скиллов, карта репозитория правятся в одном месте и расходятся скриптами |
-| **Свежесть** | `update-all.sh` обновляет всё: brew → репо → venv → скиллы → Julia → Wolfram → Craft Apps, и следит за сроками лицензий/подписок/кредитов |
-| **Переносимость** | Пути в конфигах через `{env:HOME}`; свежая машина = `git clone` + `setup.sh` |
-| **Маршрутизация** | Локальный трафик стека — всегда напрямую; внешний web — через настроенный ISP-прокси (`proxy.sh`, персональные значения в `~/.stack-secrets.sh`) |
-
-## Быстрый старт
-
-```bash
-git clone https://github.com/EgoruZz/stack.git ~/stack
-cd ~/stack
-bash setup.sh        # 12 шагов: brew + каски, репозитории, venv, CLI, скиллы, конфиги
-```
-
-- Пароль спрашивается только там, где его требует система
-- В конце запускается автопроверка — все компоненты должны быть ✅
-- Форма первого старта применяется автоматически, если `first-start.txt` заполнен
-- Проекты подключаются: `~/stack/new-project.sh <путь>`
-
-## Ручные шаги
-
-`setup.sh` автоматизирует почти всё — включая бывшие ручные пункты (OpenCode, Wolfram Engine, ParaView, MacTeX, tldraw Desktop) официальными brew-касками и официальным tap. Руками остаётся только:
-
-| Шаг | Зачем | Как |
-|-----|-------|-----|
-| **Форма первого старта** | прокси, Wolfram ID, git identity | `cp ~/stack/first-start.template.txt ~/stack/first-start.txt` → заполнить → `bash ~/stack/apply-first-start.sh` |
-| **Активация Wolfram** | лицензия MCP (продлевать каждые ~40 дней) | `wolframscript` — войти с Wolfram ID; проверка: `bash ~/stack/check-wolfram-license.sh` |
-| **Firecrawl auth** *(опционально)* | Firecrawl работает по учётной записи: без входа лишь минимальный анонимный лимит, бесплатной достаточно | `firecrawl login --browser`; проверка: `firecrawl --status` |
-
-> Наличие компонентов проверяет `check-all.sh` — по каждому ✅ или ❌.
-
-## Что внутри
-
-**13 CLI-инструментов** (setup — 12 шагов, update-all — 13 шагов + срок-контроль, check-all, new-project, sync-agents, gen-opencode-config — 10 MCP, sync-aris, consolidate-skills, craft-install, apply-first-start, proxy.sh, chrome-version, check-wolfram-license) · **10 MCP-серверов** (Wolfram, julia, manim, ParaView, tldraw + офисные Craft Apps: wordcraft .docx, gridcraft .xlsx, deckcraft .pptx, pdfcraft .pdf, figcraft UI-дизайн) · **5 Craft Apps** ([ArtCraft](https://getartcraft.com), alpha — храни копии важных документов) · **60 скиллов** (Firecrawl 37, ARIS 14, standalone 8, tldraw-offline) · **6 расширений VS Code** (ставятся автоматически)
-
-Проект получает два файла: `AGENTS.md` (инструкции агента) и `.opencode/opencode.json` (`mcp` ×10 · `skills` → skills-store). Ручные правки конфига затираются при каждой синхронизации — правь шаблон в `gen-opencode-config.sh`. Содержимое AGENTS.md вне маркеров `STACK:START/END` сохраняется. `projects.txt` — личный реестр (gitignored, из `projects.template.txt`).
-
-Использование: `update-all.sh` — обновить всё · `check-all.sh` — проверка · `new-project.sh` — подключить проект · `sync-agents.sh` — синхронизация · `craft-install.sh` — Craft Apps · `proxy.sh status/test/expiry` — сеть и сроки · `check-wolfram-license.sh` — лицензия Wolfram · `firecrawl credits` — кредиты · `chrome-version.sh` — Chrome для tldraw.
-
-Полные инструкции агента: [`AGENTS.md`](AGENTS.md) · Полная документация для человека: [`STACK.md`](STACK.md) · Git-правила: [`workflow.txt`](workflow.txt) · Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md).
-</details>
