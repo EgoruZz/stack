@@ -551,6 +551,19 @@ Word/Excel/PowerPoint/PDF как нативные open-source Rust-прилож�
 
 ---
 
+## Сеть (proxy.sh)
+
+ISP-прокси (proxy.market, Singapore) задаётся в `.zshrc` (STACK_PROXY_*). Локальный трафик стека (все MCP, localhost) через прокси НЕ идёт (no_proxy в .zshrc).
+
+```bash
+bash ~/stack/proxy.sh status    # состояние маршрутов
+bash ~/stack/proxy.sh git on    # git → github через прокси
+bash ~/stack/proxy.sh git off   # git напрямую
+bash ~/stack/proxy.sh test      # живой тест + внешний IP
+```
+
+Если сеть недоступна из терминала — VPN-клиент (fake-IP) или мёртвый прокси; сначала `proxy.sh test`, затем проверь VPN.
+
 ## Общие команды
 
 ### Обновить всё (одной командой)
