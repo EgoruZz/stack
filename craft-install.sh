@@ -14,7 +14,7 @@ DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$DIR"
 FORCE=${1:-}
 
-APPS="wordcraft gridcraft deckcraft pdfcraft"
+APPS="wordcraft gridcraft deckcraft pdfcraft figcraft"
 
 # Последняя версия приложения из GitHub API (тег vX.Y.Z -> X.Y.Z)
 latest_ver() {
@@ -30,6 +30,7 @@ installed_ver() {
         gridcraft) app=GridCraft ;;
         deckcraft) app=DeckCraft ;;
         pdfcraft)  app=PdfCraft ;;
+        figcraft)  app=FigCraft ;;
     esac
     [ -d "/Applications/$app.app" ] \
         && defaults read "/Applications/$app.app/Contents/Info.plist" CFBundleShortVersionString 2>/dev/null \
@@ -83,7 +84,7 @@ done
 
 echo ""
 echo "Проверка:"
-for pair in "WordCraft wordcraft" "GridCraft gridcraft" "DeckCraft deckcraft" "PdfCraft pdfcraft"; do
+for pair in "WordCraft wordcraft" "GridCraft gridcraft" "DeckCraft deckcraft" "PdfCraft pdfcraft" "FigCraft figcraft"; do
     set -- $pair
     V=$(installed_ver "$2")
     [ -n "$V" ] && echo "  ✅ $1 v$V" || echo "  ❌ $1 не установлен"

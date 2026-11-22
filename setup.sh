@@ -25,6 +25,21 @@ brew install python@3.12 node gh ffmpeg juliaup
 juliaup add release 2>/dev/null || echo "  Julia release уже установлен"
 juliaup default release 2>/dev/null || echo "  Julia default уже настроен"
 
+# Сеть стека: .zshrc должен source-ить proxy.sh (маршрутизация через ISP-прокси).
+# Управляется только эта строка — остальной .zshrc пользователя не трогается.
+if ! grep -q "stack/proxy.sh" "$HOME/.zshrc" 2>/dev/null; then
+    cat >> "$HOME/.zshrc" << 'PROXYBLOCK'
+
+# === Stack network (managed; подробно: ~/stack/proxy.sh) ===
+export TZ="Asia/Singapore"
+source "$HOME/stack/proxy.sh"
+# === End Stack network ===
+PROXYBLOCK
+    echo "  .zshrc: добавлен source proxy.sh (перезапусти терминал)"
+else
+    echo "  .zshrc: proxy.sh уже подключён"
+fi
+
 # Wolfram AgentTools (paclet) — сразу, если Wolfram Engine уже установлен;
 # иначе поставится update-all.sh (шаг 10) после ручной установки Wolfram.
 if command -v wolframscript &>/dev/null; then
@@ -140,9 +155,9 @@ fi
 # 7. CRAFT APPS CLI (офисные документы)
 # ═══════════════════════════════════════
 
-echo ">>> 7/12 Craft Apps CLI (headless, для MCP-серверов wordcraft/gridcraft/deckcraft/pdfcraft)..."
+echo ">>> 7/12 Craft Apps CLI (headless, для MCP-серверов wordcraft/gridcraft/deckcraft/pdfcraft/figcraft)..."
 mkdir -p "$STACK_DIR/craft-cli"
-CRAFT_CLI_VERSIONS="wordcraft=0.18.1 gridcraft=0.19.1 deckcraft=0.18.1 pdfcraft=0.21.1"
+CRAFT_CLI_VERSIONS="wordcraft=0.18.1 gridcraft=0.19.1 deckcraft=0.18.1 pdfcraft=0.21.1 figcraft=0.18.1"
 for kv in $CRAFT_CLI_VERSIONS; do
     name=${kv%%=*}; ver=${kv##*=}
     BIN="$STACK_DIR/craft-cli/$name-cli"

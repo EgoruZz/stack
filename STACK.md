@@ -432,6 +432,7 @@ brew upgrade --cask mactex
 | ParaView | ✅ | Визуализация данных (через TCP-мост) |
 | tldraw | ✅ | Управление canvas, диаграммы (30 инструментов) |
 | wordcraft | ✅ | Word-документы: .docx создание/правки/конвертация |
+| figcraft | ✅ | UI-дизайн: frames, auto-layout, прототипы |
 | gridcraft | ✅ | Excel-файлы: .xlsx, формулы, PivotTables |
 | deckcraft | ✅ | Презентации: .pptx сборка и экспорт |
 | pdfcraft | ✅ | PDF: объединение, разделение, защита |
@@ -530,6 +531,7 @@ Word/Excel/PowerPoint/PDF как нативные open-source Rust-прилож�
 | GridCraft | .xlsx (+.csv; PivotTables, 500+ функций, графики) | `~/stack/craft-cli/gridcraft-cli` | `gridcraft` |
 | DeckCraft | .pptx (+.potx, экспорт PDF/PNG/GIF) | `~/stack/craft-cli/deckcraft-cli` | `deckcraft` |
 | PdfCraft | .pdf (объединение/разделение/защита/комментарии) | `~/stack/craft-cli/pdfcraft-cli` | `pdfcraft` |
+| FigCraft | интерфейсы/прототипы (.figcraft, экспорт PNG/SVG) | `~/stack/craft-cli/figcraft-cli` | `figcraft` |
 
 ```bash
 # CLI без окна (головной режим — по умолчанию для агента)
@@ -542,7 +544,7 @@ Word/Excel/PowerPoint/PDF как нативные open-source Rust-прилож�
 # Live-режим: агент правит документ в открытом окне (ты видишь в реальном времени)
 /Applications/WordCraft.app/Contents/MacOS/wordcraft --control 7981
 # MCP-команда агента: ~/stack/craft-cli/wordcraft-cli mcp --connect 127.0.0.1:7981
-# порты: wordcraft 7981 · gridcraft 7982 · deckcraft 7983 · pdfcraft 7984
+# порты: wordcraft 7981 · gridcraft 7982 · deckcraft 7983 · pdfcraft 7984 · figcraft 7985
 
 # Обновление GUI-приложений: bash ~/stack/craft-install.sh (сам находит свежие версии)
 ```

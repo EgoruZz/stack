@@ -238,21 +238,35 @@ echo ">>> 10/13 Wolfram..."
 WOLFRAM_VER=$(wolframscript -code 'p = PacletInstall["Wolfram/AgentTools"]; Print[p["Version"]]' 2>/dev/null | head -1)
 if [ -n "$WOLFRAM_VER" ]; then
     echo "  AgentTools: $WOLFRAM_VER"
+    WLIC=$(wolframscript -code 'Print[$LicenseExpirationDate]' 2>/dev/null | grep -oE '\{[0-9, ]+\}' | head -1 | tr -d '{}' | tr ',' ' ')
+    WYEAR=$(echo $WLIC | awk '{print $1}'); WMONTH=$(echo $WLIC | awk '{print $2}'); WDAY=$(echo $WLIC | awk '{print $3}')
+    if [ -n "$WYEAR" ]; then
+        WEXP=$(date -j -f "%Y-%m-%d" "$WYEAR-$(printf '%02d' $WMONTH)-$(printf '%02d' $WDAY)" +%s 2>/dev/null)
+        WDAYS=$(( ($WEXP - $(date +%s)) / 86400 ))
+        if [ "$WDAYS" -lt 0 ]; then
+            echo "  ⚠️ Лицензия Wolfram ИСТЕКЛА — MCP не подключится! Продли: https://www.wolfram.com/engine/ и запусти wolframscript -activate"
+        elif [ "$WDAYS" -lt 14 ]; then
+            echo "  ⚠️ Лицензия Wolfram: $WDAYS дн. — продлевай: https://www.wolfram.com/engine/"
+        else
+            echo "  Лицензия Wolfram: $WDAYS дн."
+        fi
+    fi
 else
     echo "  Wolfram: обновление пропущено (проверь лицензию)"
 fi
 echo ""
 
-# Craft Apps (WordCraft, GridCraft, DeckCraft, PdfCraft): сравниваем
+# Craft Apps (WordCraft, GridCraft, DeckCraft, PdfCraft, FigCraft): сравниваем
 # установленную версию с последним GitHub-релизом. GUI-обновления идут
 # через install-craft-apps.sh (аналог Launcher без GUI) — здесь только проверка.
 echo "  Craft Apps..."
-for repo in wordcraft gridcraft deckcraft pdfcraft; do
+for repo in wordcraft gridcraft deckcraft pdfcraft figcraft; do
     case "$repo" in
         wordcraft) APP_NAME="WordCraft" ;;
         gridcraft) APP_NAME="GridCraft" ;;
         deckcraft) APP_NAME="DeckCraft" ;;
         pdfcraft)  APP_NAME="PdfCraft" ;;
+        figcraft)  APP_NAME="FigCraft" ;;
     esac
     INSTALLED=""
     [ -d "/Applications/$APP_NAME.app" ] && \
@@ -279,7 +293,7 @@ fi
 
 # ── Срок подписки ISP-прокси ──
 echo "  Прокси..."
-bash "$STACK_DIR/check-proxy-expiry.sh" 2>/dev/null || echo "  ⚠️ проверка прокси не прошла (STACK_PROXY_EXPIRES задан?)"
+bash "$STACK_DIR/proxy.sh" expiry 2>/dev/null || echo "  ⚠️ проверка прокси не прошла"
 echo ""
 
 # ═══════════════════════════════════════

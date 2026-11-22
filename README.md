@@ -2,7 +2,7 @@
 
 ![платформа](https://img.shields.io/badge/платформа-macOS-black)
 ![агент](https://img.shields.io/badge/AI--агент-OpenCode_v2-1F6FEB)
-![MCP](https://img.shields.io/badge/MCP--серверы-9-2EA043)
+![MCP](https://img.shields.io/badge/MCP--серверы-10-2EA043)
 ![скиллы](https://img.shields.io/badge/скиллы-60-E16F24)
 ![VS_Code](https://img.shields.io/badge/расширения_VS_Code-6-8250DF)
 ![CLI](https://img.shields.io/badge/CLI--инструменты-12-0969DA)
@@ -150,9 +150,9 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | `wolframresearch.wolfram` | `.wl` |
 | `james-yu.latex-workshop` | `.tex` — компиляция + PDF-превью |
 
-### Офисные документы — Craft Apps (4)
+### Craft Apps (5)
 
-Нативные macOS-приложения [ArtCraft](https://getartcraft.com) (open source, Rust): **WordCraft** (.docx, цитирования APA/MLA/Chicago/IEEE, Zotero), **GridCraft** (.xlsx, PivotTables, 500+ функций), **DeckCraft** (.pptx, экспорт PDF/GIF), **PdfCraft** (объединение/разделение/защита PDF). GUI — ручной шаг; headless-CLI ставится автоматически и поднимает 4 MCP-сервера (`wordcraft`, `gridcraft`, `deckcraft`, `pdfcraft`). Подробный workflow — скилл `craft-office`.
+Нативные macOS-приложения [ArtCraft](https://getartcraft.com) (open source, Rust): **WordCraft** (.docx, цитирования APA/MLA/Chicago/IEEE, Zotero), **GridCraft** (.xlsx, PivotTables, 500+ функций), **DeckCraft** (.pptx, экспорт PDF/GIF), **PdfCraft** (объединение/разделение/защита PDF), **FigCraft** (UI-дизайн и прототипы: frames, auto-layout, components). GUI — ручной шаг (`craft-install.sh`); headless-CLI ставится автоматически и поднимает 5 MCP-серверов. Подробный workflow офисных — скилл `craft-office`.
 
 ### Скиллы OpenCode (60)
 
@@ -194,7 +194,7 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | Файл | Содержимое |
 |------|-----------|
 | `AGENTS.md` | Инструкции агента: карта стека, MCP-инструменты, конвенции |
-| `.opencode/opencode.json` | `mcp` ×9 · `skills` → skills-store |
+| `.opencode/opencode.json` | `mcp` ×10 · `skills` → skills-store |
 
 | Факт | Детали |
 |------|--------|
@@ -238,7 +238,8 @@ bash setup.sh        # 12 шагов: brew, репозитории, venv, CLI, �
 | **Срок лицензии Wolfram** | `bash ~/stack/check-wolfram-license.sh` |
 | **Версия Chrome под tldraw** | `bash ~/stack/chrome-version.sh` |
 | **Кредиты Firecrawl** | `firecrawl credits` |
-| **Срок подписки прокси** | `bash ~/stack/check-proxy-expiry.sh` |
+| **Сроки: прокси / Wolfram** | `bash ~/stack/proxy.sh expiry` / `bash ~/stack/check-wolfram-license.sh` |
+| **Маршрутизация сети** | `bash ~/stack/proxy.sh status` / `test` / `git on\|off` |
 
 > Конфиги OpenCode v2 перечитываются на лету (`/reload`); после обновления самих компонентов (MCP-бинарники, venv, скиллы) надёжнее перезапустить OpenCode.
 
