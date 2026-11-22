@@ -27,17 +27,23 @@ juliaup default release 2>/dev/null || echo "  Julia default уже настро
 
 # Сеть стека: .zshrc должен source-ить proxy.sh (маршрутизация через ISP-прокси).
 # Управляется только эта строка — остальной .zshrc пользователя не трогается.
-if ! grep -q "stack/proxy.sh" "$HOME/.zshrc" 2>/dev/null; then
-    cat >> "$HOME/.zshrc" << 'PROXYBLOCK'
+# Стек требует zsh: без него .zshrc не читается вообще.
+if command -v zsh &>/dev/null; then
+    [ -f "$HOME/.zshrc" ] || touch "$HOME/.zshrc"
+    if ! grep -q "stack/proxy.sh" "$HOME/.zshrc" 2>/dev/null; then
+        cat >> "$HOME/.zshrc" << 'PROXYBLOCK'
 
 # === Stack network (managed; подробно: ~/stack/proxy.sh) ===
 export TZ="Asia/Singapore"
 source "$HOME/stack/proxy.sh"
 # === End Stack network ===
 PROXYBLOCK
-    echo "  .zshrc: добавлен source proxy.sh (перезапусти терминал)"
+        echo "  .zshrc: добавлен source proxy.sh (перезапусти терминал)"
+    else
+        echo "  .zshrc: proxy.sh уже подключён"
+    fi
 else
-    echo "  .zshrc: proxy.sh уже подключён"
+    echo "  ⚠️ zsh не найден — блок прокси не добавлен (стек предполагает zsh как shell)"
 fi
 
 # Wolfram AgentTools (paclet) — сразу, если Wolfram Engine уже установлен;

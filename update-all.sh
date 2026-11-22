@@ -280,6 +280,30 @@ for repo in wordcraft gridcraft deckcraft pdfcraft figcraft; do
     else
         echo "  $APP_NAME: $INSTALLED актуальна"
     fi
+    # Headless-CLI: синхронизируем со свежим релизом (ставит/обновляет при
+    # несовпадении с $LATEST)
+    CLIBIN="$STACK_DIR/craft-cli/$repo-cli"
+    CLIVER="$LATEST"
+    NEED_CLI=0
+    [ ! -x "$CLIBIN" ] && NEED_CLI=1
+    if [ -x "$CLIBIN" ] && [ -n "$CLIVER" ]; then
+        CURCLI=$("$CLIBIN" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+        [ "$CURCLI" != "$CLIVER" ] && NEED_CLI=1
+    fi
+    if [ "$NEED_CLI" = "1" ] && [ -n "$CLIVER" ]; then
+        TMPZIP="/tmp/$repo-cli-$CLIVER.zip"
+        if curl -sL --max-time 600 -o "$TMPZIP" \
+            "https://github.com/storytold/$repo/releases/download/v$CLIVER/$repo-cli-$CLIVER-macos-universal.zip"; then
+            rm -rf "$STACK_DIR/craft-cli/$repo-cli-$CLIVER-macos-universal"
+            unzip -q -o "$TMPZIP" -d "$STACK_DIR/craft-cli/" \
+                && ln -sfn "$repo-cli-$CLIVER-macos-universal/$repo-cli" "$CLIBIN" \
+                && chmod +x "$STACK_DIR/craft-cli/$repo-cli-$CLIVER-macos-universal/$repo-cli" \
+                && echo "  $APP_NAME CLI: установлен/обновлён до $CLIVER"
+            rm -f "$TMPZIP"
+        else
+            echo "  $APP_NAME CLI: скачивание не удалось"
+        fi
+    fi
 done
 # ── Firecrawl: кредиты учётки (обновляются раз в месяц) ──
 echo "  Firecrawl кредиты..."
