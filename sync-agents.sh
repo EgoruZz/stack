@@ -24,9 +24,14 @@ if ! grep -q "STACK:START" "$STACK_AGENTS"; then
 fi
 
 if [ ! -f "$REGISTRY" ]; then
-    echo "ОШИБКА: реестр $REGISTRY не найден"
-    echo "  Создай его: ~/stack/new-project.sh <путь>"
-    exit 1
+    if [ -f "$STACK_DIR/projects.template.txt" ]; then
+        cp "$STACK_DIR/projects.template.txt" "$REGISTRY"
+        echo "  projects.txt создан из шаблона (пустой — добавь проекты: ~/stack/new-project.sh <путь>)"
+    else
+        echo "ОШИБКА: реестр $REGISTRY не найден и шаблона нет"
+        echo "  Создай его: ~/stack/new-project.sh <путь>"
+        exit 1
+    fi
 fi
 
 echo "=== Синхронизация AGENTS.md и конфигов OpenCode ==="
