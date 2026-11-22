@@ -6,9 +6,9 @@
 MCP servers, skills, CLI tools and office apps — one command to attach to a project, one command to update everything.
 
 
-| 🖥 Platform | 🤖 Agent | 🔌 MCP servers | 🎯 Skills | 🛠 CLI tools | 🏷 Version |
-|---|---|---|---|---|---|
-| macOS | [OpenCode](https://opencode.ai) v2 | 10 | 60 | 13 | v1.0.0 |
+| 🖥 Platform | 🤖 Agent | 🔌 MCP | 🎯 Skills | 🧩 Apps | 🛠 CLI tools | 🖼 VS Code ext |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| macOS | OpenCode v2 | 10 | 60 | 6 | 13 | 6 |
 
 </div>
 
@@ -19,7 +19,7 @@ MCP servers, skills, CLI tools and office apps — one command to attach to a pr
 Research and development need many things at once: computation, data visualization, web research, deliverables in familiar office formats, interface mockups — **in one place, driven by an AI agent**. The stack assembles official open-source tools and attaches them to OpenCode through every available channel: **MCP servers** (interactive compute and editing), **skills** (step-by-step agent workflows), **headless CLIs** (scripted commands without a window) and **control CLI scripts** (checks, updates, expiry tracking) — and it is available **only in projects where it is explicitly attached**: the global OpenCode config stays empty, and outside those projects the agent sees none of it.
 
 | Principle | Meaning |
-|---------|-----------|
+|:---:|:---:|
 | **Project-scoped** | The stack activates only in projects it is attached to |
 | **Single source** | The config template, skill lists and the repo map are edited in one place and spread by scripts |
 | **Freshness** | `update-all.sh` updates everything — brew → repos → venvs → skills → Julia → Wolfram → Craft Apps — and tracks license/subscription/credit expiry |
@@ -81,7 +81,7 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`):
 Only three things stay manual:
 
 | Step | Why | How |
-|-----|-----|-----|
+|:---:|:---:|:---:|
 | **First-start form** | proxy, Wolfram ID, git identity | `cp ~/stack/first-start.template.txt ~/stack/first-start.txt` → fill it in → `bash ~/stack/apply-first-start.sh` |
 | **Wolfram activation** | license for the MCP (renew every ~40 days) | `wolframscript` — sign in with a Wolfram ID; check: `bash ~/stack/check-wolfram-license.sh` |
 | **Firecrawl auth** *(optional)* | Firecrawl works per account: without signing in only a minimal anonymous quota is available, the free tier is enough | `firecrawl login --browser`; check: `firecrawl --status` |
@@ -108,7 +108,7 @@ $ bash setup.sh        # 12 steps: brew + casks, repos, venvs, CLIs, skills, con
 Everything is installed automatically by `setup.sh`:
 
 | What | How |
-|-----|--------------|
+|:---:|:---:|
 | Python 3.12 · Node.js · gh · ffmpeg · juliaup | `brew install` |
 | Wolfram Engine · ParaView · MacTeX · tldraw Desktop | `brew install --cask` |
 | OpenCode | `brew install anomalyco/tap/opencode-v2` |
@@ -131,7 +131,7 @@ Everything is installed automatically by `setup.sh`:
 Configs are generated automatically (`gen-opencode-config.sh`); for ParaView start the GUI + pvserver using the workflow from `STACK.md`:
 
 | Server | What it does |
-|--------|-----------|
+|:---:|:---:|
 | **Wolfram** | Wolfram Language computation (via AgentTools) |
 | **julia** | Persistent Julia REPL sessions |
 | **manim** | Headless animation rendering to video |
@@ -152,7 +152,7 @@ $ bash ~/stack/craft-install.sh
 ```
 
 | App | Official status |
-|---|---|
+|:---:|:---:|
 | WordCraft · GridCraft · DeckCraft | In development |
 | PdfCraft · FigCraft | Early alpha |
 
@@ -168,7 +168,7 @@ Installed automatically by `setup.sh` if the VS Code CLI (`code`) is present: `t
 Assembled automatically (`consolidate-skills.sh`) into `~/stack/skills-store/` and attached to projects via `skills` in the config — **outside projects the agent sees only OpenCode's built-in skills**.
 
 | Group | ~Count | Source |
-|--------|---------|----------|
+|:---:|:---:|:---:|
 | Firecrawl — web research, scraping, SEO | 37 | `firecrawl setup skills/build/workflows` |
 | ARIS — research pipeline, papers, experiments | 14 | ARIS clone → `sync-aris.sh` |
 | `tldraw-offline` — control of an open tldraw Desktop | 1 | installed by the app itself |
@@ -178,7 +178,7 @@ Assembled automatically (`consolidate-skills.sh`) into `~/stack/skills-store/` a
 <summary><b>8 standalone skills, by name</b></summary>
 
 | Skill | Purpose |
-|-------|-----------|
+|:---:|:---:|
 | `render-visual` | Polished PNG/SVG/PDF, slides, diagrams, GIF |
 | `data-analysis` | EDA, data visualization, reports, hypotheses |
 | `craft-office` | Office deliverables: Word/Excel/PowerPoint/PDF via Craft Apps |
@@ -199,12 +199,12 @@ $ ~/stack/new-project.sh ~/work/my-project    # create new / register existing
 The project receives **two files**:
 
 | File | Contents |
-|------|-----------|
+|:---:|:---:|
 | `AGENTS.md` | Agent instructions: stack map, MCP tools, conventions |
 | `.opencode/opencode.json` | `mcp` ×10 · `skills` → skills-store |
 
 | Fact | Details |
-|------|--------|
+|:---:|:---:|
 | **Portability** | Paths in the config go through `{env:HOME}` — portable between machines |
 | **Registry** | `~/stack/projects.txt` is personal (gitignored, created from `projects.template.txt`) — one path per line |
 | **Sync** | `bash ~/stack/sync-agents.sh` regenerates AGENTS.md + configs in all projects (part of `update-all.sh`, step 12); AGENTS.md content **outside** the `<!-- STACK:START/END -->` markers is preserved |
@@ -218,7 +218,7 @@ The project receives **two files**:
 You — in VS Code (the stack's extensions provide language servers: autocomplete and errors as you type), the agent — in OpenCode (via MCP/CLI and by running compilers/linters directly):
 
 | File | You — in VS Code | Agent — in OpenCode |
-|------|---------------------|--------------------|
+|:---:|:---:|:---:|
 | `.tldr` | Draw on the canvas | tldraw MCP; render `tldraw export` |
 | `.py` | Pylance | Run code; linters |
 | `.sh` | Terminal: `bash -n` | `bash -n` + run |
@@ -233,7 +233,7 @@ You — in VS Code (the stack's extensions provide language servers: autocomplet
 <h2 align="center">🛠 Usage</h2>
 
 | Task | Command |
-|--------|---------|
+|:---:|:---:|
 | **Update the whole stack** | `cd ~/stack && bash update-all.sh` — 13 steps, then `/reload` or an OpenCode restart |
 | **Health check** | `bash ~/stack/check-all.sh` |
 | **Attach a project** | `~/stack/new-project.sh <path>` |
