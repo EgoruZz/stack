@@ -20,6 +20,30 @@ fi
 echo ">>> Homebrew пакеты..."
 brew install python@3.12 node gh ffmpeg juliaup
 
+# GUI-приложения и крупные пакеты — официальные brew-каски (автообновление cask)
+echo ">>> Brew-каски (GUI): wolfram-engine, paraview, mactex, tldraw..."
+for cask in wolfram-engine paraview mactex tldraw; do
+    if brew list --cask "$cask" &>/dev/null; then
+        echo "  $cask: уже установлен"
+    elif brew install --cask "$cask" >/dev/null 2>&1; then
+        echo "  $cask: ✅"
+    else
+        echo "  $cask: ⚠️ не установился — поставь вручную: brew install --cask $cask"
+    fi
+done
+
+# OpenCode — официальный tap (update-all.sh обновляет этот же пакет)
+if ! command -v opencode &>/dev/null; then
+    brew tap anomalyco/tap >/dev/null 2>&1
+    if brew install anomalyco/tap/opencode-v2 >/dev/null 2>&1; then
+        echo "  opencode: ✅"
+    else
+        echo "  opencode: ⚠️ поставь вручную (https://opencode.ai)"
+    fi
+else
+    echo "  opencode: уже установлен"
+fi
+
 # Julia — через juliaup (не brew-julia: вся документация и check-all.sh
 # рассчитаны на ~/.juliaup/bin). release = актуальная стабильная версия.
 juliaup add release 2>/dev/null || echo "  Julia release уже установлен"
