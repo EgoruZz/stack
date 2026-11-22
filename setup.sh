@@ -20,11 +20,16 @@ fi
 echo ">>> Homebrew пакеты..."
 brew install python@3.12 node gh ffmpeg juliaup
 
-# GUI-приложения и крупные пакеты — официальные brew-каски (автообновление cask)
+# GUI-приложения и крупные пакеты — официальные brew-каски (автообновление cask).
+# Guard: если приложение уже стоит вручную (не через каск) — каск не ставим,
+# чтобы не получить два экземпляра (напр. ParaView-6.2.0-RC1.app + ParaView.app).
 echo ">>> Brew-каски (GUI): wolfram-engine, paraview, mactex, tldraw..."
-for cask in wolfram-engine paraview mactex tldraw; do
+for pair in "wolfram-engine Wolfram" "paraview ParaView-" "mactex TeX" "tldraw tldraw"; do
+    set -- $pair; cask=$1; appdir=$2
     if brew list --cask "$cask" &>/dev/null; then
-        echo "  $cask: уже установлен"
+        echo "  $cask: уже установлен (cask)"
+    elif ls -d /Applications/"$appdir"* >/dev/null 2>&1; then
+        echo "  $cask: приложение уже стоит вручную — каск не ставлю (удали ручную копию, если хочешь автообновление)"
     elif brew install --cask "$cask" >/dev/null 2>&1; then
         echo "  $cask: ✅"
     else
