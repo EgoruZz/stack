@@ -97,13 +97,13 @@
 - Экспорт: `.tldr` → PNG/SVG через `@kitschpatrol/tldraw-cli`; после обновления CLI нужно проверять совместимость схемы MCP-файлов.
 - Текущий MCP надёжно создаёт/сохраняет `.tldr` и редактирует документ; live-синхронизация с уже открытым desktop canvas не гарантируется.
 
-### Craft Apps (офисные документы, ArtCraft)
-- **WordCraft / GridCraft / DeckCraft / PdfCraft** — Word/Excel/PowerPoint/PDF, установлены в /Applications/ (alpha-версии)
-- MCP серверы: `wordcraft`, `gridcraft`, `deckcraft`, `pdfcraft` (в .opencode/opencode.json проекта)
+### Craft Apps (ArtCraft)
+- **WordCraft / GridCraft / DeckCraft / PdfCraft / FigCraft** — Word/Excel/PowerPoint/PDF/UI-дизайн, установлены в /Applications/ (alpha-версии)
+- MCP серверы: `wordcraft`, `gridcraft`, `deckcraft`, `pdfcraft`, `figcraft` (в .opencode/opencode.json проекта)
 - Headless CLI: `~/stack/craft-cli/<name>-cli` — convert, run, inspect, info, commands
 - **Финальные офисные деливераблы (.docx/.xlsx/.pptx/.pdf) делай через Craft Apps**, не python-скриптами
 - Компиляция .tex — по-прежнему pdflatex; WordCraft только импортирует/экспортирует .tex
-- Live-режим (правки в открытом окне): `/Applications/<App>.app/Contents/MacOS/<app> --control 798X`; порты: wordcraft 7981, gridcraft 7982, deckcraft 7983, pdfcraft 7984
+- Live-режим (правки в открытом окне): `/Applications/<App>.app/Contents/MacOS/<app> --control 798X`; порты: wordcraft 7981, gridcraft 7982, deckcraft 7983, pdfcraft 7984, figcraft 7985
 - Установка/обновление GUI: `bash ~/stack/craft-install.sh` (в терминале пользователя); версии проверяет update-all.sh
 - Скилл: `craft-office` (подробный workflow)
 

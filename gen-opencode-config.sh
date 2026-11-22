@@ -125,6 +125,12 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
       "command": ["{env:HOME}/stack/craft-cli/pdfcraft-cli", "mcp"],
       "enabled": true,
       "timeout": 120000
+    },
+    "figcraft": {
+      "type": "local",
+      "command": ["{env:HOME}/stack/craft-cli/figcraft-cli", "mcp"],
+      "enabled": true,
+      "timeout": 120000
     }
   }
 }
