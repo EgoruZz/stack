@@ -7,6 +7,8 @@
 **Персональная AI-разработка среда для macOS: человек + ИИ-ассистент в OpenCode.**
 MCP-серверы, скиллы, CLI-инструменты и офисные приложения — всё подключается к проекту одной командой и обновляется одной командой.
 
+**🇷🇺 Русский** · [🇬🇧 English](README_EN.md)
+
 ![macOS](https://img.shields.io/badge/macOS-000000?logo=apple&logoColor=white&style=for-the-badge)
 ![OpenCode v2](https://img.shields.io/badge/OpenCode_v2-1F6FEB?style=for-the-badge)
 
