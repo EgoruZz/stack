@@ -262,6 +262,18 @@ echo "============================================"
 echo "  Установка завершена!"
 echo "============================================"
 echo ""
+
+# Форма первого старта: если пользователь её заполнил — применяем сразу
+if [ -f "$HOME/stack/first-start.txt" ]; then
+    echo ">>> Найдена форма первого старта — применяю..."
+    bash "$STACK_DIR/apply-first-start.sh" "$HOME/stack/first-start.txt" || \
+        echo "  ⚠️ Форма не применилась (заполнено неполностью — исправь и перезапусти)"
+else
+    echo "Персональные данные (прокси, ключи) стек НЕ хранит в репозитории."
+    echo "Заполни форму и запусти:"
+    echo "  cp ~/stack/first-start.template.txt ~/stack/first-start.txt"
+    echo "  nano ~/stack/first-start.txt && bash ~/stack/apply-first-start.sh"
+fi
 echo "Ручные шаги (если ещё не сделаны):"
 echo "  1. OpenCode: https://opencode.ai"
 echo "  2. Wolfram Engine: brew install --cask wolfram-engine"
