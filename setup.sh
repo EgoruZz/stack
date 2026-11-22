@@ -98,7 +98,7 @@ create_venv() {
     echo "  $name готов"
 }
 
-create_venv manim-env manim manimgl
+create_venv manim-env manim manimgl "setuptools<81"
 create_venv jupyter-env jupyterlab numpy matplotlib pandas sympy plotly ipywidgets openpyxl markitdown
 
 # ParaView MCP venv
@@ -138,6 +138,12 @@ echo ">>> 5/12 CLI инструменты..."
 
 echo "  Firecrawl CLI..."
 npx -y firecrawl-cli@latest init -y --browser || echo "  Firecrawl: init пропущен (выполни вручную: firecrawl init)"
+
+# Firecrawl-скиллы: ставятся в глобальные каталоги, переносит их в
+# skills-store консолидация (шаг 9)
+firecrawl setup skills >/dev/null 2>&1 || true
+firecrawl setup build >/dev/null 2>&1 || true
+firecrawl setup workflows >/dev/null 2>&1 || true
 
 echo "  tldraw CLI..."
 npm install -g --allow-scripts=puppeteer @kitschpatrol/tldraw-cli
