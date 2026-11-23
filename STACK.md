@@ -391,7 +391,7 @@ brew upgrade --cask mactex
 
 ### Расширения (установлены)
 | Расширение | Назначение |
-|---|---|
+|:---:|:---:|
 | Jupyter | Ноутбуки прямо в VS Code |
 | Python | Автодополнение, отладка |
 | Julia | Julia language support |
@@ -425,7 +425,7 @@ brew upgrade --cask mactex
 
 ### MCP серверы (настроены)
 | Сервер | Статус | Функция |
-|---|---|---|
+|:---:|:---:|:---:|
 | Wolfram | ✅ | Выполнение Wolfram Language |
 | Julia | ✅ | Persistent Julia сессии |
 | Manim | ✅ | Генерация анимаций (headless) |
@@ -439,7 +439,7 @@ brew upgrade --cask mactex
 
 ### tldraw MCP — инструменты
 | Инструмент | Описание |
-|------------|----------|
+|:---:|:---:|
 | `tldraw_create_geo` | Геометрические shapes (rectangle, ellipse, diamond, star...) |
 | `tldraw_create_text` | Текстовые labels |
 | `tldraw_create_arrow` | Стрелки с привязками к shapes |
@@ -526,7 +526,7 @@ CHROME_PATH="$HOME/Library/Caches/ms-playwright/chromium_headless_shell-1234/chr
 Word/Excel/PowerPoint/PDF как нативные open-source Rust-приложения из [ArtCraft](https://getartcraft.com). GUI ставится/обновляется скриптом `bash ~/stack/craft-install.sh` в своём терминале (аналог Launcher без GUI); headless-CLI — автоматически в `~/stack/craft-cli/` (setup.sh, шаг 7).
 
 | Приложение | Формат | CLI | MCP-сервер |
-|---|---|---|---|
+|:---:|:---:|:---:|:---:|
 | WordCraft | .docx (+.odt/.rtf/.html/.md/.tex/.txt, PDF-экспорт, цитирования APA/MLA/Chicago/IEEE, Zotero) | `~/stack/craft-cli/wordcraft-cli` | `wordcraft` |
 | GridCraft | .xlsx (+.csv; PivotTables, 500+ функций, графики) | `~/stack/craft-cli/gridcraft-cli` | `gridcraft` |
 | DeckCraft | .pptx (+.potx, экспорт PDF/PNG/GIF) | `~/stack/craft-cli/deckcraft-cli` | `deckcraft` |
@@ -569,7 +569,7 @@ bash ~/stack/proxy.sh test      # живой тест + внешний IP
 ## Опциональные вещи: кто и когда
 
 | Вещь | Кому опционально | Когда нужно | Как |
-|---|---|---|---|
+|:---:|:---:|:---:|:---:|
 | `firecrawl login` | пользователю | если нужен полный лимит кредитов | `firecrawl login --browser`; без входа — минимальный анонимный лимит |
 | Wolfram ID в форме | пользователю | для неинтерактивной активации лицензии агентом | поле формы; иначе активация вручную `wolframscript -activate` |
 | Live-режим Craft Apps | пользователю | правки агента в открытом окне | `<app> --control 798X` + `--connect`; по умолчанию headless |
@@ -593,7 +593,7 @@ bash ~/stack/proxy.sh test      # живой тест + внешний IP
 После `setup.sh` стеку не хватает **персональных** данных — они принципиально не входят в репозиторий:
 
 | Что | Зачем | Как задать |
-|---|---|---|
+|:---:|:---:|:---:|
 | Прокси (host/user/pass/expiry) | маршрутизация внешнего трафика | создать `~/.stack-secrets.sh` (шаблон ниже); проверить: `bash ~/stack/proxy.sh test` |
 | OpenCode + провайдеры/ключи моделей | агент без моделей не отвечает | установить с opencode.ai, `opencode auth` (или env-ключи) |
 | Wolfram Engine + лицензия | Wolfram MCP | `brew install --cask wolfram-engine`, `wolframscript` — логин Wolfram ID; продление каждые ~40 дней |
