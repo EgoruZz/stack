@@ -26,6 +26,9 @@ Research and development need many things at once: computation, data visualizati
 | **Portability** | Paths in configs go through `{env:HOME}`; a fresh machine = `git clone` + `setup.sh` |
 | **Routing** | Local stack traffic always goes direct; external web traffic goes through the configured ISP proxy (`proxy.sh`, personal values in `~/.stack-secrets.sh`) |
 
+> [!TIP]
+> **Integration-friendly — the stack is a layer, not a box.** Attach it to any existing project and keep working your way. Add anything new — your own tools, other MCP servers, skills, even C++ support — into *your project*, or extend *the stack itself*: the AI assistant can wire new instruments into either. Nothing here is a static set — the stack grows with whatever you want to add.
+
 <h2 align="center">🗂️ Table of contents</h2>
 
 - [🗺️ Repository structure](#-repository-structure)

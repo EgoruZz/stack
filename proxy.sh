@@ -25,7 +25,6 @@ PROXY_HTTP_PORT="50100"
 PROXY_SOCKS_PORT="50101"
 # Срок подписки; проверка: bash proxy.sh expiry
 PROXY_EXPIRES_DEFAULT=""
-
 # ═══ Секреты — НЕ в этом файле! ═══
 # Персональные значения задаются в ~/.stack-secrets.sh (gitignored):
 #   PROXY_HOST="..."  PROXY_USER="..."  PROXY_PASS="..."
@@ -75,7 +74,14 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
     _stack_proxy_export_env
     case "${1:-status}" in
     status)
-        echo "Прокси-хост: $PROXY_HOST (http :$PROXY_HTTP_PORT, socks5 :$PROXY_SOCKS_PORT)"
+        if [ -n "$PROXY_HOST" ] && [ -n "$PROXY_USER" ]; then
+            echo "Прокси-хост: $PROXY_HOST (http :$PROXY_HTTP_PORT, socks5 :$PROXY_SOCKS_PORT)"
+        else
+            echo "Прокси НЕ настроен (опционально) — трафик идёт напрямую."
+            echo "Чтобы включить: заполни поля прокси в ~/stack/first-start.txt и запусти apply-first-start.sh"
+            _stack_proxy_expiry 2>/dev/null || true
+            return 0 2>/dev/null || exit 0
+        fi
         _stack_proxy_expiry
         echo "env http_proxy задан, no_proxy: $no_proxy"
         GIT_P=$(git config --global --get http.https://github.com.proxy 2>/dev/null)
@@ -93,6 +99,12 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
         *) echo "Использование: bash proxy.sh git [on|off]" ;;
         esac ;;
     test)
+        if [ -z "$PROXY_USER" ]; then
+            echo "Прокси не настроен (опционально) — проверяю прямой маршрут..."
+            CODE=$(curl -s --max-time 20 -o /dev/null -w '%{http_code}' https://api.github.com/zen)
+            [ "$CODE" = "200" ] && echo "✅ прямой доступ к GitHub работает" || echo "❌ прямой доступ не работает"
+            exit 0
+        fi
         echo "Проверка прокси..."
         CODE=$(curl -s --max-time 20 -o /dev/null -w '%{http_code}' -x "$STACK_PROXY_HTTP" https://api.github.com/zen)
         if [ "$CODE" = "200" ]; then
@@ -110,4 +122,20 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
 fi
 
 # ═══ Режим source (из .zshrc) ═══
+# Прокси ОПЦИОНАЛЕН: если персональные значения не заданы (нет
+# ~/.stack-secrets.sh или поля пустые) — трафик идёт напрямую, стек работает.
+_stack_proxy_export_env() {
+    export STACK_PROXY_HOST STACK_PROXY_HTTP STACK_PROXY_SOCKS STACK_PROXY_EXPIRES
+    if [ -n "$PROXY_HOST" ] && [ -n "$PROXY_USER" ] && [ -n "$PROXY_PASS" ]; then
+        export http_proxy="$STACK_PROXY_HTTP" HTTP_PROXY="$STACK_PROXY_HTTP"
+        export https_proxy="$STACK_PROXY_HTTP" HTTPS_PROXY="$STACK_PROXY_HTTP"
+        export all_proxy="$STACK_PROXY_SOCKS"
+        export no_proxy="localhost,127.0.0.1,::1,*.local"
+        export NO_PROXY="$no_proxy"
+    else
+        unset http_proxy HTTP_PROXY https_proxy HTTPS_PROXY all_proxy 2>/dev/null
+        export no_proxy="localhost,127.0.0.1,::1,*.local"
+        export NO_PROXY="$no_proxy"
+    fi
+}
 _stack_proxy_export_env

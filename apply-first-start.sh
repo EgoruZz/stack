@@ -27,18 +27,26 @@ while IFS= read -r line || [ -n "$line" ]; do
     export "$key"
 done < "$FORM"
 
-MISSING=""
+# НЕ заданные в форме поля -> пусто (set -u safe)
 for v in PROXY_HOST PROXY_USER PROXY_PASS PROXY_EXPIRES GIT_NAME GIT_EMAIL WOLFRAM_ID WOLFRAM_PASS; do
-    eval "test -n \"\${$v+x}\" || $v=''"   # не задано в форме -> пусто (без set -u abort)
-    eval "val=\${$v}"
-    case "$v" in PROXY_*) [ -z "$val" ] && MISSING="$MISSING $v" ;; esac
+    eval "test -n \"\${$v+x}\" || $v=''"
 done
-if [ -n "$MISSING" ]; then
-    echo "❌ Не заполнены обязательные поля:$MISSING (блок прокси)"
+# Прокси ОПЦИОНАЛЕН: либо заполнены все поля блока, либо ни одного
+P_EMPTY=0; P_FULL=0
+for v in PROXY_HOST PROXY_USER PROXY_PASS; do
+    eval "val=\${$v}"
+    [ -z "$val" ] && P_EMPTY=$((P_EMPTY+1)) || P_FULL=$((P_FULL+1))
+done
+if [ "$P_EMPTY" -gt 0 ] && [ "$P_FULL" -gt 0 ]; then
+    echo "❌ Блок прокси заполнен наполовину — заполни все PROXY_* поля или оставь пустыми (без прокси)"
     exit 1
 fi
 
-# ~/.stack-secrets.sh
+# ~/.stack-secrets.sh — только если прокси настроен
+if [ "$P_FULL" = "0" ]; then
+    rm -f "$SECRETS"
+    echo "ℹ️ Прокси не настроен (опционально) — стек работает напрямую"
+else
 cat > "$SECRETS" << EOF
 # Сгенерировано apply-first-start.sh из first-start.txt $(date +%F)
 PROXY_HOST="$PROXY_HOST"
@@ -48,6 +56,7 @@ PROXY_EXPIRES="$PROXY_EXPIRES"
 EOF
 chmod 600 "$SECRETS"
 echo "✅ $SECRETS записан (600)"
+fi
 
 # git identity
 if [ -n "${GIT_NAME:-}" ] && [ -n "${GIT_EMAIL:-}" ]; then

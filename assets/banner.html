@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { width:1500px; height:560px; overflow:hidden; position:relative;
+    background:
+      radial-gradient(900px 500px at 85% -10%, #dbeafe 0%, transparent 60%),
+      radial-gradient(900px 500px at 10% 110%, #d1fae5 0%, transparent 55%),
+      linear-gradient(160deg,#ffffff 0%,#f4f7fb 100%);
+    font-family:-apple-system,'SF Pro Display',sans-serif; }
+  .wordmark { position:absolute; top:34px; left:64px; display:flex; align-items:center; gap:18px; }
+  .wordmark .blocks { display:flex; gap:6px; }
+  .block { width:26px; height:26px; border-radius:7px; }
+  .b1{background:#1F6FEB}.b2{background:#2EA043}.b3{background:#EA4AAA}
+  .wordmark h1 { font-size:40px; font-weight:800; color:#1f2328; }
+  .tags { position:absolute; top:52px; right:64px; display:flex; gap:12px; }
+  .tag { padding:8px 18px; border-radius:999px; font-size:17px; font-weight:600; color:#fff;
+    box-shadow:0 4px 14px rgba(2,6,23,.18); }
+  .t1{background:#1F6FEB} .t2{background:#2EA043} .t3{background:#6e56cf}
+  .card { position:absolute; left:64px; right:64px; top:104px; bottom:56px;
+    background:rgba(255,255,255,.82); backdrop-filter:blur(4px);
+    border:1px solid #e3e8ef; border-radius:22px;
+    box-shadow:0 24px 60px rgba(2,6,23,.10);
+    display:flex; flex-direction:column; justify-content:space-evenly; padding:0 40px; }
+  .row { display:flex; align-items:center; gap:22px; }
+  .rowlabel { width:230px; flex-shrink:0; }
+  .rowlabel .t { font-size:21px; font-weight:700; color:#1f2328; }
+  .rowlabel .s { font-size:15px; color:#6b7280; margin-top:2px; }
+  .icons { display:flex; gap:16px; align-items:center; }
+  .sq { width:58px; height:58px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+    font-size:30px; box-shadow:0 8px 18px rgba(2,6,23,.16); border:1px solid rgba(0,0,0,.06); }
+  .dots { color:#9ca3af; font-size:24px; }
+  .fire { background:linear-gradient(160deg,#f97316,#ea580c); color:#fff; }
+  .vscode { background:#fff; color:#1F6FEB; font-weight:800; font-size:32px; }
+  .wl { background:#fff; color:#dd1100; font-weight:800; font-size:26px; }
+  .tex { background:#ececf1; color:#1f2328; font-family:Georgia,serif; font-size:24px; }
+  .julia { background:#fff; display:flex; gap:4px; align-items:center; justify-content:center; }
+  .jdot { width:16px; height:16px; border-radius:50%; }
+  .terminal { background:#0d1117; color:#4ade80; font-size:26px; font-weight:700; }
+  .zsh { background:#2d2d2d; color:#d8d8d8; font-size:12px; font-weight:600; text-align:center; line-height:1.2; }
+  .deck { background:#0f172a; color:#f472b6; font-size:26px; }
+  .py { background:#fff; color:#3776ab; font-weight:800; font-size:26px; }
+  .wlg { background:#fff; color:#656d76; font-weight:800; font-size:24px; }
+</style></head>
+<body>
+  <div class="wordmark">
+    <div class="blocks"><div class="block b1"></div><div class="block b2"></div><div class="block b3"></div></div>
+    <h1>Stack</h1>
+  </div>
+  <div class="tags">
+    <div class="tag t1">ai-friendly</div>
+    <div class="tag t2">auto-fresh</div>
+    <div class="tag t3">progressive</div>
+  </div>
+  <div class="card">
+
+    <div class="row">
+      <div class="rowlabel"><div class="t">Skills</div><div class="s">вошли в агент, работают в проектах</div></div>
+      <div class="icons">
+        <div class="sq fire">🔥</div><div class="sq" style="background:#0d1117;color:#7dd3fc">🌐</div>
+        <div class="sq" style="background:#fff7ed;color:#ea580c">📊</div><div class="sq" style="background:#f0fdf4;color:#16a34a">🧪</div>
+        <div class="dots">…</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="rowlabel"><div class="t">In VS Code</div><div class="s">расширения: язык и просмотр файлов</div></div>
+      <div class="icons">
+        <div class="sq vscode">&lt;&gt;</div>
+        <div class="sq wl">✳</div>
+        <div class="sq tex">TeX</div>
+        <div class="sq py">Py</div>
+        <div class="sq wlg">WL</div>
+        <div class="dots">…</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="rowlabel"><div class="t">GUI apps</div><div class="s">нативные macOS-приложения</div></div>
+      <div class="icons">
+        <div class="sq terminal">▸_</div>
+        <div class="sq julia"><div class="jdot" style="background:#4063d8"></div><div class="jdot" style="background:#cb3c33"></div><div class="jdot" style="background:#389826"></div></div>
+        <div class="sq deck">▤</div>
+        <div class="dots">…</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="rowlabel"><div class="t">In terminal</div><div class="s">формулы, пакеты, CLI</div></div>
+      <div class="icons">
+        <div class="sq zsh">oh my<br>zsh</div>
+        <div class="sq" style="background:#111;color:#fff;font-size:15px;font-weight:700">open<br>code</div>
+        <div class="sq" style="background:#fff;color:#bf3989;font-weight:800;font-size:20px">npm</div>
+        <div class="dots">…</div>
+      </div>
+    </div>
+
+  </div>
+</body></html>

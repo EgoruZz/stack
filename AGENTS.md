@@ -41,6 +41,9 @@
 - MCP сервер: `Wolfram` (в .opencode/opencode.json проекта)
 - Jupyter kernel: `wolframlanguage15` (для Jupyter notebooks)
 - Лицензия: продлевать на https://www.wolfram.com/engine/ каждые ~40 дней
+- Данные лицензии живут на машине (~/Library/Wolfram*) и ПЕРЕЖИВАЮТ сбросы сессии и git pull
+- Креды для активации: ~/.stack-wolfram.conf (пишет apply-first-start.sh из формы); если файла нет — запросить у пользователя
+- Процедура при истечении: 1) продление на сайте; 2) попытка `wolframscript -activate` (интерактивный ввод: если в конфе есть WOLFRAM_ID/PASS — попробовать неинтерактивно; если нет — попросить пользователя ввести)
 - Проверка лицензии: `wolframscript -code 'Print[$LicenseExpirationDate]'`
 - Пакеты: ~/stack/WolframLanguage/ (пользовательские пакеты, создаются по мере необходимости)
 - Jupyter интеграция: ~/stack/WolframLanguageForJupyter/
