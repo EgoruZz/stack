@@ -6,6 +6,9 @@
 # Использование:
 #   bash sync-agents.sh              # синхронизация + подсказка о перезапуске
 #   bash sync-agents.sh --no-hint    # без подсказки (для вызова из update-all.sh)
+#   bash sync-agents.sh --discover   # + автоиндексирование: найти проекты по
+#                                    #   маркеру .opencode/opencode.json и
+#                                    #   добавить их в реестр
 
 set -uo pipefail
 
@@ -36,6 +39,28 @@ fi
 
 echo "=== Синхронизация AGENTS.md и конфигов OpenCode ==="
 echo ""
+
+# --discover: автоиндексирование — ищем проекты по маркеру
+# .opencode/opencode.json (его создаёт new-project.sh) и добавляем
+# найденное в реестр. Сам стек исключается.
+if [ "${1:-}" = "--discover" ] || [ "${2:-}" = "--discover" ]; then
+    echo "── Автоиндексирование проектов (маркер: .opencode/opencode.json)..."
+    FOUND=$(find "$HOME" -maxdepth 4 -type d -name .opencode -not -path "*/node_modules/*" -not -path "$STACK_DIR/*" -not -path "*/Library/*" -not -path "*/.Trash/*" 2>/dev/null | sed 's|/.opencode$||' | sort -u)
+    ADDED=0
+    while IFS= read -r d; do
+        [ -z "$d" ] && continue
+        [ -f "$d/.opencode/opencode.json" ] || continue
+        if ! grep -qxF "$d" "$REGISTRY" 2>/dev/null; then
+            echo "$d" >> "$REGISTRY"
+            echo "  + найден и добавлен: $d"
+            ADDED=$((ADDED + 1))
+        fi
+    done <<EOF
+$FOUND
+EOF
+    echo "  добавлено новых: $ADDED"
+    echo ""
+fi
 
 SYNCED=0
 CREATED=0
