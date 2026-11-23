@@ -8,7 +8,7 @@ MCP servers, skills, CLI tools and office apps — one command to attach to a pr
 
 | 🖥 Platform | 🤖 Agent | 🔌 MCP | 🎯 Skills | 🧩 Apps | 🛠 CLI tools | 🖼 VS Code ext |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| macOS | OpenCode v2 | 10 | 60 | 6 | 13 | 6 |
+| macOS | OpenCode v2 | 10 | 60 | 9 | 13 | 6 |
 
 </div>
 
