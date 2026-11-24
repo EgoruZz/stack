@@ -67,6 +67,7 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
   "__SCHEMA__": "https://opencode.ai/config.json",
   "skills": ["__STACK__/skills-store"],
   "mcp": {
+    "servers": {
     "Wolfram": {
       "type": "local",
       "command": [
@@ -94,14 +95,14 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
     "manim": {
       "type": "local",
       "command": ["__STACK__/manim-env/bin/python", "__STACK__/manim-mcp/src/manim_server.py"],
-      "env": {"PATH": "__STACK__/manim-env/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"},
+      "environment": {"PATH": "__STACK__/manim-env/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"},
       "enabled": true,
       "timeout": 120000
     },
     "ParaView": {
       "type": "local",
       "command": ["__STACK__/paraview-mcp-env/bin/python", "__STACK__/paraview-mcp/paraview_mcp_server.py"],
-      "env": {
+      "environment": {
         "PYTHONPATH": "__PARAVIEW_PYTHON__:__PARAVIEW_PYLIB__:__STACK__/paraview-mcp-env/lib/python3.12/site-packages",
         "DYLD_LIBRARY_PATH": "__PARAVIEW_LIBS__:__PARAVIEW_FRAMEWORKS__"
       },
@@ -143,6 +144,7 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
       "command": ["__STACK__/craft-cli/figcraft-cli", "mcp"],
       "enabled": true,
       "timeout": 120000
+    }
     }
   }
 }
