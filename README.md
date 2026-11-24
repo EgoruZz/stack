@@ -50,7 +50,8 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`)
 ```
 ~/stack/
 ├── README.md                    # This file
-├── AGENTS.md                    # Agent instructions (with the repo map)
+├── AGENTS.template.md           # Agent instructions source ({{STACK}} placeholder)
+├── AGENTS.md                    # (generated locally, gitignored)
 ├── STACK.md                     # Full documentation: keybinds, examples (Russian)
 ├── workflow.txt                 # Git workflow rules
 │
@@ -58,8 +59,9 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`)
 ├── update-all.sh                # Update everything (15 steps) + expiry tracking
 ├── check-all.sh                 # Health check
 │
-├── new-project.sh               # Attach a project
-├── sync-agents.sh               # AGENTS.md + configs → all projects
+├── new-project.sh               # Attach a project (any folder, git or not)
+├── detach-project.sh            # Detach the stack from a project
+├── sync-agents.sh               # AGENTS.md + configs → all projects (rewrites paths if the stack moved)
 ├── gen-opencode-config.sh       # .opencode/opencode.json generator (10 MCP)
 ├── sync-aris.sh                 # ARIS skills → skills-store
 ├── consolidate-skills.sh        # Assemble skills-store + clean global dirs
@@ -113,6 +115,9 @@ $ git clone https://github.com/custom-opencode/stack.git ~/stack
 $ cd ~/stack
 $ bash setup.sh
 ```
+
+> [!NOTE]
+> The clone destination is **your choice** — the stack is path-agnostic: every script finds its own root, and project configs get absolute paths at attach time. In the docs, `~/stack` is shorthand for "wherever you cloned the stack" (`STACK_DIR`); substitute your real path, e.g. `~/git/custom-opencode/stack`.
 
 - The repository is public: `git clone` works over HTTPS, no SSH keys needed
 - It asks for a password only where the system requires one
@@ -319,7 +324,8 @@ You — in VS Code (the stack's extensions provide language servers: autocomplet
 |:---:|:---:|
 | **Update the whole stack** | `cd ~/stack && bash update-all.sh` — 15 steps, then `/reload` or an OpenCode restart |
 | **Health check** | `bash ~/stack/check-all.sh` |
-| **Attach a project** | `~/stack/new-project.sh <path>` |
+| **Attach a project** | `~/stack/new-project.sh <path>` — any folder, git or not |
+| **Detach a project** | `~/stack/detach-project.sh <path>` — removes the config + registry entry, project files stay |
 | **Sync projects** | `bash ~/stack/sync-agents.sh` |
 | **Install/update Craft Apps** | `bash ~/stack/craft-install.sh` |
 | **Network: status / test / git** | `bash ~/stack/proxy.sh status` · `test` · `git on\|off` |

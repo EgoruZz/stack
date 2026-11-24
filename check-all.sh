@@ -1,6 +1,6 @@
 #!/bin/bash
 # Проверка что весь стэк работает
-# Запуск: cd ~/stack && bash check-all.sh
+# Запуск: cd $STACK_DIR && bash check-all.sh
 
 export PATH="$HOME/.juliaup/bin:$PATH"
 
@@ -48,8 +48,8 @@ fi
 
 # Manim
 echo -n "Manim: "
-if [ -f ~/stack/manim-env/bin/activate ]; then
-    source ~/stack/manim-env/bin/activate 2>/dev/null
+if [ -f $STACK_DIR/manim-env/bin/activate ]; then
+    source $STACK_DIR/manim-env/bin/activate 2>/dev/null
     if python3 -c "import manim" >/dev/null 2>&1; then
         MANIM_VER=$(python3 -c "import manim; print(manim.__version__)" 2>/dev/null)
         echo "✅ v$MANIM_VER"
@@ -63,8 +63,8 @@ fi
 
 # ManimGL
 echo -n "ManimGL: "
-if [ -f ~/stack/manim-env/bin/activate ]; then
-    source ~/stack/manim-env/bin/activate 2>/dev/null
+if [ -f $STACK_DIR/manim-env/bin/activate ]; then
+    source $STACK_DIR/manim-env/bin/activate 2>/dev/null
     if python3 -c "import manimlib" >/dev/null 2>&1; then
         echo "✅ OK"
     else
@@ -77,8 +77,8 @@ fi
 
 # Jupyter
 echo -n "Jupyter: "
-if [ -f ~/stack/jupyter-env/bin/activate ]; then
-    source ~/stack/jupyter-env/bin/activate 2>/dev/null
+if [ -f $STACK_DIR/jupyter-env/bin/activate ]; then
+    source $STACK_DIR/jupyter-env/bin/activate 2>/dev/null
     if jupyter --version >/dev/null 2>&1; then
         echo "✅ $(jupyter --version 2>/dev/null | head -1)"
     else
@@ -152,35 +152,35 @@ for app in WordCraft GridCraft DeckCraft PdfCraft FigCraft; do
 done
 CLI_OK=0
 for cli in wordcraft-cli gridcraft-cli deckcraft-cli pdfcraft-cli figcraft-cli; do
-    [ -x ~/stack/craft-cli/$cli ] && CLI_OK=$((CLI_OK+1))
+    [ -x $STACK_DIR/craft-cli/$cli ] && CLI_OK=$((CLI_OK+1))
 done
 if [ "$CRAFT_OK" -eq "$CRAFT_ALL" ] && [ "$CLI_OK" -eq "$CRAFT_ALL" ]; then
     echo "✅ 5/5 apps, 5/5 CLI"
 else
-    echo "⚠️ apps $CRAFT_OK/5, CLI $CLI_OK/5 — GUI: bash ~/stack/craft-install.sh, CLI уже в ~/stack/craft-cli/"
+    echo "⚠️ apps $CRAFT_OK/5, CLI $CLI_OK/5 — GUI: bash $STACK_DIR/craft-install.sh, CLI уже в $STACK_DIR/craft-cli/"
 fi
 
 # Хранилище скиллов
 echo -n "Skills store: "
-if [ -d ~/stack/skills-store ]; then
-    N=$(ls ~/stack/skills-store | wc -l | tr -d ' ')
+if [ -d $STACK_DIR/skills-store ]; then
+    N=$(ls $STACK_DIR/skills-store | wc -l | tr -d ' ')
     GLOBAL=$(ls ~/.config/opencode/skills 2>/dev/null | wc -l | tr -d ' ')
     if [ "$N" -ge 50 ] && [ "$GLOBAL" -eq 0 ]; then
         # tldraw-offline ставит само приложение tldraw Desktop при первом запуске:
         # на чистой машине его нет до первого запуска приложения — это не ошибка,
         # но пользователь должен знать, что скилл добавится позже.
-        if [ ! -d ~/stack/skills-store/tldraw-offline ]; then
-            echo "✅ $N скиллов (глобальные каталоги чисты; 60-й — tldraw-offline — появится после первого запуска tldraw Desktop, затем bash ~/stack/consolidate-skills.sh)"
+        if [ ! -d $STACK_DIR/skills-store/tldraw-offline ]; then
+            echo "✅ $N скиллов (глобальные каталоги чисты; 60-й — tldraw-offline — появится после первого запуска tldraw Desktop, затем bash $STACK_DIR/consolidate-skills.sh)"
         else
             echo "✅ $N скиллов (глобальные каталоги чисты)"
         fi
     elif [ "$N" -lt 50 ]; then
-        echo "⚠️ только $N скиллов — запусти: bash ~/stack/consolidate-skills.sh"
+        echo "⚠️ только $N скиллов — запусти: bash $STACK_DIR/consolidate-skills.sh"
     else
-        echo "⚠️ в ~/.config/opencode/skills $GLOBAL скиллов — запусти: bash ~/stack/consolidate-skills.sh"
+        echo "⚠️ в ~/.config/opencode/skills $GLOBAL скиллов — запусти: bash $STACK_DIR/consolidate-skills.sh"
     fi
 else
-    echo "❌ ~/stack/skills-store не найден"
+    echo "❌ $STACK_DIR/skills-store не найден"
 fi
 
 echo ""

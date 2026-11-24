@@ -3,10 +3,10 @@
 <!-- STACK:START -->
 ## Установленный стэк
 
-Весь стэк находится в ~/stack/
-Запускай OpenCode отсюда: `cd ~/stack && opencode`
+Весь стэк находится в {{STACK}}/
+Запускай OpenCode отсюда: `cd {{STACK}} && opencode`
 
-### Карта репозитория ~/stack
+### Карта репозитория {{STACK}}
 
 | Файл / папка | Назначение |
 |:---:|:---:|
@@ -45,14 +45,14 @@
 - Креды для активации: ~/.stack-wolfram.conf (пишет apply-first-start.sh из формы); если файла нет — запросить у пользователя
 - Процедура при истечении: 1) продление на сайте; 2) попытка `wolframscript -activate` (интерактивный ввод: если в конфе есть WOLFRAM_ID/PASS — попробовать неинтерактивно; если нет — попросить пользователя ввести)
 - Проверка лицензии: `wolframscript -code 'Print[$LicenseExpirationDate]'`
-- Пакеты: ~/stack/WolframLanguage/ (пользовательские пакеты, создаются по мере необходимости)
-- Jupyter интеграция: ~/stack/WolframLanguageForJupyter/
+- Пакеты: {{STACK}}/WolframLanguage/ (пользовательские пакеты, создаются по мере необходимости)
+- Jupyter интеграция: {{STACK}}/WolframLanguageForJupyter/
 
 ### Manim
 - **Manim** (community edition) — основная версия для анимаций
 - **ManimGL** (3Blue1Brown) — OpenGL версия
-- Окружение: ~/stack/manim-env (Python 3.12)
-- Активация: `source ~/stack/manim-env/bin/activate`
+- Окружение: {{STACK}}/manim-env (Python 3.12)
+- Активация: `source {{STACK}}/manim-env/bin/activate`
 - Запуск (community): `manim script.py SceneName`
 - Запуск (GL): `manimgl script.py SceneName`
 - MCP сервер: `manim` (в .opencode/opencode.json проекта)
@@ -64,17 +64,17 @@
 - Python API: `paraview.simple`
 - Скрипты: писать → запускать через pvpython или вставлять в GUI Python Shell
 - MCP сервер: `ParaView` (в .opencode/opencode.json проекта)
-- Окружение: ~/stack/paraview-mcp-env (Python 3.12)
+- Окружение: {{STACK}}/paraview-mcp-env (Python 3.12)
 - MCP инструменты: load_data, create_source, create_isosurface, create_slice, toggle_volume_rendering, color_by, rotate_camera, reset_camera, plot_over_line, warp_by_vector, create_streamline, get_pipeline, и др.
-- **Скриншоты:** папка `~/stack/paraview-mcp/screenshots/`
+- **Скриншоты:** папка `{{STACK}}/paraview-mcp/screenshots/`
   - Сохраняй скриншоты туда с понятными именами (например `isosurface_temp.png`)
-  - Говори агенту: "скриншот в ~/stack/paraview-mcp/screenshots/имя.png — можешь смотреть"
+  - Говори агенту: "скриншот в {{STACK}}/paraview-mcp/screenshots/имя.png — можешь смотреть"
   - MCP скриншоты не доступны (bridge работает в отдельном pvprocess и не видит render view GUI)
 - **Workflow запуска (обязательно!):**
   1. Запустить ParaView GUI: `PVAPP=$(ls -d /Applications/ParaView-*.app | head -1) && open "$PVAPP"`
   2. Запустить pvserver: `"$PVAPP/Contents/bin/pvserver" --multi-clients --server-port=11111`
   3. В GUI: File → Connect → localhost:11111
-  4. Запустить TCP-мост: `"$PVAPP/Contents/bin/pvpython" ~/stack/paraview-mcp/paraview_bridge.py`
+  4. Запустить TCP-мост: `"$PVAPP/Contents/bin/pvpython" {{STACK}}/paraview-mcp/paraview_bridge.py`
   5. MCP сервер подключается к мосту автоматически
 - **Workflow завершения:**
   1. Закрыть ParaView GUI (просто закрыть окно)
@@ -95,7 +95,7 @@
 ### tldraw
 - **tldraw MCP** — управление canvas через MCP (30 инструментов)
 - MCP сервер: `tldraw` (в .opencode/opencode.json проекта)
-- Сервер: ~/stack/tldraw-mcp/ (Node.js, zero browser deps)
+- Сервер: {{STACK}}/tldraw-mcp/ (Node.js, zero browser deps)
 - Инструменты: create_geo, create_text, create_arrow, create_note, create_frame, move_shapes, group_shapes, set_camera, save_document, load_document и др.
 - Экспорт: `.tldr` → PNG/SVG через `@kitschpatrol/tldraw-cli`; после обновления CLI нужно проверять совместимость схемы MCP-файлов.
 - Текущий MCP надёжно создаёт/сохраняет `.tldr` и редактирует документ; live-синхронизация с уже открытым desktop canvas не гарантируется.
@@ -106,22 +106,22 @@
 ### Первый старт (сообщи пользователю, если стек ещё не настроен)
 - Персональные данные (прокси, Wolfram ID, git identity) живут вне репозитория
 - Если `~/.stack-secrets.sh` отсутствует: попроси пользователя заполнить
-  `~/stack/first-start.txt` (шаблон: `first-start.template.txt`) и запустить
-  `bash ~/stack/apply-first-start.sh`; после этого `bash ~/stack/proxy.sh test`
+  `{{STACK}}/first-start.txt` (шаблон: `first-start.template.txt`) и запустить
+  `bash {{STACK}}/apply-first-start.sh`; после этого `bash {{STACK}}/proxy.sh test`
 
 ### Craft Apps (офисные документы, ArtCraft)
 - **WordCraft / GridCraft / DeckCraft / PdfCraft / FigCraft** — Word/Excel/PowerPoint/PDF/UI-дизайн, установлены в /Applications/ (alpha-версии)
 - MCP серверы: `wordcraft`, `gridcraft`, `deckcraft`, `pdfcraft`, `figcraft` (в .opencode/opencode.json проекта)
-- Headless CLI: `~/stack/craft-cli/<name>-cli` — convert, run, inspect, info, commands
+- Headless CLI: `{{STACK}}/craft-cli/<name>-cli` — convert, run, inspect, info, commands
 - **Финальные офисные деливераблы (.docx/.xlsx/.pptx/.pdf) делай через Craft Apps**, не python-скриптами
 - Компиляция .tex — по-прежнему pdflatex; WordCraft только импортирует/экспортирует .tex
 - Live-режим (правки в открытом окне): `/Applications/<App>.app/Contents/MacOS/<app> --control 798X`; порты: wordcraft 7981, gridcraft 7982, deckcraft 7983, pdfcraft 7984, figcraft 7985
-- Установка/обновление GUI: `bash ~/stack/craft-install.sh` (в терминале пользователя); версии проверяет update-all.sh
+- Установка/обновление GUI: `bash {{STACK}}/craft-install.sh` (в терминале пользователя); версии проверяет update-all.sh
 - Скилл: `craft-office` (подробный workflow)
 
 ### Jupyter
-- **JupyterLab** окружение: ~/stack/jupyter-env
-- Запуск: `source ~/stack/jupyter-env/bin/activate && jupyter-lab`
+- **JupyterLab** окружение: {{STACK}}/jupyter-env
+- Запуск: `source {{STACK}}/jupyter-env/bin/activate && jupyter-lab`
 - Kernel: Python 3.12 + Wolfram Language 15
 - Пакеты: numpy, matplotlib, pandas, sympy, plotly, ipywidgets
 - XLSX support: openpyxl, markitdown
@@ -134,7 +134,7 @@
 - Конфиг MCP: .opencode/opencode.json проекта (генерируется gen-opencode-config.sh; глобально стек не поднимается — MCP и скиллы живут только в проектах из projects.txt)
 - **Версия:** OpenCode **v2** (brew `anomalyco/tap/opencode-v2`, v1 удалён). Жертвы v2: LSP-серверов нет (поле `lsp` игнорируется), переменных `OPENCODE_DISABLE_*_SKILLS` нет. MCP-конфиг v1-формы нормализуется автоматически.
 - **Диагностика кода:** через запуск линтеров/компиляторов/тестов напрямую — `bash -n` (.sh), `python` (.py), `npm run build` (.ts), `julia` (.jl), `pdflatex` (.tex). Проверяй правки компилятором до того, как заявить результат.
-- Skills: ARIS research pipeline, Firecrawl, render-visual, xlsx, data-analysis, grill-me, epistemic-rigor, deep-mind, dag-hallucination-detector, и др. (60 скиллов, хранилище: ~/stack/skills-store (проектные, через skills.paths))
+- Skills: ARIS research pipeline, Firecrawl, render-visual, xlsx, data-analysis, grill-me, epistemic-rigor, deep-mind, dag-hallucination-detector, и др. (60 скиллов, хранилище: {{STACK}}/skills-store (проектные, через skills.paths))
 - ARIS работает в local-only режиме: внешние Codex/Oracle/manual-review MCP не используются и не считаются доступными.
 - Для многораундовой проверки используются локальные OpenCode subagents; результат нельзя называть независимой cross-model экспертизой.
 - Для исследовательских утверждений явно разделять verified, inferred и unknown; отсутствие источника не считать подтверждением.
@@ -148,7 +148,7 @@
 
 ## STACK.md — справка по ситуации
 
-~/stack/STACK.md — полная документация стека. Открывай его:
+{{STACK}}/STACK.md — полная документация стека. Открывай его:
 - перед первой в сессии работой с инструментом (Wolfram, Manim, ParaView, tldraw, Julia, Jupyter) — раздел этого инструмента;
 - когда нужны горячие клавиши, примеры кода, ссылки на документацию;
 - когда задач касается визуализация или обновление, а деталей этого файла не хватает.
@@ -164,18 +164,18 @@
 
 ## Управление пакетами
 
-### Manim (~/stack/manim-env)
+### Manim ({{STACK}}/manim-env)
 ```bash
-source ~/stack/manim-env/bin/activate
+source {{STACK}}/manim-env/bin/activate
 pip list                          # список пакетов
 pip install <package>             # добавить
 pip install --upgrade <package>   # обновить
 pip install --upgrade manim manimgl  # обновить всё
 ```
 
-### Jupyter (~/stack/jupyter-env)
+### Jupyter ({{STACK}}/jupyter-env)
 ```bash
-source ~/stack/jupyter-env/bin/activate
+source {{STACK}}/jupyter-env/bin/activate
 pip list
 pip install <package>
 pip install --upgrade jupyterlab
@@ -199,7 +199,7 @@ wolframscript -code 'PacletInstall["Wolfram/AgentTools"]'  # обновить
 
 ### Проверка полноты
 ```bash
-cd ~/stack && bash check-all.sh  # проверить что всё работает
-cd ~/stack && bash update-all.sh  # обновить весь стек
+cd {{STACK}} && bash check-all.sh  # проверить что всё работает
+cd {{STACK}} && bash update-all.sh  # обновить весь стек
 ```
 <!-- STACK:END -->

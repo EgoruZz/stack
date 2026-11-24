@@ -1,14 +1,14 @@
 #!/bin/bash
-# Синхронизация ARIS-скиллов из клона в ~/stack/skills-store/
-# Список скиллов: ~/stack/aris-skills.txt (единый источник правды)
+# Синхронизация ARIS-скиллов из клона в $STACK_DIR/skills-store/
+# Список скиллов: $STACK_DIR/aris-skills.txt (единый источник правды)
 # Использование:
 #   bash sync-aris.sh            # только синхронизация
 #   bash sync-aris.sh --update   # git pull клона + синхронизация
 
 set -uo pipefail
 
-STACK_DIR="$HOME/stack"
-SKILLS_DIR="$HOME/stack/skills-store"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SKILLS_DIR="$STACK_DIR/skills-store"
 ARIS_REPO="$STACK_DIR/aris-research-repo"
 ARIS_LIST="$STACK_DIR/aris-skills.txt"
 

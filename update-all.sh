@@ -1,13 +1,13 @@
 #!/bin/bash
 # Скрипт полного обновления всего стека
-# Запуск: cd ~/stack && bash update-all.sh
+# Запуск: cd $STACK_DIR && bash update-all.sh
 # Обновляет: brew, Apple CLT/систему, внешние репозитории, tldraw-mcp,
 #            Python venv, npm CLI, VS Code расширения, ARIS skills,
 #            standalone skills, Julia, Wolfram, Craft Apps
 
 set -uo pipefail
 
-STACK_DIR="$HOME/stack"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "============================================"
 echo "  Обновление стека"
@@ -142,7 +142,7 @@ echo "  tldraw CLI: $(tldraw --version 2>/dev/null || echo 'не установ�
 
 # Firecrawl: обновление скиллов (core + build + workflows) из свежего CLI.
 # Ставятся во временные глобальные каталоги — consolidate-skills.sh (шаг 8)
-# переносит их в ~/stack/skills-store и очищает глобальные каталоги.
+# переносит их в $STACK_DIR/skills-store и очищает глобальные каталоги.
 echo "  Firecrawl skills..."
 firecrawl setup skills >/dev/null 2>&1 || true
 firecrawl setup build >/dev/null 2>&1 || true
@@ -191,7 +191,7 @@ echo ""
 # 8. STANDALONE SKILLS
 # ═══════════════════════════════════════
 
-echo ">>> 10/15 Skills (консолидация в ~/stack/skills-store)..."
+echo ">>> 10/15 Skills (консолидация в $STACK_DIR/skills-store)..."
 bash "$STACK_DIR/consolidate-skills.sh" || echo "  Консолидация: пропущена"
 echo ""
 
@@ -315,9 +315,9 @@ for repo in wordcraft gridcraft deckcraft pdfcraft figcraft; do
     LATEST=$(curl -s --max-time 20 "https://api.github.com/repos/storytold/$repo/releases/latest" \
         | grep -o '"tag_name": "[^"]*"' | cut -d'"' -f4 | sed 's/^v//')
     if [ -z "$INSTALLED" ]; then
-        echo "  $APP_NAME: не установлен (ставится: bash ~/stack/craft-install.sh)"
+        echo "  $APP_NAME: не установлен (ставится: bash $STACK_DIR/craft-install.sh)"
     elif [ -n "$LATEST" ] && [ "$INSTALLED" != "$LATEST" ]; then
-        echo "  $APP_NAME: $INSTALLED → $LATEST доступна — обнови: bash ~/stack/craft-install.sh"
+        echo "  $APP_NAME: $INSTALLED → $LATEST доступна — обнови: bash $STACK_DIR/craft-install.sh"
     else
         echo "  $APP_NAME: $INSTALLED актуальна"
     fi

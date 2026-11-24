@@ -2,8 +2,8 @@
 # Определяет версию Chrome, закреплённую установленным tldraw-cli
 # (через его bundled puppeteer). Печатает версию или ничего.
 # Использование:
-#   VER=$(bash ~/stack/chrome-version.sh)     # получить версию
-#   bash ~/stack/chrome-version.sh            # напечатать
+#   VER=$(bash $STACK_DIR/chrome-version.sh)     # получить версию
+#   bash $STACK_DIR/chrome-version.sh            # напечатать
 
 set -uo pipefail
 

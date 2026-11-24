@@ -4,10 +4,10 @@
 # обновляет только те приложения, чья версия изменилась.
 #
 # Запуск в ТЕРМИНАЛЕ пользователя (не из OpenCode — его песочница
-# блокирует hdiutil). Путь: ~/stack/craft-install.sh. DMG кэшируются в
-# ~/stack/craft-downloads/ (gitignored).
+# блокирует hdiutil). Путь: $STACK_DIR/craft-install.sh. DMG кэшируются в
+# $STACK_DIR/craft-downloads/ (gitignored).
 # блокирует hdiutil):
-#   bash ~/stack/craft-downloads/install-craft-apps.sh [--force]
+#   bash $STACK_DIR/craft-downloads/install-craft-apps.sh [--force]
 set -uo pipefail
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -90,6 +90,6 @@ for pair in "WordCraft wordcraft" "GridCraft gridcraft" "DeckCraft deckcraft" "P
     [ -n "$V" ] && echo "  ✅ $1 v$V" || echo "  ❌ $1 не установлен"
 done
 echo ""
-echo "CLI (headless, для MCP): ~/stack/craft-cli/ — обновляются setup.sh,"
+echo "CLI (headless, для MCP): $STACK_DIR/craft-cli/ — обновляются setup.sh,"
 echo "проверяются check-all.sh и update-all.sh."
 echo "После установки/обновления: перезапусти OpenCode."

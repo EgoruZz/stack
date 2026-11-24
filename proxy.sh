@@ -3,8 +3,8 @@
 #  Сеть стека: ISP-прокси (proxy.market, Singapore)
 # ═══════════════════════════════════════════════════════════════
 # Двойной режим:
-#   • `source ~/stack/proxy.sh` — из .zshrc: экспортирует env-прокси
-#   • `bash ~/stack/proxy.sh [команда]` — CLI управления
+#   • `source $STACK_DIR/proxy.sh` — из .zshrc: экспортирует env-прокси
+#   • `bash $STACK_DIR/proxy.sh [команда]` — CLI управления
 #
 # Правила маршрутизации:
 #   1. Локальный трафик стека (все MCP, localhost, *.local) — НИКОГДА
@@ -78,7 +78,7 @@ if [ "${BASH_SOURCE[0]}" = "$0" ]; then
             echo "Прокси-хост: $PROXY_HOST (http :$PROXY_HTTP_PORT, socks5 :$PROXY_SOCKS_PORT)"
         else
             echo "Прокси НЕ настроен (опционально) — трафик идёт напрямую."
-            echo "Чтобы включить: заполни поля прокси в ~/stack/first-start.txt и запусти apply-first-start.sh"
+            echo "Чтобы включить: заполни поля прокси в $STACK_DIR/first-start.txt и запусти apply-first-start.sh"
             _stack_proxy_expiry 2>/dev/null || true
             return 0 2>/dev/null || exit 0
         fi

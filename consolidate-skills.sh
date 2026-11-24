@@ -1,5 +1,5 @@
 #!/bin/bash
-# Консолидация всех скиллов в ~/stack/skills-store (единое хранилище)
+# Консолидация всех скиллов в $STACK_DIR/skills-store (единое хранилище)
 # Скиллы подключаются к проектам через skills.paths в .opencode/opencode.json —
 # глобальные каталоги (~/.config/opencode/skills, ~/.claude/skills,
 # ~/.config/opencode/skills опустошается полностью; ~/.claude/skills и
@@ -12,7 +12,7 @@
 
 set -uo pipefail
 
-STACK_DIR="$HOME/stack"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 STORE="$STACK_DIR/skills-store"
 ARIS_REPO="$STACK_DIR/aris-research-repo"
 ARIS_LIST="$STACK_DIR/aris-skills.txt"

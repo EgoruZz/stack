@@ -1,6 +1,6 @@
 #!/bin/bash
 # Синхронизация stack-секции AGENTS.md во все зарегистрированные проекты
-# Читает реестр из ~/stack/projects.txt (по одному пути на строку)
+# Читает реестр из $STACK_DIR/projects.txt (по одному пути на строку)
 # Заменяет ТОЛЬКО содержимое между STACK:START и STACK:END
 # Проект-специфичное содержимое сохраняется
 # Использование:
@@ -12,14 +12,28 @@
 
 set -uo pipefail
 
-STACK_DIR="$HOME/stack"
-STACK_AGENTS="$STACK_DIR/AGENTS.md"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_TEMPLATE="$STACK_DIR/AGENTS.template.md"
 REGISTRY="$STACK_DIR/projects.txt"
 
-if [ ! -f "$STACK_AGENTS" ]; then
-    echo "ОШИБКА: $STACK_AGENTS не найден"
+if [ ! -f "$STACK_TEMPLATE" ]; then
+    echo "ОШИБКА: $STACK_TEMPLATE не найден"
     exit 1
 fi
+
+if ! grep -q "STACK:START" "$STACK_TEMPLATE"; then
+    echo "ОШИБКА: маркеры STACK:START/END не найдены в $STACK_TEMPLATE"
+    exit 1
+fi
+
+# Подстановка реального пути стека: AGENTS.template.md хранит {{STACK}} —
+# при синхронизации каждый проект (и сам стек) получает фактический путь.
+STACK_AGENTS="$(mktemp)"
+trap 'rm -f "$STACK_AGENTS"' EXIT
+sed "s|{{STACK}}|$STACK_DIR|g" "$STACK_TEMPLATE" > "$STACK_AGENTS"
+
+# Рендер AGENTS.md для сессий в самом стеке (gitignored, локальный)
+sed "s|{{STACK}}|$STACK_DIR|g" "$STACK_TEMPLATE" > "$STACK_DIR/AGENTS.md"
 
 if ! grep -q "STACK:START" "$STACK_AGENTS"; then
     echo "ОШИБКА: маркеры STACK:START/END не найдены в $STACK_AGENTS"
@@ -29,10 +43,10 @@ fi
 if [ ! -f "$REGISTRY" ]; then
     if [ -f "$STACK_DIR/projects.template.txt" ]; then
         cp "$STACK_DIR/projects.template.txt" "$REGISTRY"
-        echo "  projects.txt создан из шаблона (пустой — добавь проекты: ~/stack/new-project.sh <путь>)"
+        echo "  projects.txt создан из шаблона (пустой — добавь проекты: $STACK_DIR/new-project.sh <путь>)"
     else
         echo "ОШИБКА: реестр $REGISTRY не найден и шаблона нет"
-        echo "  Создай его: ~/stack/new-project.sh <путь>"
+        echo "  Создай его: $STACK_DIR/new-project.sh <путь>"
         exit 1
     fi
 fi
@@ -68,10 +82,10 @@ CONFIGURED=0
 MISSING=0
 SEEN=$(mktemp)
 
-# Конфиг самого стека (для сессий в ~/stack) — перегенерируем из шаблона
+# Конфиг самого стека (для сессий в $STACK_DIR) — перегенерируем из шаблона
 bash "$STACK_DIR/gen-opencode-config.sh" "$STACK_DIR" >/dev/null 2>&1 \
-    && echo "  ~/stack/.opencode/opencode.json: перегенерирован" \
-    || echo "  ⚠️ конфиг ~/stack не сгенерирован"
+    && echo "  $STACK_DIR/.opencode/opencode.json: перегенерирован" \
+    || echo "  ⚠️ конфиг $STACK_DIR не сгенерирован"
 
 while IFS= read -r project || [ -n "$project" ]; do
     # Пропускаем комментарии и пустые строки
@@ -109,7 +123,7 @@ while IFS= read -r project || [ -n "$project" ]; do
     # Если AGENTS.md нет — копируем из стека
     if [ ! -f "$AGENTS" ]; then
         cp "$STACK_AGENTS" "$AGENTS"
-        echo "  $AGENTS: создан из ~/stack/AGENTS.md"
+        echo "  $AGENTS: создан из $STACK_DIR/AGENTS.md"
         CREATED=$((CREATED + 1))
         continue
     fi

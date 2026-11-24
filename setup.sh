@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-STACK_DIR="$HOME/stack"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "============================================"
 echo "  Установка стека"
@@ -73,9 +73,9 @@ if command -v zsh &>/dev/null; then
     if ! grep -q "stack/proxy.sh" "$HOME/.zshrc" 2>/dev/null; then
         cat >> "$HOME/.zshrc" << 'PROXYBLOCK'
 
-# === Stack network (managed; подробно: ~/stack/proxy.sh) ===
+# === Stack network (managed; подробно: $STACK_DIR/proxy.sh) ===
 export TZ="Asia/Singapore"
-source "$HOME/stack/proxy.sh"
+source "$STACK_DIR/proxy.sh"
 # === End Stack network ===
 PROXYBLOCK
         echo "  .zshrc: добавлен source proxy.sh (перезапусти терминал)"
@@ -234,7 +234,7 @@ for name in $CRAFT_REPOS; do
         echo "  $name-cli: уже есть"
     fi
 done
-echo "  GUI-приложения (WordCraft, GridCraft, DeckCraft, PdfCraft, FigCraft): bash ~/stack/craft-install.sh — см. README «Manual steps»"
+echo "  GUI-приложения (WordCraft, GridCraft, DeckCraft, PdfCraft, FigCraft): bash $STACK_DIR/craft-install.sh — см. README «Manual steps»"
 echo ""
 
 # ═══════════════════════════════════════
@@ -262,10 +262,10 @@ fi
 echo ""
 
 # ═══════════════════════════════════════
-# 8. SKILLS (хранилище ~/stack/skills-store)
+# 8. SKILLS (хранилище $STACK_DIR/skills-store)
 # ═══════════════════════════════════════
 
-echo ">>> 9/12 Skills (консолидация в ~/stack/skills-store)..."
+echo ">>> 9/12 Skills (консолидация в $STACK_DIR/skills-store)..."
 # Firecrawl-скиллы поставлены firecrawl-cli init (шаг 5) — переносятся
 # в хранилище. Глобальные каталоги скиллов опустошаются: скиллы видны
 # только в проектах (подключаются через skills.paths в конфиге).
@@ -360,24 +360,24 @@ echo "============================================"
 echo ""
 
 # Форма первого старта: если пользователь её заполнил — применяем сразу
-if [ -f "$HOME/stack/first-start.txt" ]; then
+if [ -f "$STACK_DIR/first-start.txt" ]; then
     echo ">>> Найдена форма первого старта — применяю..."
-    bash "$STACK_DIR/apply-first-start.sh" "$HOME/stack/first-start.txt" || \
+    bash "$STACK_DIR/apply-first-start.sh" "$STACK_DIR/first-start.txt" || \
         echo "  ⚠️ Форма не применилась (заполнено неполностью — исправь и перезапусти)"
 else
     echo "Персональные данные (прокси, ключи) стек НЕ хранит в репозитории."
     echo "Заполни форму и запусти:"
-    echo "  cp ~/stack/first-start.template.txt ~/stack/first-start.txt"
-    echo "  nano ~/stack/first-start.txt && bash ~/stack/apply-first-start.sh"
+    echo "  cp $STACK_DIR/first-start.template.txt $STACK_DIR/first-start.txt"
+    echo "  nano $STACK_DIR/first-start.txt && bash $STACK_DIR/apply-first-start.sh"
 fi
 echo "Ручные шаги (если ещё не сделаны):"
 echo "  0. Открой НОВОЕ окно терминала (чтобы brew и инструменты попали в PATH)"
-echo "  1. Форма первого старта: cp ~/stack/first-start.template.txt ~/stack/first-start.txt → заполнить → bash ~/stack/apply-first-start.sh; проверка: bash ~/stack/proxy.sh test"
-echo "  2. Craft Apps GUI: bash ~/stack/craft-install.sh"
+echo "  1. Форма первого старта: cp $STACK_DIR/first-start.template.txt $STACK_DIR/first-start.txt → заполнить → bash $STACK_DIR/apply-first-start.sh; проверка: bash $STACK_DIR/proxy.sh test"
+echo "  2. Craft Apps GUI: bash $STACK_DIR/craft-install.sh"
 echo "  3. Wolfram активация: wolframscript (вход с Wolfram ID)"
 echo "  4. Firecrawl (опционально): firecrawl login --browser"
 echo "  5. Перезапусти OpenCode для применения MCP и skills"
 echo ""
-echo "Проверка: bash ~/stack/check-all.sh"
+echo "Проверка: bash $STACK_DIR/check-all.sh"
 echo "Начать:"
-echo "  cd ~/stack && opencode"
+echo "  cd $STACK_DIR && opencode"

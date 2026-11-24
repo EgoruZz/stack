@@ -1,14 +1,14 @@
 #!/bin/bash
 # Применяет заполненную форму первого старта (first-start.txt).
-# Запуск:  bash ~/stack/apply-first-start.sh [путь-к-форме]
-# По умолчанию ищет ~/stack/first-start.txt (копия шаблона с данными).
+# Запуск:  bash $STACK_DIR/apply-first-start.sh [путь-к-форме]
+# По умолчанию ищет $STACK_DIR/first-start.txt (копия шаблона с данными).
 
 set -uo pipefail
 
-FORM="${1:-$HOME/stack/first-start.txt}"
+FORM="${1:-$STACK_DIR/first-start.txt}"
 SECRETS="$HOME/.stack-secrets.sh"
 
-[ -f "$FORM" ] || { echo "Форма не найдена: $FORM"; echo "Скопируй шаблон: cp ~/stack/first-start.template.txt ~/stack/first-start.txt и заполни."; exit 1; }
+[ -f "$FORM" ] || { echo "Форма не найдена: $FORM"; echo "Скопируй шаблон: cp $STACK_DIR/first-start.template.txt $STACK_DIR/first-start.txt и заполни."; exit 1; }
 
 # Парсим форму строка за строкой (не source!): пробелы в значениях и
 # пропущенные кавычки не должны ломать разбор; хвостовые # комментарии срезаем.
@@ -80,7 +80,7 @@ else
 fi
 
 echo ""
-echo "Готово. Проверка: bash ~/stack/proxy.sh test && bash ~/stack/check-all.sh"
+echo "Готово. Проверка: bash $STACK_DIR/proxy.sh test && bash $STACK_DIR/check-all.sh"
 
 # Sudo без пароля для агента (опционально)
 SUDOERS="/etc/sudoers.d/stack-agent"

@@ -1,20 +1,28 @@
 #!/bin/bash
 # Генерирует .opencode/opencode.json — конфиг стека (MCP + skills)
-# для указанной директории (по умолчанию ~/stack).
+# для указанной директории.
 #
 # Стек работает ТОЛЬКО в проектах, где сгенерирован этот файл.
 # Глобальный ~/.config/opencode стек не использует.
 #
-# Пути записываются через {env:HOME} — OpenCode подставляет переменные
-# окружения при чтении конфига, поэтому файл переносим между машинами.
+# Пути записываются АБСОЛЮТНЫМИ: стек может лежать в любом месте
+# ($STACK_DIR, ~/git/custom-opencode/stack, ...), а конфиг привязывается
+# к реальному расположению на момент генерации. Если стек переедет —
+# пути переписываются перегенерацией: bash <stack>/sync-agents.sh
+# ({env:HOME} остаётся только для пользовательских каталогов Wolfram).
 #
 # Использование:
-#   bash gen-opencode-config.sh                # для ~/stack
-#   bash gen-opencode-config.sh ~/projects/foo # для проекта
+#   bash gen-opencode-config.sh <целевая-папка>   # обязательный аргумент
 
 set -euo pipefail
 
-TARGET="${1:-$HOME/stack}"
+# Корень стека = папка, где лежит этот скрипт
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+TARGET="${1:-}"
+if [ -z "$TARGET" ]; then
+    echo "Использование: $0 <целевая-папка>"; exit 1
+fi
 
 mkdir -p "$TARGET/.opencode"
 
@@ -58,7 +66,7 @@ done
 cat > "$TARGET/.opencode/opencode.json" << 'CONF'
 {
   "__SCHEMA__": "https://opencode.ai/config.json",
-  "skills": ["{env:HOME}/stack/skills-store"],
+  "skills": ["__STACK__/skills-store"],
   "mcp": {
     "Wolfram": {
       "type": "local",
@@ -80,55 +88,55 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
     },
     "julia": {
       "type": "local",
-      "command": ["{env:HOME}/stack/julia-mcp-env/bin/python", "{env:HOME}/stack/julia-mcp/server.py"],
+      "command": ["__STACK__/julia-mcp-env/bin/python", "__STACK__/julia-mcp/server.py"],
       "enabled": true,
       "timeout": 60000
     },
     "manim": {
       "type": "local",
-      "command": ["{env:HOME}/stack/manim-env/bin/python", "{env:HOME}/stack/manim-mcp/src/manim_server.py"],
+      "command": ["__STACK__/manim-env/bin/python", "__STACK__/manim-mcp/src/manim_server.py"],
       "enabled": true,
       "timeout": 120000
     },
     "ParaView": {
       "type": "local",
-      "command": ["{env:HOME}/stack/paraview-mcp-env/bin/python", "{env:HOME}/stack/paraview-mcp/paraview_mcp_server.py"],
+      "command": ["__STACK__/paraview-mcp-env/bin/python", "__STACK__/paraview-mcp/paraview_mcp_server.py"],
       "enabled": true,
       "timeout": 60000
     },
     "tldraw": {
       "type": "local",
-      "command": ["node", "{env:HOME}/stack/tldraw-mcp/dist/index.js"],
+      "command": ["node", "__STACK__/tldraw-mcp/dist/index.js"],
       "enabled": true,
       "timeout": 60000
     },
     "wordcraft": {
       "type": "local",
-      "command": ["{env:HOME}/stack/craft-cli/wordcraft-cli", "mcp"],
+      "command": ["__STACK__/craft-cli/wordcraft-cli", "mcp"],
       "enabled": true,
       "timeout": 120000
     },
     "gridcraft": {
       "type": "local",
-      "command": ["{env:HOME}/stack/craft-cli/gridcraft-cli", "mcp"],
+      "command": ["__STACK__/craft-cli/gridcraft-cli", "mcp"],
       "enabled": true,
       "timeout": 120000
     },
     "deckcraft": {
       "type": "local",
-      "command": ["{env:HOME}/stack/craft-cli/deckcraft-cli", "mcp"],
+      "command": ["__STACK__/craft-cli/deckcraft-cli", "mcp"],
       "enabled": true,
       "timeout": 120000
     },
     "pdfcraft": {
       "type": "local",
-      "command": ["{env:HOME}/stack/craft-cli/pdfcraft-cli", "mcp"],
+      "command": ["__STACK__/craft-cli/pdfcraft-cli", "mcp"],
       "enabled": true,
       "timeout": 120000
     },
     "figcraft": {
       "type": "local",
-      "command": ["{env:HOME}/stack/craft-cli/figcraft-cli", "mcp"],
+      "command": ["__STACK__/craft-cli/figcraft-cli", "mcp"],
       "enabled": true,
       "timeout": 120000
     }
@@ -136,11 +144,12 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
 }
 CONF
 
-# Подставляем вычисленные Wolfram-пути (heredoc кавыченный ради {env:HOME})
+# Подставляем вычисленные пути (heredoc кавыченный ради {env:HOME})
 sed -i '' \
     -e "s|__WOLFRAM_BIN__|$WOLFRAM_BIN|g" \
     -e "s|__SCHEMA__|\$schema|g" \
     -e "s|__WOLFRAM_BASE__|$WOLFRAM_BASE|g" \
+    -e "s|__STACK__|$STACK_DIR|g" \
     "$TARGET/.opencode/opencode.json"
 
 # Валидация JSON

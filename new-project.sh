@@ -1,14 +1,14 @@
 #!/bin/bash
 # Создание или регистрация проекта использующего стек
-# Использование: ~/stack/new-project.sh <путь>
+# Использование: $STACK_DIR/new-project.sh <путь>
 # Примеры:
-#   ~/stack/new-project.sh ~/projects/my-calculation   # создать новый
-#   ~/stack/new-project.sh ~/learn                      # зарегистрировать существующий
-#   ~/stack/new-project.sh ~/work/analysis              # создать в любом месте
+#   $STACK_DIR/new-project.sh ~/projects/my-calculation   # создать новый
+#   $STACK_DIR/new-project.sh ~/learn                      # зарегистрировать существующий
+#   $STACK_DIR/new-project.sh ~/work/analysis              # создать в любом месте
 
 set -euo pipefail
 
-STACK_DIR="$HOME/stack"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REGISTRY="$STACK_DIR/projects.txt"
 AGENTS_SRC="$STACK_DIR/AGENTS.md"
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Проверка лицензии Wolfram Engine (macOS)
-# Запуск: cd ~/stack && bash check-wolfram-license.sh
+# Запуск: cd $STACK_DIR && bash check-wolfram-license.sh
 # Примечание: использует macOS-специфичную команду date -j -f
 
 echo "=== Проверка лицензии Wolfram ==="
