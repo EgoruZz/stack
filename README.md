@@ -43,12 +43,12 @@ Research and development need many things at once: computation, data visualizati
 
 <div align="center">
 
-All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`)
+All `*.sh` are CLI tools (run: `bash <path>/<name>.sh`)
 
 </div>
 
 ```
-~/stack/
+<path>/                # wherever you cloned the stack
 ├── README.md                    # This file
 ├── AGENTS.template.md           # Agent instructions source ({{STACK}} placeholder)
 ├── AGENTS.md                    # (generated locally, gitignored)
@@ -110,13 +110,13 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`)
 <h2 align="center">🚀 Quick start</h2>
 
 ```shell
-git clone https://github.com/custom-opencode/stack.git ~/stack   # or any other folder
-cd ~/stack                                                       # <path of your clone>
+git clone https://github.com/custom-opencode/stack.git <path>
+cd <path>                                                        # the folder you cloned into
 opencode
 ```
 
 > [!NOTE]
-> The clone destination is **your choice** — the stack is path-agnostic: every script finds its own root, and project configs get absolute paths at attach time. In the docs, `~/stack` is shorthand for "wherever you cloned the stack" (`STACK_DIR`); substitute your real path, e.g. `~/git/custom-opencode/stack`.
+> The clone destination is **your choice** — the stack is path-agnostic: every script finds its own root, and project configs get absolute paths at attach time. `<path>` = the folder you cloned the stack into.
 
 That's the whole start. In the fresh clone the agent is "bare" (no stack MCPs yet) — its first action is running `setup.sh` itself (approving that one command is the only click you make; you may be asked for the macOS password where the system requires it). Then the agent leads the rest of the setup: asks for your proxy and git identity in chat, fills the first-start form, installs the Craft Apps GUI, checks the Wolfram license, attaches your projects — and runs `check-all.sh` so you see every ✅. All you ever do interactively: approve, type the password, confirm browser logins. After the setup — restart OpenCode in each project folder so MCP servers and skills load.
 
@@ -148,7 +148,7 @@ Everything is installed automatically by `setup.sh`
 | Wolfram AgentTools (paclet) | `PacletInstall` — if Wolfram Engine is already installed, otherwise at the first `update-all.sh` |
 | 6 external repositories | `git clone --depth 1` |
 | `tldraw-mcp` build | `npm install && npm run build` |
-| Craft Apps headless CLIs ×5 | GitHub releases → `~/stack/craft-cli/` |
+| Craft Apps headless CLIs ×5 | GitHub releases → `<path>/craft-cli/` |
 
 </div>
 
@@ -189,7 +189,7 @@ Native macOS apps by [ArtCraft](https://getartcraft.com) (open source, pure Rust
 </p>
 
 ```shell
-$ bash ~/stack/craft-install.sh
+$ bash <path>/craft-install.sh
 ```
 
 <div align="center">
@@ -212,7 +212,7 @@ Installed automatically by `setup.sh` if the VS Code CLI (`code`) is present: `t
 
 <p align="center">
 
-Assembled automatically (`consolidate-skills.sh`) into `~/stack/skills-store/` and attached to projects via `skills` in the config — **outside projects the agent sees only OpenCode's built-in skills**.
+Assembled automatically (`consolidate-skills.sh`) into `<path>/skills-store/` and attached to projects via `skills` in the config — **outside projects the agent sees only OpenCode's built-in skills**.
 
 </p>
 
@@ -246,7 +246,7 @@ Assembled automatically (`consolidate-skills.sh`) into `~/stack/skills-store/` a
 <h2 align="center">☎️ Attaching to a project</h2>
 
 ```shell
-$ ~/stack/new-project.sh ~/work/my-project    # create new / register existing
+$ <path>/new-project.sh ~/work/my-project    # create new / register existing
 ```
 
 <div align="center">
@@ -265,8 +265,8 @@ The project receives **two files**
 | Fact | Details |
 |:---:|:---:|
 | **Portability** | Paths in the config go through `{env:HOME}` — portable between machines |
-| **Registry** | `~/stack/projects.txt` is personal (gitignored, created from `projects.template.txt`) — one path per line |
-| **Sync** | `bash ~/stack/sync-agents.sh` regenerates AGENTS.md + configs in all projects (part of `update-all.sh`, step 14); AGENTS.md content **outside** the `<!-- STACK:START/END -->` markers is preserved |
+| **Registry** | `<path>/projects.txt` is personal (gitignored, created from `projects.template.txt`) — one path per line |
+| **Sync** | `bash <path>/sync-agents.sh` regenerates AGENTS.md + configs in all projects (part of `update-all.sh`, step 14); AGENTS.md content **outside** the `<!-- STACK:START/END -->` markers is preserved |
 | **Config — no markers** | `.opencode/opencode.json` is regenerated **wholesale** on every sync / new-project: edit the template in `gen-opencode-config.sh`, not project configs |
 | **Diagnostics — by running** | OpenCode v2 has no LSP: the agent gets code errors by running linters/compilers/tests directly (`bash -n`, `python`, `npm run build`, `pdflatex`) — honest build errors |
 | **Outside projects** | No MCP, no skills; `~/.config/opencode/` holds only client settings |
@@ -305,18 +305,18 @@ You — in VS Code (the stack's extensions provide language servers: autocomplet
 
 | Task | Command |
 |:---:|:---:|
-| **Update the whole stack** | `cd ~/stack && bash update-all.sh` — 15 steps, then `/reload` or an OpenCode restart |
-| **Health check** | `bash ~/stack/check-all.sh` |
-| **Attach a project** | `~/stack/new-project.sh <path>` — any folder, git or not |
-| **Detach a project** | `~/stack/detach-project.sh <path>` — removes the config + registry entry, project files stay (works even if the folder is already gone) |
-| **Sync + drop dead entries** | `bash ~/stack/sync-agents.sh --prune` — removes registry paths that no longer exist |
-| **Back up personal data** | `bash ~/stack/export-personal.sh` — collects `projects.txt`, first-start form, `~/.stack-secrets.sh`, `~/skills` into one folder |
-| **Sync projects** | `bash ~/stack/sync-agents.sh` |
-| **Install/update Craft Apps** | `bash ~/stack/craft-install.sh` |
-| **Network: status / test / git** | `bash ~/stack/proxy.sh status` · `test` · `git on\|off` |
-| **Expiry: proxy / Wolfram** | `bash ~/stack/proxy.sh expiry` · `bash ~/stack/check-wolfram-license.sh` |
+| **Update the whole stack** | `cd <path> && bash update-all.sh` — 15 steps, then `/reload` or an OpenCode restart |
+| **Health check** | `bash <path>/check-all.sh` |
+| **Attach a project** | `<path>/new-project.sh <project-path>` — any folder, git or not |
+| **Detach a project** | `<path>/detach-project.sh <project-path>` — removes the config + registry entry, project files stay (works even if the folder is already gone) |
+| **Sync + drop dead entries** | `bash <path>/sync-agents.sh --prune` — removes registry paths that no longer exist |
+| **Back up personal data** | `bash <path>/export-personal.sh` — collects `projects.txt`, first-start form, `~/.stack-secrets.sh`, `~/skills` into one folder |
+| **Sync projects** | `bash <path>/sync-agents.sh` |
+| **Install/update Craft Apps** | `bash <path>/craft-install.sh` |
+| **Network: status / test / git** | `bash <path>/proxy.sh status` · `test` · `git on\|off` |
+| **Expiry: proxy / Wolfram** | `bash <path>/proxy.sh expiry` · `bash <path>/check-wolfram-license.sh` |
 | **Firecrawl credits** | `firecrawl credits` |
-| **Chrome version for tldraw** | `bash ~/stack/chrome-version.sh` |
+| **Chrome version for tldraw** | `bash <path>/chrome-version.sh` |
 
 </div>
 
