@@ -209,9 +209,15 @@ fi
 
 echo ">>> 7/12 Craft Apps CLI (headless, для MCP-серверов wordcraft/gridcraft/deckcraft/pdfcraft/figcraft)..."
 mkdir -p "$STACK_DIR/craft-cli"
-CRAFT_CLI_VERSIONS="wordcraft=0.18.1 gridcraft=0.19.1 deckcraft=0.18.1 pdfcraft=0.21.1 figcraft=0.18.1"
-for kv in $CRAFT_CLI_VERSIONS; do
-    name=${kv%%=*}; ver=${kv##*=}
+CRAFT_REPOS="wordcraft gridcraft deckcraft pdfcraft figcraft"
+# Фолбэк на случай недоступности GitHub API (дальше update-all.sh поднимет
+# до актуальных версий сам).
+CRAFT_FALLBACK="wordcraft=0.18.1 gridcraft=0.19.1 deckcraft=0.18.1 pdfcraft=0.21.1 figcraft=0.18.1"
+for name in $CRAFT_REPOS; do
+    ver=$(curl -s --max-time 20 "https://api.github.com/repos/storytold/$name/releases/latest" \
+        | grep -o '"tag_name": "[^"]*"' | cut -d'"' -f4 | sed 's/^v//')
+    [ -z "$ver" ] && ver=$(printf '%s' "$CRAFT_FALLBACK" | tr ' ' '\n' | grep "^$name=" | cut -d= -f2)
+    [ -z "$ver" ] && { echo "  $name-cli: версию не определил, пропускаю"; continue; }
     BIN="$STACK_DIR/craft-cli/$name-cli"
     if [ ! -e "$BIN" ]; then
         TMPZIP="/tmp/$name-cli-$ver.zip"
