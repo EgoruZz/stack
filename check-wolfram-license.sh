@@ -3,6 +3,7 @@
 # Запуск: cd $STACK_DIR && bash check-wolfram-license.sh
 # Примечание: использует macOS-специфичную команду date -j -f
 
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 echo "=== Проверка лицензии Wolfram ==="
 echo ""
 

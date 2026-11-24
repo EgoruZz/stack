@@ -61,6 +61,7 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`)
 │
 ├── new-project.sh               # Attach a project (any folder, git or not)
 ├── detach-project.sh            # Detach the stack from a project
+├── export-personal.sh           # Collect personal files (registry, form, secrets) for backup/migration
 ├── sync-agents.sh               # AGENTS.md + configs → all projects (rewrites paths if the stack moved)
 ├── gen-opencode-config.sh       # .opencode/opencode.json generator (10 MCP)
 ├── sync-aris.sh                 # ARIS skills → skills-store
@@ -325,7 +326,9 @@ You — in VS Code (the stack's extensions provide language servers: autocomplet
 | **Update the whole stack** | `cd ~/stack && bash update-all.sh` — 15 steps, then `/reload` or an OpenCode restart |
 | **Health check** | `bash ~/stack/check-all.sh` |
 | **Attach a project** | `~/stack/new-project.sh <path>` — any folder, git or not |
-| **Detach a project** | `~/stack/detach-project.sh <path>` — removes the config + registry entry, project files stay |
+| **Detach a project** | `~/stack/detach-project.sh <path>` — removes the config + registry entry, project files stay (works even if the folder is already gone) |
+| **Sync + drop dead entries** | `bash ~/stack/sync-agents.sh --prune` — removes registry paths that no longer exist |
+| **Back up personal data** | `bash ~/stack/export-personal.sh` — collects `projects.txt`, first-start form, `~/.stack-secrets.sh`, `~/skills` into one folder |
 | **Sync projects** | `bash ~/stack/sync-agents.sh` |
 | **Install/update Craft Apps** | `bash ~/stack/craft-install.sh` |
 | **Network: status / test / git** | `bash ~/stack/proxy.sh status` · `test` · `git on\|off` |

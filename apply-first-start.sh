@@ -5,6 +5,7 @@
 
 set -uo pipefail
 
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FORM="${1:-$STACK_DIR/first-start.txt}"
 SECRETS="$HOME/.stack-secrets.sh"
 

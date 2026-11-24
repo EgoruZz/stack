@@ -76,6 +76,32 @@ EOF
     echo ""
 fi
 
+if [ "${1:-}" = "--prune" ] || [ "${2:-}" = "--prune" ]; then
+    if [ -f "$REGISTRY" ]; then
+        PRUNED=0
+        REG_SNAPSHOT=$(mktemp)
+        trap 'rm -f "$REG_SNAPSHOT"' EXIT
+        cp "$REGISTRY" "$REG_SNAPSHOT"
+        while IFS= read -r line; do
+            [[ "$line" =~ ^[[:space:]]*# ]] && continue
+            [[ -z "${line// }" ]] && continue
+            P="$line"
+            case "$P" in
+                "~") P="$HOME" ;;
+                "~/"*) P="$HOME/${P#\~/}" ;;
+            esac
+            if [ ! -d "$P" ]; then
+                grep -vxF "$line" "$REGISTRY" > "$REGISTRY.tmp" && mv "$REGISTRY.tmp" "$REGISTRY"
+                echo "  - вычищена мёртвая запись: $line"
+                PRUNED=$((PRUNED + 1))
+            fi
+        done < "$REG_SNAPSHOT"
+        rm -f "$REG_SNAPSHOT"
+        echo "  вычищено мёртвых записей: $PRUNED"
+        echo ""
+    fi
+fi
+
 SYNCED=0
 CREATED=0
 CONFIGURED=0

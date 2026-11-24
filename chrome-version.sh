@@ -7,6 +7,7 @@
 
 set -uo pipefail
 
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TLDRAW_PUPPETEER="$(npm root -g 2>/dev/null)/@kitschpatrol/tldraw-cli/node_modules/puppeteer"
 
 if [ ! -d "$TLDRAW_PUPPETEER" ]; then

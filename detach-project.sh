@@ -25,8 +25,17 @@ case "$INPUT_DIR" in
 esac
 
 if [ ! -d "$INPUT_DIR" ]; then
-    echo "❌ Папка не найдена: $INPUT_DIR"
-    exit 1
+    # Папка переехала/удалена —Detach всё равно возможен: чистим реестр.
+    echo "⚠️ Папка не существует: $INPUT_DIR"
+    echo "   Отцеплю только запись в реестре (конфигов на диске уже нет)."
+    if [ -f "$REGISTRY" ] && grep -qxF "$INPUT_DIR" "$REGISTRY"; then
+        grep -vxF "$INPUT_DIR" "$REGISTRY" > "$REGISTRY.tmp" && mv "$REGISTRY.tmp" "$REGISTRY"
+        echo "  ✅ Убран из projects.txt"
+        exit 0
+    else
+        echo "  ℹ️ В реестре не числился — делать нечего"
+        exit 0
+    fi
 fi
 PROJECT_DIR=$(cd "$INPUT_DIR" && pwd)
 

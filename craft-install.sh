@@ -10,6 +10,7 @@
 #   bash $STACK_DIR/craft-downloads/install-craft-apps.sh [--force]
 set -uo pipefail
 
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$DIR"
 FORCE=${1:-}
