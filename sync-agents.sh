@@ -26,13 +26,13 @@ if ! grep -q "STACK:START" "$STACK_TEMPLATE"; then
     exit 1
 fi
 
-# Подстановка реального пути стека: AGENTS.template.md хранит {{STACK}} —
-# при синхронизации каждый проект (и сам стек) получает фактический путь.
+# Substitute the real stack path: AGENTS.template.md keeps {{STACK}} —
+# on sync every project (and the stack itself) gets the actual path.
 STACK_AGENTS="$(mktemp)"
 trap 'rm -f "$STACK_AGENTS"' EXIT
 sed "s|{{STACK}}|$STACK_DIR|g" "$STACK_TEMPLATE" > "$STACK_AGENTS"
 
-# Рендер AGENTS.md для сессий в самом стеке (gitignored, локальный)
+# Render AGENTS.md for sessions inside the stack itself (gitignored, local)
 sed "s|{{STACK}}|$STACK_DIR|g" "$STACK_TEMPLATE" > "$STACK_DIR/AGENTS.md"
 
 if ! grep -q "STACK:START" "$STACK_AGENTS"; then

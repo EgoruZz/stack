@@ -1,12 +1,12 @@
 #!/bin/bash
-# Отцепление стека от проекта (detach)
-# Использование: bash detach-project.sh <путь-к-проекту>
+# Detach the stack from a project
+# Usage: bash detach-project.sh <path-to-project>
 #
-# Делает:
-#   1. Удаляет .opencode/ из проекта (агент больше не видит стек)
-#   2. Убирает stack-секцию (между STACK:START/END) из AGENTS.md проекта
-#   3. Убирает проект из реестра projects.txt
-# Содержимое проекта (код, файлы) не трогается.
+# What it does:
+#   1. Removes .opencode/ from the project (the agent no longer sees the stack)
+#   2. Removes the stack section (STACK:START/END) from the project AGENTS.md
+#   3. Removes the project from the projects.txt registry
+# Project contents (code, files) are not touched.
 
 set -euo pipefail
 
@@ -25,7 +25,7 @@ case "$INPUT_DIR" in
 esac
 
 if [ ! -d "$INPUT_DIR" ]; then
-    # Папка переехала/удалена —Detach всё равно возможен: чистим реестр.
+    # Folder moved/deleted — detach is still possible: clean the registry only.
     echo "⚠️ Папка не существует: $INPUT_DIR"
     echo "   Отцеплю только запись в реестре (конфигов на диске уже нет)."
     if [ -f "$REGISTRY" ] && grep -qxF "$INPUT_DIR" "$REGISTRY"; then
@@ -46,7 +46,7 @@ fi
 
 echo "=== Отцепление стека: $PROJECT_DIR ==="
 
-# 1. Конфиг OpenCode
+# 1. OpenCode config
 if [ -d "$PROJECT_DIR/.opencode" ]; then
     rm -rf "$PROJECT_DIR/.opencode"
     echo "  ✅ .opencode/ удалён (MCP и скиллы больше не видны в этой папке)"
@@ -54,7 +54,7 @@ else
     echo "  ℹ️ .opencode/ не было"
 fi
 
-# 2. AGENTS.md: убираем stack-секцию, если есть
+# 2. AGENTS.md: remove the stack section if present
 AGENTS="$PROJECT_DIR/AGENTS.md"
 if [ -f "$AGENTS" ] && grep -q "STACK:START" "$AGENTS"; then
     python3 - "$AGENTS" << 'PYEOF'
@@ -69,7 +69,7 @@ else
     echo "  ℹ️ AGENTS.md без stack-секции"
 fi
 
-# 3. Реестр
+# 3. Registry
 if [ -f "$REGISTRY" ] && grep -qxF "$PROJECT_DIR" "$REGISTRY"; then
     grep -vxF "$PROJECT_DIR" "$REGISTRY" > "$REGISTRY.tmp" && mv "$REGISTRY.tmp" "$REGISTRY"
     echo "  ✅ Убран из projects.txt"

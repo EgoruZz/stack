@@ -1,16 +1,16 @@
 #!/bin/bash
-# Сбор личных (в git не попадающих) данных стека в одну папку —
-# для бэкапа или переезда на другую машину.
+# Collect the stack personal files (excluded from git) into one folder —
+# for backup or migration to another machine.
 #
-# Использование:
-#   bash export-personal.sh [целевая-папка]
-#   # по умолчанию: ~/stack-personal-backup-YYYY-MM-DD/
+# Usage:
+#   bash export-personal.sh [target-folder]
+#   # default: ~/stack-personal-backup-YYYY-MM-DD/
 #
-# Собирает (если существуют):
-#   projects.txt      — реестр проектов
-#   first-start.txt   — заполненная форма первого старта
-#   ~/.stack-secrets.sh — персональные данные (прокси, Wolfram ID, git identity)
-#   ~/skills/         — хелпер tldraw-offline (ставится приложением tldraw)
+# Collects (if they exist):
+#   projects.txt      — project registry
+#   first-start.txt   — filled first-start form
+#   ~/.stack-secrets.sh — personal data (proxy, Wolfram ID, git identity)
+#   ~/skills/         — tldraw-offline helper (installed by the tldraw app)
 
 set -euo pipefail
 

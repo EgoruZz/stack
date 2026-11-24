@@ -167,9 +167,9 @@ if [ -d $STACK_DIR/skills-store ]; then
     N=$(ls $STACK_DIR/skills-store | wc -l | tr -d ' ')
     GLOBAL=$(ls ~/.config/opencode/skills 2>/dev/null | wc -l | tr -d ' ')
     if [ "$N" -ge 50 ] && [ "$GLOBAL" -eq 0 ]; then
-        # tldraw-offline ставит само приложение tldraw Desktop при первом запуске:
-        # на чистой машине его нет до первого запуска приложения — это не ошибка,
-        # но пользователь должен знать, что скилл добавится позже.
+        # tldraw-offline is installed by the tldraw Desktop app on its first
+        # launch: on a fresh machine it is absent until then — not an error,
+        # but the user should know the 60th skill will appear later.
         if [ ! -d $STACK_DIR/skills-store/tldraw-offline ]; then
             echo "✅ $N скиллов (глобальные каталоги чисты; 60-й — tldraw-offline — появится после первого запуска tldraw Desktop, затем bash $STACK_DIR/consolidate-skills.sh)"
         else

@@ -5,18 +5,18 @@
 # Стек работает ТОЛЬКО в проектах, где сгенерирован этот файл.
 # Глобальный ~/.config/opencode стек не использует.
 #
-# Пути записываются АБСОЛЮТНЫМИ: стек может лежать в любом месте
+# Paths are written ABSOLUTE: the stack can live anywhere
 # ($STACK_DIR, ~/git/custom-opencode/stack, ...), а конфиг привязывается
-# к реальному расположению на момент генерации. Если стек переедет —
-# пути переписываются перегенерацией: bash <stack>/sync-agents.sh
-# ({env:HOME} остаётся только для пользовательских каталогов Wolfram).
+# its real location at generation time. If the stack moves —
+# paths are rewritten by regeneration: bash <stack>/sync-agents.sh
+# ({env:HOME} remains only for the user-level Wolfram directories).
 #
 # Использование:
 #   bash gen-opencode-config.sh <целевая-папка>   # обязательный аргумент
 
 set -euo pipefail
 
-# Корень стека = папка, где лежит этот скрипт
+# Stack root = the folder containing this script
 STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 TARGET="${1:-}"
@@ -144,7 +144,7 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
 }
 CONF
 
-# Подставляем вычисленные пути (heredoc кавыченный ради {env:HOME})
+# Substitute the computed paths (quoted heredoc keeps {env:HOME} intact)
 sed -i '' \
     -e "s|__WOLFRAM_BIN__|$WOLFRAM_BIN|g" \
     -e "s|__SCHEMA__|\$schema|g" \
