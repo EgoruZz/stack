@@ -1,6 +1,6 @@
 <div align="center">
 
-# Stack
+<img src="assets/head.png" alt="Stack" width="100%">
 
 **A personal AI development environment for macOS: a human working alongside an AI assistant in [OpenCode](https://opencode.ai).**
 MCP servers, skills, CLI tools and office apps — one command to attach to a project, one command to update everything.
@@ -41,7 +41,9 @@ Research and development need many things at once: computation, data visualizati
 
 <h2 align="center">🗺️ Repository structure</h2>
 
+<p align="center">
 All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`):
+</p>
 
 ```
 ~/stack/
@@ -81,7 +83,9 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`):
 
 <h2 align="center">🖐 Manual steps</h2>
 
+<p align="center">
 Only three things stay manual:
+</p>
 
 | Step | Why | How |
 |:---:|:---:|:---:|
@@ -97,7 +101,7 @@ Only three things stay manual:
 ```shell
 $ git clone https://github.com/EgoruZz/stack.git ~/stack
 $ cd ~/stack
-$ bash setup.sh        # 12 steps: brew + casks, repos, venvs, CLIs, skills, configs
+$ bash setup.sh
 ```
 
 - It asks for a password only where the system requires one
@@ -131,7 +135,9 @@ Everything is installed automatically by `setup.sh`:
 
 ### MCP servers (10)
 
+<p align="center">
 Configs are generated automatically (`gen-opencode-config.sh`); for ParaView start the GUI + pvserver using the workflow from `STACK.md`:
+</p>
 
 | Server | What it does |
 |:---:|:---:|
@@ -148,7 +154,9 @@ Configs are generated automatically (`gen-opencode-config.sh`); for ParaView sta
 
 ### Craft Apps (5)
 
-Native macOS apps by [ArtCraft](https://getartcraft.com) (open source, pure Rust) — each with a headless CLI and an MCP. The GUI is installed/updated by a script:
+Native macOS apps by [ArtCraft](https://getartcraft.com) (open source, pure Rust) — each with a headless CLI and an MCP. <p align="center">
+The GUI is installed/updated by a script:
+</p>
 
 ```shell
 $ bash ~/stack/craft-install.sh
@@ -168,7 +176,9 @@ Installed automatically by `setup.sh` if the VS Code CLI (`code`) is present: `t
 
 ### OpenCode skills (60)
 
+<p align="center">
 Assembled automatically (`consolidate-skills.sh`) into `~/stack/skills-store/` and attached to projects via `skills` in the config — **outside projects the agent sees only OpenCode's built-in skills**.
+</p>
 
 | Group | ~Count | Source |
 |:---:|:---:|:---:|
@@ -199,7 +209,9 @@ Assembled automatically (`consolidate-skills.sh`) into `~/stack/skills-store/` a
 $ ~/stack/new-project.sh ~/work/my-project    # create new / register existing
 ```
 
+<p align="center">
 The project receives **two files**:
+</p>
 
 | File | Contents |
 |:---:|:---:|
@@ -218,7 +230,9 @@ The project receives **two files**:
 
 <h2 align="center">🤝 Files: human vs AI agent</h2>
 
+<p align="center">
 You — in VS Code (the stack's extensions provide language servers: autocomplete and errors as you type), the agent — in OpenCode (via MCP/CLI and by running compilers/linters directly):
+</p>
 
 | File | You — in VS Code | Agent — in OpenCode |
 |:---:|:---:|:---:|
