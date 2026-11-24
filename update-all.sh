@@ -114,8 +114,14 @@ update_venv jupyter-env jupyterlab numpy matplotlib pandas sympy plotly ipywidge
 if [ -d "$STACK_DIR/paraview-mcp-env" ]; then
     source "$STACK_DIR/paraview-mcp-env/bin/activate"
     pip install --upgrade --quiet -r "$STACK_DIR/paraview-mcp/requirements.txt" 2>/dev/null
+    pip install --quiet "mcp[cli]<2" "anyio[asyncio]<5" 2>/dev/null
     deactivate
-    echo "  paraview-mcp-env: updated"
+    # Re-apply ParaView MCP patches (git pull restores upstream code)
+    sed -i '' 's/FastMCP("ParaView", system_prompt=default_prompt)/FastMCP("ParaView", instructions=default_prompt)/' \
+        "$STACK_DIR/paraview-mcp/paraview_mcp_server.py" 2>/dev/null || true
+    cp "$STACK_DIR/paraview-mcp-env/lib/python3.12/site-packages/typing_extensions.py" \
+        "$STACK_DIR/paraview-mcp/typing_extensions.py" 2>/dev/null || true
+    echo "  paraview-mcp-env: updated (patches applied)"
 else
     echo "  paraview-mcp-env: not found, skipping"
 fi

@@ -13,6 +13,14 @@ echo ""
 # ═══════════════════════════════════════
 
 echo ">>> 1/12 Homebrew..."
+# Manifest of what was already installed before the stack — teardown.sh uses it
+# to uninstall ONLY what the stack added (brew leaves list, formulae + casks).
+if [ ! -f "$STACK_DIR/.brew-pre-manifest.txt" ]; then
+    if command -v brew &>/dev/null; then
+        { brew list --formula; echo "── casks:"; brew list --cask; } > "$STACK_DIR/.brew-pre-manifest.txt" 2>/dev/null
+        echo "  Pre-install manifest saved (.brew-pre-manifest.txt)"
+    fi
+fi
 if ! command -v brew &>/dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
@@ -138,7 +146,7 @@ create_venv() {
     echo "  $name ready"
 }
 
-create_venv manim-env manim manimgl "setuptools<81"
+create_venv manim-env manim manimgl "setuptools<81" "mcp[cli]<2" "anyio[asyncio]<5"
 create_venv jupyter-env jupyterlab numpy matplotlib pandas sympy plotly ipywidgets openpyxl markitdown
 
 # ParaView MCP venv
@@ -148,8 +156,16 @@ fi
 source "$STACK_DIR/paraview-mcp-env/bin/activate"
 pip install --upgrade pip
 pip install -r "$STACK_DIR/paraview-mcp/requirements.txt"
+pip install "mcp[cli]<2" "anyio[asyncio]<5"
 deactivate
 echo "  paraview-mcp-env ready"
+# ParaView MCP patches (see README «Known fixes» in AGENTS):
+# 1) FastMCP API: system_prompt → instructions (mcp 1.x)
+# 2) pvpython's bundled typing_extensions is too old for anyio — fresh copy in the repo dir
+sed -i '' 's/FastMCP("ParaView", system_prompt=default_prompt)/FastMCP("ParaView", instructions=default_prompt)/' \
+    "$STACK_DIR/paraview-mcp/paraview_mcp_server.py" || true
+cp "$STACK_DIR/paraview-mcp-env/lib/python3.12/site-packages/typing_extensions.py" \
+    "$STACK_DIR/paraview-mcp/typing_extensions.py" 2>/dev/null || true
 
 # Julia MCP venv
 if [ ! -d "$STACK_DIR/julia-mcp-env" ]; then
@@ -157,7 +173,7 @@ if [ ! -d "$STACK_DIR/julia-mcp-env" ]; then
 fi
 source "$STACK_DIR/julia-mcp-env/bin/activate"
 pip install --upgrade pip
-pip install "mcp[cli]"
+pip install "mcp[cli]<2" "anyio[asyncio]<5"
 deactivate
 echo "  julia-mcp-env ready"
 

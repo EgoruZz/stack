@@ -94,12 +94,17 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
     "manim": {
       "type": "local",
       "command": ["__STACK__/manim-env/bin/python", "__STACK__/manim-mcp/src/manim_server.py"],
+      "env": {"PATH": "__STACK__/manim-env/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"},
       "enabled": true,
       "timeout": 120000
     },
     "ParaView": {
       "type": "local",
       "command": ["__STACK__/paraview-mcp-env/bin/python", "__STACK__/paraview-mcp/paraview_mcp_server.py"],
+      "env": {
+        "PYTHONPATH": "__PARAVIEW_PYTHON__:__PARAVIEW_PYLIB__:__STACK__/paraview-mcp-env/lib/python3.12/site-packages",
+        "DYLD_LIBRARY_PATH": "__PARAVIEW_LIBS__:__PARAVIEW_FRAMEWORKS__"
+      },
       "enabled": true,
       "timeout": 60000
     },
@@ -144,11 +149,17 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
 CONF
 
 # Substitute the computed paths (quoted heredoc keeps {env:HOME} intact)
+PVAPP="$(ls -d /Applications/ParaView-*.app 2>/dev/null | head -1)"
+PVPYTHON="$PVAPP/Contents/bin/pvpython"
 sed -i '' \
     -e "s|__WOLFRAM_BIN__|$WOLFRAM_BIN|g" \
     -e "s|__SCHEMA__|\$schema|g" \
     -e "s|__WOLFRAM_BASE__|$WOLFRAM_BASE|g" \
     -e "s|__STACK__|$STACK_DIR|g" \
+    -e "s|__PARAVIEW_PYTHON__|$PVAPP/Contents/Python|g" \
+    -e "s|__PARAVIEW_PYLIB__|$PVAPP/Contents/Libraries/lib/python3.12|g" \
+    -e "s|__PARAVIEW_LIBS__|$PVAPP/Contents/Libraries|g" \
+    -e "s|__PARAVIEW_FRAMEWORKS__|$PVAPP/Contents/Frameworks|g" \
     "$TARGET/.opencode/opencode.json"
 
 # JSON validation
