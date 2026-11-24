@@ -49,7 +49,6 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`)
 
 ```
 ~/stack/
-~/stack/
 ├── README.md                    # This file
 ├── AGENTS.md                    # Agent instructions (with the repo map)
 ├── STACK.md                     # Full documentation: keybinds, examples (Russian)
