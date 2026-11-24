@@ -619,14 +619,17 @@ cd ~/stack && bash update-all.sh
 ```
 
 Обновляет все компоненты:
-- Homebrew пакеты (node, python, gh, ffmpeg и др.)
+- Homebrew пакеты (node, python, gh, ffmpeg, ripgrep и др.) + `brew cleanup`
+- Command Line Tools и системные обновления (через softwareupdate; CLT требует sudo)
 - Внешние MCP репозитории (paraview-mcp, manim-mcp, julia-mcp, tldraw-mcp, WolframLanguageForJupyter)
 - tldraw-mcp сборка (npm install + build)
 - Python venv (manim-env, jupyter-env, paraview-mcp-env, julia-mcp-env)
-- npm global CLI (firecrawl-cli, tldraw CLI)
+- npm global CLI (firecrawl-cli, tldraw CLI) + Chrome под tldraw export
+- VS Code расширения
 - ARIS skills + standalone skills
 - Julia пакеты
 - Wolfram paclets
+- Craft Apps: версии + headless-CLI (GUI — `craft-install.sh`)
 - AGENTS.md синхронизация (все проекты)
 
 > [!IMPORTANT]

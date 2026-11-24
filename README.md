@@ -16,7 +16,7 @@ Research and development need many things at once: computation, data visualizati
 |:---:|:---:|
 | **Project-scoped** | The stack activates only in projects it is attached to |
 | **Single source** | The config template, skill lists and the repo map are edited in one place and spread by scripts |
-| **Freshness** | `update-all.sh` updates everything — brew → repos → venvs → skills → Julia → Wolfram → Craft Apps — and tracks license/subscription/credit expiry |
+| **Freshness** | `update-all.sh` updates everything — brew → Apple CLT/system → repos → venvs → skills → VS Code extensions → Julia → Wolfram → Craft Apps — and tracks license/subscription/credit expiry |
 | **Portability** | Paths in configs go through `{env:HOME}`; a fresh machine = `git clone` + `setup.sh` |
 | **Routing** | Local stack traffic always goes direct; external web traffic goes through the configured ISP proxy (`proxy.sh`, personal values in `~/.stack-secrets.sh`) |
 
@@ -55,7 +55,7 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`)
 ├── workflow.txt                 # Git workflow rules
 │
 ├── setup.sh                     # Install on a clean macOS (12 steps)
-├── update-all.sh                # Update everything (13 steps) + expiry tracking
+├── update-all.sh                # Update everything (15 steps) + expiry tracking
 ├── check-all.sh                 # Health check
 │
 ├── new-project.sh               # Attach a project
@@ -260,7 +260,7 @@ The project receives **two files**
 |:---:|:---:|
 | **Portability** | Paths in the config go through `{env:HOME}` — portable between machines |
 | **Registry** | `~/stack/projects.txt` is personal (gitignored, created from `projects.template.txt`) — one path per line |
-| **Sync** | `bash ~/stack/sync-agents.sh` regenerates AGENTS.md + configs in all projects (part of `update-all.sh`, step 12); AGENTS.md content **outside** the `<!-- STACK:START/END -->` markers is preserved |
+| **Sync** | `bash ~/stack/sync-agents.sh` regenerates AGENTS.md + configs in all projects (part of `update-all.sh`, step 14); AGENTS.md content **outside** the `<!-- STACK:START/END -->` markers is preserved |
 | **Config — no markers** | `.opencode/opencode.json` is regenerated **wholesale** on every sync / new-project: edit the template in `gen-opencode-config.sh`, not project configs |
 | **Diagnostics — by running** | OpenCode v2 has no LSP: the agent gets code errors by running linters/compilers/tests directly (`bash -n`, `python`, `npm run build`, `pdflatex`) — honest build errors |
 | **Outside projects** | No MCP, no skills; `~/.config/opencode/` holds only client settings |
@@ -299,7 +299,7 @@ You — in VS Code (the stack's extensions provide language servers: autocomplet
 
 | Task | Command |
 |:---:|:---:|
-| **Update the whole stack** | `cd ~/stack && bash update-all.sh` — 13 steps, then `/reload` or an OpenCode restart |
+| **Update the whole stack** | `cd ~/stack && bash update-all.sh` — 15 steps, then `/reload` or an OpenCode restart |
 | **Health check** | `bash ~/stack/check-all.sh` |
 | **Attach a project** | `~/stack/new-project.sh <path>` |
 | **Sync projects** | `bash ~/stack/sync-agents.sh` |
