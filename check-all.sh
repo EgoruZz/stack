@@ -184,5 +184,27 @@ else
     echo "❌ $STACK_DIR/skills-store not found"
 fi
 
+# MCP servers: the modules each server imports must be present and compatible.
+# History: mcp 2.x (released 2025-11) renamed FastMCP → old servers break; the
+# ParaView app's bundled python lacks _ssl and ships an old typing_extensions;
+# the manim server needs the venv's bin on PATH. Catch all of this here.
+echo -n "MCP (julia/manim/paraview): "
+MCP_OK=0; MCP_TOTAL=0
+for env in julia-mcp-env manim-env paraview-mcp-env; do
+    MCP_TOTAL=$((MCP_TOTAL+1))
+    if [ -d "$STACK_DIR/$env" ] && "$STACK_DIR/$env/bin/python" -c "from mcp.server.fastmcp import FastMCP" >/dev/null 2>&1; then
+        MCP_OK=$((MCP_OK+1))
+    fi
+done
+PV_PATCHED=0
+[ -f "$STACK_DIR/paraview-mcp/paraview_mcp_server.py" ] \
+    && grep -q 'instructions=default_prompt' "$STACK_DIR/paraview-mcp/paraview_mcp_server.py" \
+    && [ -f "$STACK_DIR/paraview-mcp/typing_extensions.py" ] && PV_PATCHED=1
+if [ "$MCP_OK" -eq "$MCP_TOTAL" ] && [ "$PV_PATCHED" -eq 1 ]; then
+    echo "✅ FastMCP importable in $MCP_OK/$MCP_TOTAL venvs; ParaView patched"
+else
+    echo "❌ FastMCP $MCP_OK/$MCP_TOTAL venvs; ParaView patches: $PV_PATCHED/1 — re-run: bash $STACK_DIR/setup.sh"
+fi
+
 echo ""
 echo "=== Done ==="
