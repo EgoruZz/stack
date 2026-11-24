@@ -43,12 +43,12 @@ Research and development need many things at once: computation, data visualizati
 
 <div align="center">
 
-All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`)
+All `*.sh` are CLI tools (run: `bash "$STACK/<name>.sh"`)
 
 </div>
 
 ```
-~/stack/
+$STACK/            # wherever you cloned it, e.g. ~/stack or ~/git/custom-opencode/stack
 ├── README.md                    # This file
 ├── AGENTS.template.md           # Agent instructions source ({{STACK}} placeholder)
 ├── AGENTS.md                    # (generated locally, gitignored)
@@ -98,9 +98,9 @@ Only three things stay manual
 
 | Step | Why | How |
 |:---:|:---:|:---:|
-| **First-start form** | proxy, Wolfram ID, git identity, optional `AGENT_SUDO` | `cp ~/stack/first-start.template.txt ~/stack/first-start.txt` → fill it in → `bash ~/stack/apply-first-start.sh` |
-| **Craft Apps GUI** | Word/Excel/PPT/PDF apps are not installed by `setup.sh` (GUI installers) | `bash ~/stack/craft-install.sh` in your own terminal; check: `bash ~/stack/check-all.sh` (Craft Apps row) |
-| **Wolfram activation** | license for the MCP (renew every ~40 days) | `wolframscript` — sign in with a Wolfram ID; check: `bash ~/stack/check-wolfram-license.sh` |
+| **First-start form** | proxy, Wolfram ID, git identity, optional `AGENT_SUDO` | `cp "$STACK/first-start.template.txt" "$STACK/first-start.txt"` → fill it in → `bash "$STACK/apply-first-start.sh"` |
+| **Craft Apps GUI** | Word/Excel/PPT/PDF apps are not installed by `setup.sh` (GUI installers) | `bash "$STACK/craft-install.sh"` in your own terminal; check: `bash "$STACK/check-all.sh"` (Craft Apps row) |
+| **Wolfram activation** | license for the MCP (renew every ~40 days) | `wolframscript` — sign in with a Wolfram ID; check: `bash "$STACK/check-wolfram-license.sh"` |
 | **Firecrawl auth** *(optional)* | Firecrawl works per account: without signing in only a minimal anonymous quota is available, the free tier is enough | `firecrawl login --browser`; check: `firecrawl --status` |
 | **Restart OpenCode** | apply MCP servers and skills to new sessions | quit OpenCode, start it again in the project folder |
 
@@ -112,13 +112,13 @@ Only three things stay manual
 <h2 align="center">🚀 Quick start</h2>
 
 ```shell
-$ git clone https://github.com/custom-opencode/stack.git ~/stack
-$ cd ~/stack
-$ bash setup.sh
+$ git clone https://github.com/custom-opencode/stack.git ~/stack   # folder is YOUR choice
+$ export STACK="$HOME/stack"                                       # the real path of your clone
+$ cd "$STACK" && bash setup.sh
 ```
 
 > [!NOTE]
-> The clone destination is **your choice** — the stack is path-agnostic: every script finds its own root, and project configs get absolute paths at attach time. In the docs, `~/stack` is shorthand for "wherever you cloned the stack" (`STACK_DIR`); substitute your real path, e.g. `~/git/custom-opencode/stack`.
+> The stack is **path-agnostic**: every script finds its own root, project configs get absolute paths at attach time. All commands in these docs use `$STACK` — set it once per terminal (or add that line to your `~/.zshrc`), substituting your real clone path. `~/stack` in the `git clone` line is just a sensible default.
 
 - The repository is public: `git clone` works over HTTPS, no SSH keys needed
 - It asks for a password only where the system requires one
@@ -129,15 +129,15 @@ $ bash setup.sh
 **After `setup.sh` — five manual steps (details in [Manual steps](#-manual-steps)):**
 
 1. **New terminal window** — so `brew` and the installed tools appear in `PATH`
-2. **First-start form** — `cp ~/stack/first-start.template.txt ~/stack/first-start.txt` → fill in (proxy, Wolfram ID, git identity) → `bash ~/stack/apply-first-start.sh`; then `bash ~/stack/proxy.sh test`
-3. **Craft Apps GUI** — `bash ~/stack/craft-install.sh` in your own terminal
+2. **First-start form** — `cp "$STACK/first-start.template.txt" "$STACK/first-start.txt"` → fill in (proxy, Wolfram ID, git identity) → `bash "$STACK/apply-first-start.sh"`; then `bash "$STACK/proxy.sh test"`
+3. **Craft Apps GUI** — `bash "$STACK/craft-install.sh"` in your own terminal
 4. **Wolfram activation** — run `wolframscript`, sign in with a Wolfram ID (optional: fill `WOLFRAM_ID`/`WOLFRAM_PASS` in the form first — then activation goes non-interactive)
 5. **Restart OpenCode** — quit and start it again in the project folder, so MCP servers and skills are applied
 
 Then the first session:
 
 ```shell
-$ cd ~/stack && opencode
+$ cd "$STACK" && opencode
 ```
 
 <h2 align="center">📦 What's inside</h2>
@@ -166,7 +166,7 @@ Everything is installed automatically by `setup.sh`
 | Wolfram AgentTools (paclet) | `PacletInstall` — if Wolfram Engine is already installed, otherwise at the first `update-all.sh` |
 | 6 external repositories | `git clone --depth 1` |
 | `tldraw-mcp` build | `npm install && npm run build` |
-| Craft Apps headless CLIs ×5 | GitHub releases → `~/stack/craft-cli/` |
+| Craft Apps headless CLIs ×5 | GitHub releases → `$STACK/craft-cli/` |
 
 </div>
 
@@ -207,7 +207,7 @@ Native macOS apps by [ArtCraft](https://getartcraft.com) (open source, pure Rust
 </p>
 
 ```shell
-$ bash ~/stack/craft-install.sh
+$ bash "$STACK/craft-install.sh"
 ```
 
 <div align="center">
@@ -230,7 +230,7 @@ Installed automatically by `setup.sh` if the VS Code CLI (`code`) is present: `t
 
 <p align="center">
 
-Assembled automatically (`consolidate-skills.sh`) into `~/stack/skills-store/` and attached to projects via `skills` in the config — **outside projects the agent sees only OpenCode's built-in skills**.
+Assembled automatically (`consolidate-skills.sh`) into `$STACK/skills-store/` and attached to projects via `skills` in the config — **outside projects the agent sees only OpenCode's built-in skills**.
 
 </p>
 
@@ -264,7 +264,8 @@ Assembled automatically (`consolidate-skills.sh`) into `~/stack/skills-store/` a
 <h2 align="center">☎️ Attaching to a project</h2>
 
 ```shell
-$ ~/stack/new-project.sh ~/work/my-project    # create new / register existing
+$ bash "$STACK/new-project.sh" ~/work/my-project    # create new / register existing
+$ bash "$STACK/detach-project.sh" ~/work/my-project # detach later
 ```
 
 <div align="center">
@@ -283,8 +284,8 @@ The project receives **two files**
 | Fact | Details |
 |:---:|:---:|
 | **Portability** | Paths in the config go through `{env:HOME}` — portable between machines |
-| **Registry** | `~/stack/projects.txt` is personal (gitignored, created from `projects.template.txt`) — one path per line |
-| **Sync** | `bash ~/stack/sync-agents.sh` regenerates AGENTS.md + configs in all projects (part of `update-all.sh`, step 14); AGENTS.md content **outside** the `<!-- STACK:START/END -->` markers is preserved |
+| **Registry** | `$STACK/projects.txt` is personal (gitignored, created from `projects.template.txt`) — one path per line |
+| **Sync** | `bash "$STACK/sync-agents.sh"` regenerates AGENTS.md + configs in all projects (part of `update-all.sh`, step 14); AGENTS.md content **outside** the `<!-- STACK:START/END -->` markers is preserved |
 | **Config — no markers** | `.opencode/opencode.json` is regenerated **wholesale** on every sync / new-project: edit the template in `gen-opencode-config.sh`, not project configs |
 | **Diagnostics — by running** | OpenCode v2 has no LSP: the agent gets code errors by running linters/compilers/tests directly (`bash -n`, `python`, `npm run build`, `pdflatex`) — honest build errors |
 | **Outside projects** | No MCP, no skills; `~/.config/opencode/` holds only client settings |
@@ -323,18 +324,18 @@ You — in VS Code (the stack's extensions provide language servers: autocomplet
 
 | Task | Command |
 |:---:|:---:|
-| **Update the whole stack** | `cd ~/stack && bash update-all.sh` — 15 steps, then `/reload` or an OpenCode restart |
-| **Health check** | `bash ~/stack/check-all.sh` |
-| **Attach a project** | `~/stack/new-project.sh <path>` — any folder, git or not |
-| **Detach a project** | `~/stack/detach-project.sh <path>` — removes the config + registry entry, project files stay (works even if the folder is already gone) |
-| **Sync + drop dead entries** | `bash ~/stack/sync-agents.sh --prune` — removes registry paths that no longer exist |
-| **Back up personal data** | `bash ~/stack/export-personal.sh` — collects `projects.txt`, first-start form, `~/.stack-secrets.sh`, `~/skills` into one folder |
-| **Sync projects** | `bash ~/stack/sync-agents.sh` |
-| **Install/update Craft Apps** | `bash ~/stack/craft-install.sh` |
-| **Network: status / test / git** | `bash ~/stack/proxy.sh status` · `test` · `git on\|off` |
-| **Expiry: proxy / Wolfram** | `bash ~/stack/proxy.sh expiry` · `bash ~/stack/check-wolfram-license.sh` |
-| **Firecrawl credits** | `firecrawl credits` |
-| **Chrome version for tldraw** | `bash ~/stack/chrome-version.sh` |
+| **Update the whole stack** | `cd "$STACK" && bash update-all.sh` — 15 steps, then `/reload` or an OpenCode restart |
+| **Health check** | `bash "$STACK/check-all.sh"` |
+| **Attach a project** | `bash "$STACK/new-project.sh" <path>` — any folder, git or not |
+| **Detach a project** | `bash "$STACK/detach-project.sh" <path>` — removes the config + registry entry, project files stay (works even if the folder is already gone) |
+| **Sync + drop dead entries** | `bash "$STACK/sync-agents.sh" --prune` — removes registry paths that no longer exist |
+| **Back up personal data** | `bash "$STACK/export-personal.sh"` — collects `projects.txt`, first-start form, `~/.stack-secrets.sh`, `~/skills` into one folder |
+| **Sync projects** | `bash "$STACK/sync-agents.sh"` (add `--prune` to drop registry paths that no longer exist) |
+| **Install/update Craft Apps** | `bash "$STACK/craft-install.sh"` |
+| **Network: status / test / git** | `bash "$STACK/proxy.sh" status` · `test` · `git on\|off` |
+| **Expiry: proxy / Wolfram** | `bash "$STACK/proxy.sh" expiry` · `bash "$STACK/check-wolfram-license.sh"` |
+| **Firecrawl credits / personal backup** | `firecrawl credits` · `bash "$STACK/export-personal.sh"` |
+| **Chrome version for tldraw** | `bash "$STACK/chrome-version.sh"` |
 
 </div>
 
