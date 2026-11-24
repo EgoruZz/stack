@@ -1,22 +1,17 @@
 <div align="center">
 
-<img src="assets/head.png" alt="Stack" width="100%">
+<img src="assets/painting.png" alt="Stack" width="100%">
+
+</div>
 
 **A personal AI development environment for macOS: a human working alongside an AI assistant in [OpenCode](https://opencode.ai).**
 MCP servers, skills, CLI tools and office apps — one command to attach to a project, one command to update everything.
 
-
-| 🖥 Platform | 🤖 Agent | 🔌 MCP | 🎯 Skills | 🧩 Apps | 🛠 CLI tools | 🖼 VS Code ext |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| macOS | OpenCode v2 | 10 | 60 | 9 | 13 | 6 |
-
-</div>
-
----
-
 <h2 align="center">🧠 Why</h2>
 
 Research and development need many things at once: computation, data visualization, web research, deliverables in familiar office formats, interface mockups — **in one place, driven by an AI agent**. The stack assembles official open-source tools and attaches them to OpenCode through every available channel: **MCP servers** (interactive compute and editing), **skills** (step-by-step agent workflows), **headless CLIs** (scripted commands without a window) and **control CLI scripts** (checks, updates, expiry tracking) — and it is available **only in projects where it is explicitly attached**: the global OpenCode config stays empty, and outside those projects the agent sees none of it.
+
+<div align="center">
 
 | Principle | Meaning |
 |:---:|:---:|
@@ -26,24 +21,30 @@ Research and development need many things at once: computation, data visualizati
 | **Portability** | Paths in configs go through `{env:HOME}`; a fresh machine = `git clone` + `setup.sh` |
 | **Routing** | Local stack traffic always goes direct; external web traffic goes through the configured ISP proxy (`proxy.sh`, personal values in `~/.stack-secrets.sh`) |
 
+</div>
+
 > [!TIP]
 > **Integration-friendly — the stack is a layer, not a box.** Attach it to any existing project and keep working your way. Add anything new — your own tools, other MCP servers, skills, even C++ support — into *your project*, or extend *the stack itself*: the AI assistant can wire new instruments into either. Nothing here is a static set — the stack grows with whatever you want to add.
 
 <h2 align="center">🗂️ Table of contents</h2>
 
-- [🗺️ Repository structure](#-repository-structure)
-- [🖐 Manual steps](#-manual-steps)
-- [🚀 Quick start](#-quick-start)
-- [📦 What's inside](#-whats-inside)
-- [🔌 Attaching to a project](#-attaching-to-a-project)
-- [🤝 Files: human vs AI agent](#-files-human-vs-ai-agent)
-- [🛠 Usage](#-usage)
+<div align="center">
+
+[🗺️ Repository structure](#-repository-structure)<p>
+[🖐 Manual steps](#-manual-steps)<p>
+[🚀 Quick start](#-quick-start)<p>
+[📦 What's inside](#-whats-inside)<p>
+[☎️ Attaching to a project](#-attaching-to-a-project)<p>
+[🤝 Files: human vs AI agent](#-files-human-vs-ai-agent)<p>
+[🛠 Usage](#-usage)
+
+</div>
 
 <h2 align="center">🗺️ Repository structure</h2>
 
 <p align="center">
-All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`):
-</p>
+
+All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`)
 
 ```
 ~/stack/
@@ -74,24 +75,32 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`):
 ├── skills-store/                # Assembled 60 skills (gitignored)
 ├── craft-cli/                   # Headless CLIs of the Craft Apps (gitignored)
 ├── craft-downloads/             # DMG cache of installers (gitignored)
-├── assets/                      # Banner + its HTML source
+├── assets/                      # Banner (painting.png) + editable painting.tldraw
 ├── WolframLanguage/             # Custom Wolfram packages
 │
 └── paraview-mcp/ · manim-mcp/ · julia-mcp/ · tldraw-mcp/ ·      # cloned
     aris-research-repo/ · WolframLanguageForJupyter/             # repos
 ```
 
+</p>
+
 <h2 align="center">🖐 Manual steps</h2>
 
 <p align="center">
-Only three things stay manual:
+
+Only three things stay manual
+
 </p>
+
+<div align="center">
 
 | Step | Why | How |
 |:---:|:---:|:---:|
 | **First-start form** | proxy, Wolfram ID, git identity | `cp ~/stack/first-start.template.txt ~/stack/first-start.txt` → fill it in → `bash ~/stack/apply-first-start.sh` |
 | **Wolfram activation** | license for the MCP (renew every ~40 days) | `wolframscript` — sign in with a Wolfram ID; check: `bash ~/stack/check-wolfram-license.sh` |
 | **Firecrawl auth** *(optional)* | Firecrawl works per account: without signing in only a minimal anonymous quota is available, the free tier is enough | `firecrawl login --browser`; check: `firecrawl --status` |
+
+</div>
 
 > [!NOTE]
 > `check-all.sh` verifies the presence of every component — ✅ or ❌ per row.
@@ -114,6 +123,8 @@ $ bash setup.sh
 
 Everything is installed automatically by `setup.sh`:
 
+<div align="center">
+
 | What | How |
 |:---:|:---:|
 | Python 3.12 · Node.js · gh · ffmpeg · juliaup | `brew install` |
@@ -130,14 +141,20 @@ Everything is installed automatically by `setup.sh`:
 | `tldraw-mcp` build | `npm install && npm run build` |
 | Craft Apps headless CLIs ×5 | GitHub releases → `~/stack/craft-cli/` |
 
+</div>
+
 > [!TIP]
 > **Manim vs ManimGL:** `manim` (community) renders headless and is what the MCP server uses. `manimgl` (3Blue1Brown) is an interactive GUI tool for you — no MCP uses it.
 
 ### MCP servers (10)
 
 <p align="center">
+
 Configs are generated automatically (`gen-opencode-config.sh`); for ParaView start the GUI + pvserver using the workflow from `STACK.md`:
+
 </p>
+
+<div align="center">
 
 | Server | What it does |
 |:---:|:---:|
@@ -152,20 +169,28 @@ Configs are generated automatically (`gen-opencode-config.sh`); for ParaView sta
 | **pdfcraft** | PDF: merge, split, protect, comments |
 | **figcraft** | UI design: frames, auto-layout, prototypes |
 
+</div>
+
 ### Craft Apps (5)
 
-Native macOS apps by [ArtCraft](https://getartcraft.com) (open source, pure Rust) — each with a headless CLI and an MCP. <p align="center">
-The GUI is installed/updated by a script:
+<p align="center">
+
+Native macOS apps by [ArtCraft](https://getartcraft.com) (open source, pure Rust) — each with a headless CLI and an MCP. The GUI is installed/updated by a script:
+
 </p>
 
 ```shell
 $ bash ~/stack/craft-install.sh
 ```
 
+<div align="center">
+
 | App | Official status |
 |:---:|:---:|
 | WordCraft · GridCraft · DeckCraft | In development |
 | PdfCraft · FigCraft | Early alpha |
+
+</div>
 
 > [!WARNING]
 > All apps are pre-release: complex files from MS Office and .fig files open best-effort and may not look perfect — **keep backups of important documents**.
@@ -177,8 +202,12 @@ Installed automatically by `setup.sh` if the VS Code CLI (`code`) is present: `t
 ### OpenCode skills (60)
 
 <p align="center">
+
 Assembled automatically (`consolidate-skills.sh`) into `~/stack/skills-store/` and attached to projects via `skills` in the config — **outside projects the agent sees only OpenCode's built-in skills**.
+
 </p>
+
+<div align="center">
 
 | Group | ~Count | Source |
 |:---:|:---:|:---:|
@@ -201,17 +230,23 @@ Assembled automatically (`consolidate-skills.sh`) into `~/stack/skills-store/` a
 | `dag-hallucination-detector` | Checking citations and facts |
 | `aris-research-pipeline` | Full research pipeline (local-only) |
 
+</div>
+
 </details>
 
-<h2 align="center">🔌 Attaching to a project</h2>
+<h2 align="center">☎️ Attaching to a project</h2>
 
 ```shell
 $ ~/stack/new-project.sh ~/work/my-project    # create new / register existing
 ```
 
 <p align="center">
+
 The project receives **two files**:
+
 </p>
+
+<div align="center">
 
 | File | Contents |
 |:---:|:---:|
@@ -228,11 +263,17 @@ The project receives **two files**:
 | **Outside projects** | No MCP, no skills; `~/.config/opencode/` holds only client settings |
 | **Extensions — no plugins** | All extensions go through MCP servers (external processes) and skills (prompts); the config contains no `plugins` field |
 
+</div>
+
 <h2 align="center">🤝 Files: human vs AI agent</h2>
 
 <p align="center">
-You — in VS Code (the stack's extensions provide language servers: autocomplete and errors as you type), the agent — in OpenCode (via MCP/CLI and by running compilers/linters directly):
+
+You — in VS Code (the stack's extensions provide language servers: autocomplete and errors as you type), the agent — in OpenCode (via MCP/CLI and by running compilers/linters directly)
+
 </p>
+
+<div align="center">
 
 | File | You — in VS Code | Agent — in OpenCode |
 |:---:|:---:|:---:|
@@ -247,7 +288,11 @@ You — in VS Code (the stack's extensions provide language servers: autocomplet
 | `.docx` `.xlsx` `.pptx` `.pdf` | Craft Apps GUI | Craft Apps MCP/CLI (headless or live mode) |
 | `.figcraft` | FigCraft | FigCraft MCP/CLI: frames, prototypes, PNG/SVG/PDF export |
 
+</div>
+
 <h2 align="center">🛠 Usage</h2>
+
+<div align="center">
 
 | Task | Command |
 |:---:|:---:|
@@ -260,6 +305,8 @@ You — in VS Code (the stack's extensions provide language servers: autocomplet
 | **Expiry: proxy / Wolfram** | `bash ~/stack/proxy.sh expiry` · `bash ~/stack/check-wolfram-license.sh` |
 | **Firecrawl credits** | `firecrawl credits` |
 | **Chrome version for tldraw** | `bash ~/stack/chrome-version.sh` |
+
+</div>
 
 > [!NOTE]
 > OpenCode v2 hot-reloads configs (`/reload`); after updating the components themselves (MCP binaries, venvs, skills) an OpenCode restart is safer.
