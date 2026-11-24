@@ -95,9 +95,11 @@ Only three things stay manual
 
 | Step | Why | How |
 |:---:|:---:|:---:|
-| **First-start form** | proxy, Wolfram ID, git identity | `cp ~/stack/first-start.template.txt ~/stack/first-start.txt` → fill it in → `bash ~/stack/apply-first-start.sh` |
+| **First-start form** | proxy, Wolfram ID, git identity, optional `AGENT_SUDO` | `cp ~/stack/first-start.template.txt ~/stack/first-start.txt` → fill it in → `bash ~/stack/apply-first-start.sh` |
+| **Craft Apps GUI** | Word/Excel/PPT/PDF apps are not installed by `setup.sh` (GUI installers) | `bash ~/stack/craft-install.sh` in your own terminal; check: `bash ~/stack/check-all.sh` (Craft Apps row) |
 | **Wolfram activation** | license for the MCP (renew every ~40 days) | `wolframscript` — sign in with a Wolfram ID; check: `bash ~/stack/check-wolfram-license.sh` |
 | **Firecrawl auth** *(optional)* | Firecrawl works per account: without signing in only a minimal anonymous quota is available, the free tier is enough | `firecrawl login --browser`; check: `firecrawl --status` |
+| **Restart OpenCode** | apply MCP servers and skills to new sessions | quit OpenCode, start it again in the project folder |
 
 </div>
 
@@ -115,6 +117,7 @@ $ bash setup.sh
 - It asks for a password only where the system requires one
 - At the end a health check runs — every component must be ✅ — not ❌
 - The first-start form is applied automatically if `first-start.txt` is filled in
+- GitHub CLI is authorized with full scopes automatically (one-time login on the first run)
 
 <h2 align="center">📦 What's inside</h2>
 

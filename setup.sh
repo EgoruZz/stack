@@ -234,7 +234,7 @@ for name in $CRAFT_REPOS; do
         echo "  $name-cli: уже есть"
     fi
 done
-echo "  GUI-приложения (WordCraft, GridCraft, DeckCraft, PdfCraft) ставятся вручную через ArtCraft Launcher — см. README «Ручные шаги»"
+echo "  GUI-приложения (WordCraft, GridCraft, DeckCraft, PdfCraft, FigCraft): bash ~/stack/craft-install.sh — см. README «Manual steps»"
 echo ""
 
 # ═══════════════════════════════════════
@@ -371,11 +371,12 @@ else
     echo "  nano ~/stack/first-start.txt && bash ~/stack/apply-first-start.sh"
 fi
 echo "Ручные шаги (если ещё не сделаны):"
-echo "  1. OpenCode: https://opencode.ai"
-echo "  2. Wolfram Engine: brew install --cask wolfram-engine"
-echo "     Затем: wolframscript (для активации лицензии)"
-echo "  3. ParaView: https://www.paraview.org/download/"
-echo "  4. Firecrawl: firecrawl login --browser (для полного функционала)"
+echo "  1. Форма первого старта: cp ~/stack/first-start.template.txt ~/stack/first-start.txt → заполнить → bash ~/stack/apply-first-start.sh"
+echo "  2. Craft Apps GUI: bash ~/stack/craft-install.sh"
+echo "  3. Wolfram активация: wolframscript (вход с Wolfram ID)"
+echo "  4. Firecrawl (опционально): firecrawl login --browser"
+echo "  5. Перезапусти OpenCode для применения MCP и skills"
 echo ""
+echo "Проверка: bash ~/stack/check-all.sh"
 echo "Начать:"
 echo "  cd ~/stack && opencode"
