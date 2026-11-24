@@ -1,14 +1,14 @@
 #!/bin/bash
-# Консолидация всех скиллов в $STACK_DIR/skills-store (единое хранилище)
-# Скиллы подключаются к проектам через skills.paths в .opencode/opencode.json —
-# глобальные каталоги (~/.config/opencode/skills, ~/.claude/skills,
-# ~/.config/opencode/skills опустошается полностью; ~/.claude/skills и
-# ~/.agents/skills чистятся выборочно — переносятся только скиллы, уже
-# существующие в хранилище (чужие скиллы других инструментов не затрагиваются).
+# Consolidate all skills into $STACK_DIR/skills-store (single store)
+# Skills are attached to projects via skills.paths in .opencode/opencode.json —
+# global directories (~/.config/opencode/skills, ~/.claude/skills,
+# ~/.config/opencode/skills is emptied completely; ~/.claude/skills and
+# ~/.agents/skills are cleaned selectively — only skills that already
+# exist in the store are moved; other tools' foreign skills are untouched).
 #
-# Вызывается setup.sh и update-all.sh. Безопасно запускать повторно.
+# Called by setup.sh and update-all.sh. Safe to run repeatedly.
 #
-# Использование: bash consolidate-skills.sh
+# Usage: bash consolidate-skills.sh
 
 set -uo pipefail
 
@@ -19,10 +19,10 @@ ARIS_LIST="$STACK_DIR/aris-skills.txt"
 
 mkdir -p "$STORE"
 
-# ── 1. Standalone-скиллы из репозитория (8) ──
+# ── 1. Standalone skills from the repo (8) ──
 cp -R "$STACK_DIR/skills/"* "$STORE/" 2>/dev/null || true
 
-# ── 2. ARIS-скиллы из клона (список aris-skills.txt) ──
+# ── 2. ARIS skills from the clone (list: aris-skills.txt) ──
 if [ -d "$ARIS_REPO/skills" ] && [ -f "$ARIS_LIST" ]; then
     while IFS= read -r skill || [ -n "$skill" ]; do
         [[ "$skill" =~ ^[[:space:]]*# ]] && continue
@@ -33,22 +33,22 @@ if [ -d "$ARIS_REPO/skills" ] && [ -f "$ARIS_LIST" ]; then
     done < "$ARIS_LIST"
 fi
 
-# ── 3. tldraw-скиллы ──
-# tldraw-offline: канонический источник — ~/skills/tldraw-offline (ставится
-# приложением tldraw Desktop вместе с хелпером tq.mjs; SKILL.md ссылается
-# именно на этот путь).
+# ── 3. tldraw skills ──
+# tldraw-offline: canonical source — ~/skills/tldraw-offline (installed
+# by the tldraw Desktop app together with the tq.mjs helper; SKILL.md
+# references exactly this path).
 if [ -d "$HOME/skills/tldraw-offline" ]; then
     rsync -aL "$HOME/skills/tldraw-offline/" "$STORE/tldraw-offline/" 2>/dev/null
 elif [ ! -d "$STORE/tldraw-offline" ] && [ -d "$HOME/.config/opencode/skills/tldraw-offline" ]; then
     mv "$HOME/.config/opencode/skills/tldraw-offline" "$STORE/tldraw-offline"
 fi
-# ── 4. Перенос скиллов из глобальных каталогов (напр. после firecrawl init) ──
-# ~/.config/opencode/skills — собственный каталог OpenCode: копируем всё и
-# полностью очищаем (скиллы не должны быть видны вне проектов).
-# ~/.claude/skills и ~/.agents/skills — каталоги ДРУГИХ AI-инструментов:
-# обновляем и удаляем только те скиллы, что уже живут в skills-store
-# (известные источники: firecrawl, ARIS, standalone, tldraw). Чужие/неизвестные
-# скиллы не трогаем — не втягиваем их в хранилище и не удаляем из глобальных.
+# ── 4. Move skills from global directories (e.g. after firecrawl init) ──
+# ~/.config/opencode/skills — OpenCode's own directory: copy everything and
+# clear it completely (skills must not be visible outside projects).
+# ~/.claude/skills and ~/.agents/skills — directories of OTHER AI tools:
+# update and delete only the skills that already live in skills-store
+# (known sources: firecrawl, ARIS, standalone, tldraw). Foreign/unknown
+# skills are not touched — neither pulled into the store nor deleted from global dirs.
 gdir="$HOME/.config/opencode/skills"
 [ -d "$gdir" ] && rsync -aL "$gdir/" "$STORE/" 2>/dev/null
 
@@ -56,7 +56,7 @@ for gdir in "$HOME/.claude/skills" "$HOME/.agents/skills"; do
     [ -d "$gdir" ] || continue
     ls "$gdir" 2>/dev/null | while IFS= read -r name; do
         [ -n "$name" ] || continue
-        # Известные источники: уже в хранилище, либо скиллы firecrawl
+        # Known sources: already in the store, or firecrawl skills
         if [ -d "$STORE/$name" ] || [ "$name" = "firecrawl" ] || [ "${name#firecrawl-}" != "$name" ]; then
             rsync -aL "$gdir/$name/" "$STORE/$name/" 2>/dev/null
             rm -rf "$gdir/$name"
@@ -64,10 +64,10 @@ for gdir in "$HOME/.claude/skills" "$HOME/.agents/skills"; do
     done
 done
 
-# ── 5. Сборка мусора в хранилище (ДО чистки глобальных каталогов!) ──
-# Удаляем из skills-store всё, что больше не существует ни в одном источнике
-# (напр. переименованные/удалённые standalone-скиллы). Имена из глобальных
-# каталогов учитываются здесь, потому что сами каталоги удаляются в шаге 6.
+# ── 5. Garbage collection in the store (BEFORE cleaning global dirs!) ──
+# Remove from skills-store everything that no longer exists in any source
+# (e.g. renamed/deleted standalone skills). Names from global directories
+# are counted here because those directories themselves are removed in step 6.
 KEEP=$(mktemp)
 { ls "$STACK_DIR/skills" 2>/dev/null;
   grep -v '^\s*#' "$ARIS_LIST" 2>/dev/null | tr -d ' ';
@@ -77,7 +77,7 @@ KEEP=$(mktemp)
   ls "$HOME/.agents/skills" 2>/dev/null; } | sort -u > "$KEEP"
 for d in "$STORE"/*; do
     name=$(basename "$d")
-    # firecrawl-скиллы — известный источник, остаются всегда
+    # firecrawl skills — known source, always kept
     if grep -qxF "$name" "$KEEP" || [ "$name" = "firecrawl" ] || [ "${name#firecrawl-}" != "$name" ]; then
         continue
     fi
@@ -85,8 +85,8 @@ for d in "$STORE"/*; do
 done
 rm -f "$KEEP"
 
-# ── 6. Очистка глобального каталога OpenCode ──
+# ── 6. Clean the global OpenCode directory ──
 rm -rf "$HOME/.config/opencode/skills"
 
 COUNT=$(ls "$STORE" 2>/dev/null | wc -l | tr -d ' ')
-echo "  Хранилище скиллов: $STORE ($COUNT скиллов), глобальные каталоги очищены"
+echo "  Skills store: $STORE ($COUNT skills), global directories cleaned"

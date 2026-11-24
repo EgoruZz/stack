@@ -1,20 +1,20 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════
-#  Сеть стека: ISP-прокси (proxy.market, Singapore)
+#  Stack networking: ISP proxy (proxy.market, Singapore)
 # ═══════════════════════════════════════════════════════════════
-# Двойной режим:
-#   • `source $STACK_DIR/proxy.sh` — из .zshrc: экспортирует env-прокси
-#   • `bash $STACK_DIR/proxy.sh [команда]` — CLI управления
+# Dual mode:
+#   • `source $STACK_DIR/proxy.sh` — from .zshrc: exports proxy env vars
+#   • `bash $STACK_DIR/proxy.sh [command]` — management CLI
 #
-# Правила маршрутизации:
-#   1. Локальный трафик стека (все MCP, localhost, *.local) — НИКОГДА
-#      через прокси (no_proxy).
-#   2. git → github.com — через прокси (см. `git on`).
-#   3. Прочий web-трафик терминала (brew, pip, npm, curl) — через env.
-#      Российские сервисы добавляй в no_proxy.
+# Routing rules:
+#   1. Local stack traffic (all MCP, localhost, *.local) — NEVER
+#      through the proxy (no_proxy).
+#   2. git → github.com — through the proxy (see `git on`).
+#   3. Other terminal web traffic (brew, pip, npm, curl) — via env.
+#      Add Russian services to no_proxy.
 #
-# Секреты живут ТОЛЬКО в ~/.stack-secrets.sh (вне репозитория, chmod 600).
-# В этом файле — только пустые дефолты и логика; никаких персональных данных.
+# Secrets live ONLY in ~/.stack-secrets.sh (outside the repo, chmod 600).
+# This file contains only empty defaults and logic; no personal data.
 # ═══════════════════════════════════════════════════════════════
 
 STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -23,17 +23,17 @@ PROXY_USER_DEFAULT=""
 PROXY_PASS_DEFAULT=""
 PROXY_HTTP_PORT="50100"
 PROXY_SOCKS_PORT="50101"
-# Срок подписки; проверка: bash proxy.sh expiry
+# Subscription expiry; check: bash proxy.sh expiry
 PROXY_EXPIRES_DEFAULT=""
-# ═══ Секреты — НЕ в этом файле! ═══
-# Персональные значения задаются в ~/.stack-secrets.sh (файл в $HOME,
-# в репозиторий не попадает):
+# ═══ Secrets — NOT in this file! ═══
+# Personal values are set in ~/.stack-secrets.sh (file in $HOME,
+# never committed to the repo):
 #   PROXY_HOST="..."  PROXY_USER="..."  PROXY_PASS="..."
 #   PROXY_EXPIRES="YYYY-MM-DD HH:MM +ZZZZ"
-# Файл создаётся apply-first-start.sh из формы; шаблон — first-start.template.txt.
+# The file is created by apply-first-start.sh from the form; template: first-start.template.txt.
 
-# Личный конфиг поверх дефолтов (секреты, не для репозитория):
-# ~/.stack-secrets.sh может переопределять PROXY_HOST/USER/PASS/EXPIRES.
+# Personal config on top of defaults (secrets, not for the repo):
+# ~/.stack-secrets.sh may override PROXY_HOST/USER/PASS/EXPIRES.
 [ -f "$HOME/.stack-secrets.sh" ] && source "$HOME/.stack-secrets.sh"
 
 PROXY_HOST="${PROXY_HOST:-$PROXY_HOST_DEFAULT}"
@@ -58,73 +58,73 @@ _stack_proxy_export_env() {
 _stack_proxy_expiry() {
     local epoch now diff
     epoch=$(date -j -f "%Y-%m-%d %H:%M %z" "$STACK_PROXY_EXPIRES" +%s 2>/dev/null) || {
-        echo "❌ STACK_PROXY_EXPIRES не распознан: '$STACK_PROXY_EXPIRES'"; return 1; }
+        echo "❌ STACK_PROXY_EXPIRES not recognized: '$STACK_PROXY_EXPIRES'"; return 1; }
     now=$(date +%s); diff=$(( (epoch - now) / 86400 ))
     if [ "$diff" -lt 0 ]; then
-        echo "❌ Прокси истёк! Продли подписку: https://proxy.market (затем обнови PROXY_* в proxy.sh или ~/.stack-secrets.sh)"
+        echo "❌ Proxy expired! Renew the subscription: https://proxy.market (then update PROXY_* in proxy.sh or ~/.stack-secrets.sh)"
         return 1
     elif [ "$diff" -lt 7 ]; then
-        echo "⚠️  Прокси истекает через $diff дн. — продлевай: https://proxy.market"
+        echo "⚠️  Proxy expires in $diff days — renew: https://proxy.market"
     else
-        echo "✅ Прокси действителен (осталось $diff дней), истекает $STACK_PROXY_EXPIRES"
+        echo "✅ Proxy valid ($diff days left), expires $STACK_PROXY_EXPIRES"
     fi
 }
 
-# ═══ CLI-режим ═══
+# ═══ CLI mode ═══
 if [ "${BASH_SOURCE[0]}" = "$0" ]; then
     _stack_proxy_export_env
     case "${1:-status}" in
     status)
         if [ -n "$PROXY_HOST" ] && [ -n "$PROXY_USER" ]; then
-            echo "Прокси-хост: $PROXY_HOST (http :$PROXY_HTTP_PORT, socks5 :$PROXY_SOCKS_PORT)"
+            echo "Proxy host: $PROXY_HOST (http :$PROXY_HTTP_PORT, socks5 :$PROXY_SOCKS_PORT)"
         else
-            echo "Прокси НЕ настроен (опционально) — трафик идёт напрямую."
-            echo "Чтобы включить: заполни поля прокси в $STACK_DIR/first-start.txt и запусти apply-first-start.sh"
+            echo "Proxy NOT configured (optional) — traffic goes direct."
+            echo "To enable: fill in the proxy fields in $STACK_DIR/first-start.txt and run apply-first-start.sh"
             _stack_proxy_expiry 2>/dev/null || true
             return 0 2>/dev/null || exit 0
         fi
         _stack_proxy_expiry
-        echo "env http_proxy задан, no_proxy: $no_proxy"
+        echo "env http_proxy set, no_proxy: $no_proxy"
         GIT_P=$(git config --global --get http.https://github.com.proxy 2>/dev/null)
-        echo "git→github: ${GIT_P:+через прокси ($HOST)}${GIT_P:-прямой маршрут}"
+        echo "git→github: ${GIT_P:+via proxy ($HOST)}${GIT_P:-direct route}"
         ;;
     expiry) _stack_proxy_expiry ;;
     git)
         case "${2:-on}" in
         on)
             git config --global http.https://github.com.proxy "$STACK_PROXY_HTTP"
-            echo "git → github.com через прокси ($PROXY_HOST)" ;;
+            echo "git → github.com via proxy ($PROXY_HOST)" ;;
         off)
             git config --global --unset http.https://github.com.proxy 2>/dev/null
-            echo "git → github.com прямой маршрут" ;;
-        *) echo "Использование: bash proxy.sh git [on|off]" ;;
+            echo "git → github.com direct route" ;;
+        *) echo "Usage: bash proxy.sh git [on|off]" ;;
         esac ;;
     test)
         if [ -z "$PROXY_USER" ]; then
-            echo "Прокси не настроен (опционально) — проверяю прямой маршрут..."
+            echo "Proxy not configured (optional) — checking direct route..."
             CODE=$(curl -s --max-time 20 -o /dev/null -w '%{http_code}' https://api.github.com/zen)
-            [ "$CODE" = "200" ] && echo "✅ прямой доступ к GitHub работает" || echo "❌ прямой доступ не работает"
+            [ "$CODE" = "200" ] && echo "✅ direct GitHub access works" || echo "❌ direct access not working"
             exit 0
         fi
-        echo "Проверка прокси..."
+        echo "Checking proxy..."
         CODE=$(curl -s --max-time 20 -o /dev/null -w '%{http_code}' -x "$STACK_PROXY_HTTP" https://api.github.com/zen)
         if [ "$CODE" = "200" ]; then
-            echo "✅ прокси жив ($PROXY_HOST), GitHub API отвечает"
+            echo "✅ proxy alive ($PROXY_HOST), GitHub API responds"
             curl -s --max-time 20 -x "$STACK_PROXY_HTTP" https://ipinfo.io/json 2>/dev/null \
-                | python3 -c "import json,sys; d=json.load(sys.stdin); print('   внешний IP:', d.get('ip'), d.get('city'), d.get('country'))" 2>/dev/null
+                | python3 -c "import json,sys; d=json.load(sys.stdin); print('   external IP:', d.get('ip'), d.get('city'), d.get('country'))" 2>/dev/null
             _stack_proxy_expiry
         else
-            echo "❌ прокси не отвечает (код $CODE)"
+            echo "❌ proxy not responding (code $CODE)"
             exit 1
         fi ;;
-    *) echo "Использование: bash proxy.sh [status|expiry|git on|git off|test]" ;;
+    *) echo "Usage: bash proxy.sh [status|expiry|git on|git off|test]" ;;
     esac
     exit 0
 fi
 
-# ═══ Режим source (из .zshrc) ═══
-# Прокси ОПЦИОНАЛЕН: если персональные значения не заданы (нет
-# ~/.stack-secrets.sh или поля пустые) — трафик идёт напрямую, стек работает.
+# ═══ Source mode (from .zshrc) ═══
+# The proxy is OPTIONAL: if personal values are not set (no
+# ~/.stack-secrets.sh or empty fields) — traffic goes direct, the stack works.
 _stack_proxy_export_env() {
     export STACK_PROXY_HOST STACK_PROXY_HTTP STACK_PROXY_SOCKS STACK_PROXY_EXPIRES
     if [ -n "$PROXY_HOST" ] && [ -n "$PROXY_USER" ] && [ -n "$PROXY_PASS" ]; then

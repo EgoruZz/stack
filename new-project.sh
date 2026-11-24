@@ -1,10 +1,10 @@
 #!/bin/bash
-# Создание или регистрация проекта использующего стек
-# Использование: $STACK_DIR/new-project.sh <путь>
-# Примеры:
-#   $STACK_DIR/new-project.sh ~/projects/my-calculation   # создать новый
-#   $STACK_DIR/new-project.sh ~/learn                      # зарегистрировать существующий
-#   $STACK_DIR/new-project.sh ~/work/analysis              # создать в любом месте
+# Create a new project or register an existing one to use the stack
+# Usage: $STACK_DIR/new-project.sh <path>
+# Examples:
+#   $STACK_DIR/new-project.sh ~/projects/my-calculation   # create new
+#   $STACK_DIR/new-project.sh ~/learn                      # register existing
+#   $STACK_DIR/new-project.sh ~/work/analysis              # create anywhere
 
 set -euo pipefail
 
@@ -13,52 +13,52 @@ REGISTRY="$STACK_DIR/projects.txt"
 AGENTS_SRC="$STACK_DIR/AGENTS.md"
 
 if [ $# -eq 0 ]; then
-    echo "Использование: $0 <путь>"
-    echo "Примеры:"
-    echo "  $0 ~/projects/my-calculation   # создать новый проект"
-    echo "  $0 ~/learn                     # зарегистрировать существующий"
+    echo "Usage: $0 <path>"
+    echo "Examples:"
+    echo "  $0 ~/projects/my-calculation   # create a new project"
+    echo "  $0 ~/learn                     # register an existing one"
     exit 1
 fi
 
-# Разворачиваем ~ в абсолютный путь (без eval для безопасности)
+# Expand ~ to an absolute path (no eval, for safety)
 INPUT_DIR="$1"
 case "$INPUT_DIR" in
     "~") INPUT_DIR="$HOME" ;;
     "~/"*) INPUT_DIR="$HOME/${INPUT_DIR#\~/}" ;;
 esac
 
-# Если директории нет — создаём
+# Create the directory if it does not exist
 if [ ! -d "$INPUT_DIR" ]; then
     mkdir -p "$INPUT_DIR"
-    echo "✅ Папка создана: $INPUT_DIR"
+    echo "✅ Folder created: $INPUT_DIR"
 else
-    echo "📁 Папка уже существует: $INPUT_DIR"
+    echo "📁 Folder already exists: $INPUT_DIR"
 fi
 PROJECT_DIR=$(cd "$INPUT_DIR" && pwd)
 
-# Проверяем что это не сам стек
+# Make sure it is not the stack itself
 if [ "$PROJECT_DIR" = "$(cd "$STACK_DIR" && pwd)" ]; then
-    echo "❌ Нельзя зарегистрировать сам стек как проект"
+    echo "❌ Cannot register the stack itself as a project"
     exit 1
 fi
 
-# Копируем AGENTS.md если его нет
+# Copy AGENTS.md if missing
 if [ ! -f "$PROJECT_DIR/AGENTS.md" ]; then
     cp "$AGENTS_SRC" "$PROJECT_DIR/AGENTS.md"
-    echo "📄 AGENTS.md скопирован"
+    echo "📄 AGENTS.md copied"
 else
-    echo "📄 AGENTS.md уже существует (синхронизация обновит stack-секцию)"
+    echo "📄 AGENTS.md already exists (sync updates the stack section)"
 fi
 
-# Генерируем конфиг OpenCode (.opencode/opencode.json) — MCP/skills стека
+# Generate the OpenCode config (.opencode/opencode.json) — stack MCP/skills
 bash "$STACK_DIR/gen-opencode-config.sh" "$PROJECT_DIR"
-echo "🔧 Конфиг OpenCode сгенерирован (стек поднимется в этом проекте)"
+echo "🔧 OpenCode config generated (the stack activates in this project)"
 
-# Регистрируем в projects.txt
+# Register in projects.txt
 mkdir -p "$STACK_DIR"
 touch "$REGISTRY"
 
-# Проверяем на дубликат (раскрываем тильду в существующих записях)
+# Duplicate check (expand ~ in existing entries)
 ALREADY_REGISTERED=false
 while IFS= read -r line; do
     [[ "$line" =~ ^[[:space:]]*# ]] && continue
@@ -75,18 +75,18 @@ while IFS= read -r line; do
 done < "$REGISTRY"
 
 if [ "$ALREADY_REGISTERED" = true ]; then
-    echo "📋 Проект уже зарегистрирован"
+    echo "📋 Project already registered"
 else
     echo "$PROJECT_DIR" >> "$REGISTRY"
-    echo "📋 Проект зарегистрирован в projects.txt"
+    echo "📋 Project registered in projects.txt"
 fi
 
 echo ""
-echo "✅ Готово: $PROJECT_DIR"
+echo "✅ Done: $PROJECT_DIR"
 echo ""
-echo "Следующие шаги:"
+echo "Next steps:"
 echo "  cd $PROJECT_DIR"
-echo "  opencode  # запустить AI"
+echo "  opencode  # start the AI"
 echo ""
-echo "Синхронизация AGENTS.md:"
+echo "AGENTS.md sync:"
 echo "  bash $STACK_DIR/sync-agents.sh"

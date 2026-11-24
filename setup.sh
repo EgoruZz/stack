@@ -4,12 +4,12 @@ set -euo pipefail
 STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "============================================"
-echo "  Установка стека"
+echo "  Stack installation"
 echo "============================================"
 echo ""
 
 # ═══════════════════════════════════════
-# 1. СИСТЕМНЫЕ ЗАВИСИМОСТИ
+# 1. SYSTEM DEPENDENCIES
 # ═══════════════════════════════════════
 
 echo ">>> 1/12 Homebrew..."
@@ -17,90 +17,90 @@ if ! command -v brew &>/dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
-echo ">>> Homebrew пакеты..."
+echo ">>> Homebrew packages..."
 brew install python@3.12 node gh ffmpeg juliaup
 
-# GUI-приложения и крупные пакеты — официальные brew-каски (автообновление cask).
-# Guard: если приложение уже стоит вручную (не через каск) — каск не ставим,
-# чтобы не получить два экземпляра (напр. ParaView-6.2.0-RC1.app + ParaView.app).
-echo ">>> Brew-каски (GUI): wolfram-engine, paraview, mactex, tldraw..."
+# GUI applications and large packages — official brew casks (auto-updated by cask).
+# Guard: if an app was already installed manually (not via cask) — skip the cask,
+# to avoid two copies (e.g. ParaView-6.2.0-RC1.app + ParaView.app).
+echo ">>> Brew casks (GUI): wolfram-engine, paraview, mactex, tldraw..."
 for pair in "wolfram-engine Wolfram" "paraview ParaView-" "mactex TeX" "tldraw tldraw"; do
     set -- $pair; cask=$1; appdir=$2
     if brew list --cask "$cask" &>/dev/null; then
-        echo "  $cask: уже установлен (cask)"
+        echo "  $cask: already installed (cask)"
     elif ls -d /Applications/"$appdir"* >/dev/null 2>&1; then
-        echo "  $cask: приложение уже стоит вручную — каск не ставлю (удали ручную копию, если хочешь автообновление)"
+        echo "  $cask: app already installed manually — skipping cask (remove the manual copy if you want auto-updates)"
     elif brew install --cask "$cask" >/dev/null 2>&1; then
         echo "  $cask: ✅"
     else
-        echo "  $cask: ⚠️ не установился — поставь вручную: brew install --cask $cask"
+        echo "  $cask: ⚠️ not installed — install manually: brew install --cask $cask"
     fi
 done
 
-# VS Code: официальный каск, если CLI `code` недоступен (нужен для расширений стека)
+# VS Code: official cask if the `code` CLI is unavailable (needed for stack extensions)
 if ! command -v code &>/dev/null; then
     if brew install --cask visual-studio-code >/dev/null 2>&1; then
         echo "  visual-studio-code: ✅"
     else
-        echo "  visual-studio-code: ⚠️ поставь вручную: brew install --cask visual-studio-code"
+        echo "  visual-studio-code: ⚠️ install manually: brew install --cask visual-studio-code"
     fi
 else
-    echo "  vscode: уже установлен"
+    echo "  vscode: already installed"
 fi
 
-# OpenCode — официальный tap (update-all.sh обновляет этот же пакет)
+# OpenCode — official tap (update-all.sh updates the same package)
 if ! command -v opencode &>/dev/null; then
     brew tap anomalyco/tap >/dev/null 2>&1
     if brew install anomalyco/tap/opencode-v2 >/dev/null 2>&1; then
         echo "  opencode: ✅"
     else
-        echo "  opencode: ⚠️ поставь вручную (https://opencode.ai)"
+        echo "  opencode: ⚠️ install manually (https://opencode.ai)"
     fi
 else
-    echo "  opencode: уже установлен"
+    echo "  opencode: already installed"
 fi
 
-# Julia — через juliaup (не brew-julia: вся документация и check-all.sh
-# рассчитаны на ~/.juliaup/bin). release = актуальная стабильная версия.
-juliaup add release 2>/dev/null || echo "  Julia release уже установлен"
-juliaup default release 2>/dev/null || echo "  Julia default уже настроен"
+# Julia — via juliaup (not brew-julia: all the documentation and check-all.sh
+# expect ~/.juliaup/bin). release = current stable version.
+juliaup add release 2>/dev/null || echo "  Julia release already installed"
+juliaup default release 2>/dev/null || echo "  Julia default already configured"
 
-# Сеть стека: .zshrc должен source-ить proxy.sh (маршрутизация через ISP-прокси).
-# Управляется только эта строка — остальной .zshrc пользователя не трогается.
-# Стек требует zsh: без него .zshrc не читается вообще.
+# Stack networking: .zshrc must source proxy.sh (routing through the ISP proxy).
+# Only this line is managed — the rest of the user's .zshrc is untouched.
+# The stack requires zsh: without it .zshrc is never read at all.
 if command -v zsh &>/dev/null; then
     [ -f "$HOME/.zshrc" ] || touch "$HOME/.zshrc"
     if ! grep -q "stack/proxy.sh" "$HOME/.zshrc" 2>/dev/null; then
         cat >> "$HOME/.zshrc" << 'PROXYBLOCK'
 
-# === Stack network (managed; подробно: $STACK_DIR/proxy.sh) ===
+# === Stack network (managed; details: $STACK_DIR/proxy.sh) ===
 export TZ="Asia/Singapore"
 source "$STACK_DIR/proxy.sh"
 # === End Stack network ===
 PROXYBLOCK
-        echo "  .zshrc: добавлен source proxy.sh (перезапусти терминал)"
+        echo "  .zshrc: added source proxy.sh (restart the terminal)"
     else
-        echo "  .zshrc: proxy.sh уже подключён"
+        echo "  .zshrc: proxy.sh already connected"
     fi
 else
-    echo "  ⚠️ zsh не найден — блок прокси не добавлен (стек предполагает zsh как shell)"
+    echo "  ⚠️ zsh not found — proxy block not added (the stack assumes zsh as the shell)"
 fi
 
-# Wolfram AgentTools (paclet) — сразу, если Wolfram Engine уже установлен;
-# иначе поставится update-all.sh (шаг 10) после ручной установки Wolfram.
+# Wolfram AgentTools (paclet) — immediately if Wolfram Engine is already installed;
+# otherwise it will be installed by update-all.sh (step 10) after manual Wolfram install.
 if command -v wolframscript &>/dev/null; then
     wolframscript -code 'PacletInstall["Wolfram/AgentTools"]' >/dev/null 2>&1 \
-        && echo "  Wolfram AgentTools: установлен" \
-        || echo "  Wolfram AgentTools: не установился (повтори через update-all.sh)"
+        && echo "  Wolfram AgentTools: installed" \
+        || echo "  Wolfram AgentTools: not installed (retry via update-all.sh)"
 else
-    echo "  Wolfram Engine ещё не установлен — AgentTools поставится в update-all.sh"
+    echo "  Wolfram Engine not yet installed — AgentTools will be installed in update-all.sh"
 fi
 
 # ═══════════════════════════════════════
-# 2. ВНЕШНИЕ MCP РЕПОЗИТОРИИ
+# 2. EXTERNAL MCP REPOSITORIES
 # ═══════════════════════════════════════
 
-echo ">>> 2/12 Клонирование MCP серверов..."
+echo ">>> 2/12 Cloning MCP servers..."
 cd "$STACK_DIR"
 
 clone_if_missing() {
@@ -108,7 +108,7 @@ clone_if_missing() {
     if [ ! -d "$dir" ]; then
         git clone --depth 1 "$url" "$dir"
     else
-        echo "  $dir уже существует, пропускаю"
+        echo "  $dir already exists, skipping"
     fi
 }
 
@@ -135,7 +135,7 @@ create_venv() {
     pip install --upgrade pip
     pip install "$@"
     deactivate
-    echo "  $name готов"
+    echo "  $name ready"
 }
 
 create_venv manim-env manim manimgl "setuptools<81"
@@ -149,7 +149,7 @@ source "$STACK_DIR/paraview-mcp-env/bin/activate"
 pip install --upgrade pip
 pip install -r "$STACK_DIR/paraview-mcp/requirements.txt"
 deactivate
-echo "  paraview-mcp-env готов"
+echo "  paraview-mcp-env ready"
 
 # Julia MCP venv
 if [ ! -d "$STACK_DIR/julia-mcp-env" ]; then
@@ -159,10 +159,10 @@ source "$STACK_DIR/julia-mcp-env/bin/activate"
 pip install --upgrade pip
 pip install "mcp[cli]"
 deactivate
-echo "  julia-mcp-env готов"
+echo "  julia-mcp-env ready"
 
 # ═══════════════════════════════════════
-# 4. NODE.JS ЗАВИСИМОСТИ
+# 4. NODE.JS DEPENDENCIES
 # ═══════════════════════════════════════
 
 echo ">>> 4/12 tldraw MCP..."
@@ -171,16 +171,16 @@ npm install
 npm run build
 
 # ═══════════════════════════════════════
-# 5. GLOBAЛЬНЫЕ CLI
+# 5. GLOBAL CLIs
 # ═══════════════════════════════════════
 
-echo ">>> 5/12 CLI инструменты..."
+echo ">>> 5/12 CLI tools..."
 
 echo "  Firecrawl CLI..."
-npx -y firecrawl-cli@latest init -y --browser || echo "  Firecrawl: init пропущен (выполни вручную: firecrawl init)"
+npx -y firecrawl-cli@latest init -y --browser || echo "  Firecrawl: init skipped (run manually: firecrawl init)"
 
-# Firecrawl-скиллы: ставятся в глобальные каталоги, переносит их в
-# skills-store консолидация (шаг 9)
+# Firecrawl skills: installed into global directories; moved into
+# skills-store by the consolidation (step 9)
 firecrawl setup skills >/dev/null 2>&1 || true
 firecrawl setup build >/dev/null 2>&1 || true
 firecrawl setup workflows >/dev/null 2>&1 || true
@@ -189,35 +189,35 @@ echo "  tldraw CLI..."
 npm install -g --allow-scripts=puppeteer @kitschpatrol/tldraw-cli
 
 # ═══════════════════════════════════════
-# 6. BROWSER ДЛЯ RENDERS
+# 6. BROWSER FOR RENDERS
 # ═══════════════════════════════════════
 
-echo ">>> 6/12 Browser для render-visual и tldraw export..."
+echo ">>> 6/12 Browser for render-visual and tldraw export..."
 echo "  Installing Playwright Chromium..."
-npx -y playwright install chromium 2>/dev/null || echo "  Playwright: установи вручную (npx playwright install chromium)"
+npx -y playwright install chromium 2>/dev/null || echo "  Playwright: install manually (npx playwright install chromium)"
 echo "  Installing Puppeteer Chrome..."
 CHROME_VER=$(bash "$STACK_DIR/chrome-version.sh" 2>/dev/null)
 if [ -n "$CHROME_VER" ]; then
-    npx -y puppeteer browsers install "chrome@$CHROME_VER" 2>/dev/null || echo "  Puppeteer: установи вручную (npx puppeteer browsers install chrome@$CHROME_VER)"
+    npx -y puppeteer browsers install "chrome@$CHROME_VER" 2>/dev/null || echo "  Puppeteer: install manually (npx puppeteer browsers install chrome@$CHROME_VER)"
 else
-    echo "  tldraw-cli не установлен — Chrome пропущен (поставится при обновлении)"
+    echo "  tldraw-cli not installed — Chrome skipped (will be installed on update)"
 fi
 
 # ═══════════════════════════════════════
-# 7. CRAFT APPS CLI (офисные документы)
+# 7. CRAFT APPS CLI (office documents)
 # ═══════════════════════════════════════
 
-echo ">>> 7/12 Craft Apps CLI (headless, для MCP-серверов wordcraft/gridcraft/deckcraft/pdfcraft/figcraft)..."
+echo ">>> 7/12 Craft Apps CLI (headless, for the wordcraft/gridcraft/deckcraft/pdfcraft/figcraft MCP servers)..."
 mkdir -p "$STACK_DIR/craft-cli"
 CRAFT_REPOS="wordcraft gridcraft deckcraft pdfcraft figcraft"
-# Фолбэк на случай недоступности GitHub API (дальше update-all.sh поднимет
-# до актуальных версий сам).
+# Fallback in case the GitHub API is unavailable (update-all.sh will
+# upgrade to the current versions itself later).
 CRAFT_FALLBACK="wordcraft=0.18.1 gridcraft=0.19.1 deckcraft=0.18.1 pdfcraft=0.21.1 figcraft=0.18.1"
 for name in $CRAFT_REPOS; do
     ver=$(curl -s --max-time 20 "https://api.github.com/repos/storytold/$name/releases/latest" \
         | grep -o '"tag_name": "[^"]*"' | cut -d'"' -f4 | sed 's/^v//')
     [ -z "$ver" ] && ver=$(printf '%s' "$CRAFT_FALLBACK" | tr ' ' '\n' | grep "^$name=" | cut -d= -f2)
-    [ -z "$ver" ] && { echo "  $name-cli: версию не определил, пропускаю"; continue; }
+    [ -z "$ver" ] && { echo "  $name-cli: could not determine version, skipping"; continue; }
     BIN="$STACK_DIR/craft-cli/$name-cli"
     if [ ! -e "$BIN" ]; then
         TMPZIP="/tmp/$name-cli-$ver.zip"
@@ -227,24 +227,24 @@ for name in $CRAFT_REPOS; do
         && unzip -q -o "$TMPZIP" -d "$STACK_DIR/craft-cli/" \
         && ln -sfn "$name-cli-$ver-macos-universal/$name-cli" "$BIN" \
         && chmod +x "$STACK_DIR/craft-cli/$name-cli-$ver-macos-universal/$name-cli" \
-        && echo "  $name-cli: установлен (v$ver)" \
-        || echo "  $name-cli: не скачался (скачай $name-cli-*.zip с github.com/storytold/$name/releases)"
+        && echo "  $name-cli: installed (v$ver)" \
+        || echo "  $name-cli: download failed (download $name-cli-*.zip from github.com/storytold/$name/releases)"
         rm -f "$TMPZIP"
     else
-        echo "  $name-cli: уже есть"
+        echo "  $name-cli: already present"
     fi
 done
-echo "  GUI-приложения (WordCraft, GridCraft, DeckCraft, PdfCraft, FigCraft): bash $STACK_DIR/craft-install.sh — см. README «Manual steps»"
+echo "  GUI apps (WordCraft, GridCraft, DeckCraft, PdfCraft, FigCraft): bash $STACK_DIR/craft-install.sh — see README «Manual steps»"
 echo ""
 
 # ═══════════════════════════════════════
-# 8. VS CODE РАСШИРЕНИЯ
+# 8. VS CODE EXTENSIONS
 # ═══════════════════════════════════════
 
-echo ">>> 8/12 VS Code расширения..."
+echo ">>> 8/12 VS Code extensions..."
 if command -v code &>/dev/null; then
-    # Расширения стека: просмотр файлов (.tldr, .ipynb, .tex, .wl, .jl, .py)
-    # и языковая поддержка. code --install-extension идемпотентен.
+    # Stack extensions: file viewing (.tldr, .ipynb, .tex, .wl, .jl, .py)
+    # and language support. code --install-extension is idempotent.
     for ext in \
         tldraw-org.tldraw-vscode \
         ms-python.python \
@@ -254,33 +254,33 @@ if command -v code &>/dev/null; then
         james-yu.latex-workshop; do
         code --install-extension "$ext" --force >/dev/null 2>&1 \
             && echo "  $ext: ✅" \
-            || echo "  $ext: ⚠️ не установилось (проверь VS Code CLI)"
+            || echo "  $ext: ⚠️ failed to install (check the VS Code CLI)"
     done
 else
-    echo "  VS Code CLI (code) не найден — пропускаю (установи VS Code и повтори)"
+    echo "  VS Code CLI (code) not found — skipping (install VS Code and re-run)"
 fi
 echo ""
 
 # ═══════════════════════════════════════
-# 8. SKILLS (хранилище $STACK_DIR/skills-store)
+# 8. SKILLS (store: $STACK_DIR/skills-store)
 # ═══════════════════════════════════════
 
-echo ">>> 9/12 Skills (консолидация в $STACK_DIR/skills-store)..."
-# Firecrawl-скиллы поставлены firecrawl-cli init (шаг 5) — переносятся
-# в хранилище. Глобальные каталоги скиллов опустошаются: скиллы видны
-# только в проектах (подключаются через skills.paths в конфиге).
+echo ">>> 9/12 Skills (assemble into $STACK_DIR/skills-store)..."
+# Firecrawl skills were installed by firecrawl-cli init (step 5) — moved
+# into the store. Global skill directories are emptied: skills are visible
+# only in projects (attached via skills.paths in the config).
 if [ -d "$STACK_DIR/aris-research-repo" ]; then
-    bash "$STACK_DIR/sync-aris.sh" || echo "  ARIS: синхронизация пропущена"
+    bash "$STACK_DIR/sync-aris.sh" || echo "  ARIS: sync skipped"
 else
-    echo "  ARIS: клон не найден, пропускаю"
+    echo "  ARIS: clone not found, skipping"
 fi
 bash "$STACK_DIR/consolidate-skills.sh"
 
 # ═══════════════════════════════════════
-# 9. JULIA ПАКЕТЫ
+# 9. JULIA PACKAGES
 # ═══════════════════════════════════════
 
-echo ">>> 10/12 Julia пакеты..."
+echo ">>> 10/12 Julia packages..."
 julia -e '
 using Pkg
 Pkg.add([
@@ -289,42 +289,42 @@ Pkg.add([
     "DataFrames", "CSV", "ForwardDiff", "SymPy", "SpecialFunctions",
     "StatsBase", "Distributions", "Polynomials", "FFTW", "IterativeSolvers"
 ])
-' 2>/dev/null || echo "  Julia: установка пакетов пропущена (повтори вручную: julia → Pkg.add(...))"
+' 2>/dev/null || echo "  Julia: package install skipped (retry manually: julia → Pkg.add(...))"
 
 # ═══════════════════════════════════════
-# 10. OPENCODE КОНФИГ (проектный)
+# 10. OPENCODE CONFIG (project)
 # ═══════════════════════════════════════
 
-echo ">>> 11/12 Генерация конфига OpenCode..."
-# Стек поднимается ТОЛЬКО в проектах: конфиг пишется в .opencode/opencode.json
-# папки стека. Проекты получают такой же конфиг через sync-agents.sh
-# и new-project.sh. Глобальный ~/.config/opencode используется только для
-# клиентских настроек (permission), НЕ для MCP/скиллов.
+echo ">>> 11/12 Generating the OpenCode config..."
+# The stack is attached ONLY in projects: the config is written to
+# .opencode/opencode.json of the stack folder. Projects get the same config
+# via sync-agents.sh and new-project.sh. The global ~/.config/opencode is used
+# only for client settings (permission), NOT for MCP/skills.
 bash "$STACK_DIR/gen-opencode-config.sh" "$STACK_DIR"
 
 # ═══════════════════════════════════════
-# 11b. GITHUB CLI + ГЛОБАЛЬНЫЙ КЛИЕНТ-КОНФИГ
+# 11b. GITHUB CLI + GLOBAL CLIENT CONFIG
 # ═══════════════════════════════════════
 
-echo ">>> 11b/12 GitHub CLI (scopes) и permission-конфиг..."
-# gh-токен нужен с полными scopes — без них агент не сможет делать PR,
-# удалять/переносить репо, работать с организациями. Вход интерактивный,
-# делается ОДИН раз на машину (токен живёт в keyring и переживает перезапуски).
+echo ">>> 11b/12 GitHub CLI (scopes) and permission config..."
+# The gh token needs full scopes — without them the agent cannot make PRs,
+# delete/move repos, or work with organizations. Login is interactive and
+# done ONCE per machine (the token lives in the keyring and survives restarts).
 if ! command -v gh >/dev/null 2>&1; then
-    echo "  gh не найден, пропускаю"
+    echo "  gh not found, skipping"
 elif ! gh auth status >/dev/null 2>&1; then
-    echo "  gh не авторизован — запускаю вход (один раз на машину)..."
+    echo "  gh not authenticated — starting login (once per machine)..."
     gh auth login -h github.com -p ssh -s repo -s admin:org -s workflow -s admin:public_key -s delete_repo -s gist || \
-        echo "  ⚠️ вход не завершён — запусти позже: gh auth login -s repo,admin:org,workflow,admin:public_key,delete_repo,gist"
+        echo "  ⚠️ login not completed — run later: gh auth login -s repo,admin:org,workflow,admin:public_key,delete_repo,gist"
 elif ! gh auth status 2>&1 | grep -q "admin:org"; then
-    echo "  токен есть, но scopes неполные — расширяю (device-flow)..."
+    echo "  token present but scopes incomplete — extending (device-flow)..."
     gh auth refresh -h github.com -s admin:org -s workflow || \
-        echo "  ⚠️ не удалось — запусти позже: gh auth refresh -s admin:org -s workflow"
+        echo "  ⚠️ failed — run later: gh auth refresh -s admin:org -s workflow"
 else
-    echo "  gh: авторизован, scopes полные"
+    echo "  gh: authenticated, scopes complete"
 fi
-# Глобальный клиент-конфиг OpenCode: permission allow — агент не кликает
-# "allow" на каждое действие (это настройки клиента, не MCP/скиллы).
+# Global OpenCode client config: permission allow — the agent is not asked
+# to click "allow" on every action (these are client settings, not MCP/skills).
 OC_DIR="$HOME/.config/opencode"; mkdir -p "$OC_DIR"
 OC_CONF="$OC_DIR/opencode.jsonc"
 if [ ! -f "$OC_CONF" ]; then
@@ -340,44 +340,37 @@ if [ ! -f "$OC_CONF" ]; then
   }
 }
 EOF
-    echo "  $OC_CONF: создан (permission: allow)"
+    echo "  $OC_CONF: created (permission: allow)"
 else
-    echo "  $OC_CONF: уже существует, не трогаю"
+    echo "  $OC_CONF: already exists, not touching"
 fi
 
 # ═══════════════════════════════════════
-# 12. ПРОВЕРКА
+# 12. CHECK
 # ═══════════════════════════════════════
 
 echo ""
-echo ">>> 12/12 Проверка стека..."
+echo ">>> 12/12 Stack check..."
 bash "$STACK_DIR/check-all.sh"
 
 echo ""
 echo "============================================"
-echo "  Установка завершена!"
+echo "  Installation complete!"
 echo "============================================"
 echo ""
 
-# Форма первого старта: если пользователь её заполнил — применяем сразу
+# First-start form: if the user filled it in beforehand — apply it right away
 if [ -f "$STACK_DIR/first-start.txt" ]; then
-    echo ">>> Найдена форма первого старта — применяю..."
+    echo ">>> Found a filled first-start form — applying..."
     bash "$STACK_DIR/apply-first-start.sh" "$STACK_DIR/first-start.txt" || \
-        echo "  ⚠️ Форма не применилась (заполнено неполностью — исправь и перезапусти)"
-else
-    echo "Персональные данные (прокси, ключи) стек НЕ хранит в репозитории."
-    echo "Заполни форму и запусти:"
-    echo "  cp $STACK_DIR/first-start.template.txt $STACK_DIR/first-start.txt"
-    echo "  nano $STACK_DIR/first-start.txt && bash $STACK_DIR/apply-first-start.sh"
+        echo "  ⚠️ The form was not applied (incomplete — fix and re-run)"
 fi
-echo "Ручные шаги (если ещё не сделаны):"
-echo "  0. Открой НОВОЕ окно терминала (чтобы brew и инструменты попали в PATH)"
-echo "  1. Форма первого старта: cp $STACK_DIR/first-start.template.txt $STACK_DIR/first-start.txt → заполнить → bash $STACK_DIR/apply-first-start.sh; проверка: bash $STACK_DIR/proxy.sh test"
-echo "  2. Craft Apps GUI: bash $STACK_DIR/craft-install.sh"
-echo "  3. Wolfram активация: wolframscript (вход с Wolfram ID)"
-echo "  4. Firecrawl (опционально): firecrawl login --browser"
-echo "  5. Перезапусти OpenCode для применения MCP и skills"
+
+echo "Remaining setup (first-start form, Craft Apps GUI, Wolfram activation,"
+echo "Firecrawl login, project attach) is guided by the AI agent:"
 echo ""
-echo "Проверка: bash $STACK_DIR/check-all.sh"
-echo "Начать:"
-echo "  cd $STACK_DIR && opencode"
+echo "  cd \"$STACK_DIR\" && opencode"
+echo ""
+echo "Just start a session here and say \"set up the stack\" — the agent will"
+echo "walk you through every step and ask for anything it needs."
+echo "Re-check any time: bash \"$STACK_DIR/check-all.sh\""

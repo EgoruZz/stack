@@ -90,19 +90,17 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`)
 
 <div align="center">
 
-Only three things stay manual
+**You don't memorize any of them — the AI agent leads the setup.**
 
 </div>
 
 <div align="center">
 
-| Step | Why | How |
-|:---:|:---:|:---:|
-| **First-start form** | proxy, Wolfram ID, git identity, optional `AGENT_SUDO` | `cp ~/stack/first-start.template.txt ~/stack/first-start.txt` → fill it in → `bash ~/stack/apply-first-start.sh` |
-| **Craft Apps GUI** | Word/Excel/PPT/PDF apps are not installed by `setup.sh` (GUI installers) | `bash ~/stack/craft-install.sh` in your own terminal; check: `bash ~/stack/check-all.sh` (Craft Apps row) |
-| **Wolfram activation** | license for the MCP (renew every ~40 days) | `wolframscript` — sign in with a Wolfram ID; check: `bash ~/stack/check-wolfram-license.sh` |
-| **Firecrawl auth** *(optional)* | Firecrawl works per account: without signing in only a minimal anonymous quota is available, the free tier is enough | `firecrawl login --browser`; check: `firecrawl --status` |
-| **Restart OpenCode** | apply MCP servers and skills to new sessions | quit OpenCode, start it again in the project folder |
+| Step | Who does it |
+|:---:|:---:|
+| First-start form (proxy, git identity, Wolfram ID) | **The agent asks in chat, fills the form, applies it** |
+| Craft Apps GUI · Wolfram activation · Firecrawl login *(optional)* | The agent runs the scripts; you only confirm in the browser/enter a password when macOS asks |
+| Project attach | The agent runs `new-project.sh` for every folder you name |
 
 </div>
 
@@ -115,6 +113,7 @@ Only three things stay manual
 $ git clone https://github.com/custom-opencode/stack.git ~/stack   # или в любую другую папку
 $ cd ~/stack                                                       # <путь, куда склонировал>
 $ bash setup.sh
+$ opencode                                                         # say "set up the stack"
 ```
 
 > [!NOTE]
@@ -126,19 +125,9 @@ $ bash setup.sh
 - The first-start form is applied automatically if `first-start.txt` is filled in
 - GitHub CLI is authorized with full scopes automatically (one-time login on the first run)
 
-**After `setup.sh` — five manual steps (details in [Manual steps](#-manual-steps)):**
+**Then — `opencode` in the stack folder.** The agent walks you through everything that remains: asks for your proxy and git identity, fills the first-start form, installs the Craft Apps GUI, checks the Wolfram license, attaches your projects — and runs `check-all.sh` so you see every ✅. All you ever do interactively: type the password when macOS asks, confirm browser logins.
 
-1. **New terminal window** — so `brew` and the installed tools appear in `PATH`
-2. **First-start form** — `cp ~/stack/first-start.template.txt ~/stack/first-start.txt` → fill in (proxy, Wolfram ID, git identity) → `bash ~/stack/apply-first-start.sh`; then `bash ~/stack/proxy.sh test`
-3. **Craft Apps GUI** — `bash ~/stack/craft-install.sh` in your own terminal
-4. **Wolfram activation** — run `wolframscript`, sign in with a Wolfram ID (optional: fill `WOLFRAM_ID`/`WOLFRAM_PASS` in the form first — then activation goes non-interactive)
-5. **Restart OpenCode** — quit and start it again in the project folder, so MCP servers and skills are applied
-
-Then the first session:
-
-```shell
-$ cd ~/stack && opencode
-```
+The setup procedure the agent follows lives in `AGENTS.template.md` — nothing to memorize.
 
 <h2 align="center">📦 What's inside</h2>
 

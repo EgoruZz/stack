@@ -1,12 +1,12 @@
 #!/bin/bash
-# Установка/обновление GUI-приложений Craft Apps (ArtCraft) в /Applications
-# Заменяет ArtCraft Launcher: сам находит свежие версии на GitHub и
-# обновляет только те приложения, чья версия изменилась.
+# Install/update GUI Craft Apps (ArtCraft) applications in /Applications
+# Replaces ArtCraft Launcher: finds fresh versions on GitHub itself and
+# updates only the apps whose version changed.
 #
-# Запуск в ТЕРМИНАЛЕ пользователя (не из OpenCode — его песочница
-# блокирует hdiutil). Путь: $STACK_DIR/craft-install.sh. DMG кэшируются в
+# Run in the USER'S TERMINAL (not from OpenCode — its sandbox
+# blocks hdiutil). Path: $STACK_DIR/craft-install.sh. DMGs are cached in
 # $STACK_DIR/craft-downloads/ (gitignored).
-# блокирует hdiutil):
+# blocks hdiutil):
 #   bash $STACK_DIR/craft-downloads/install-craft-apps.sh [--force]
 set -uo pipefail
 
@@ -17,14 +17,14 @@ FORCE=${1:-}
 
 APPS="wordcraft gridcraft deckcraft pdfcraft figcraft"
 
-# Последняя версия приложения из GitHub API (тег vX.Y.Z -> X.Y.Z)
+# Latest app version from the GitHub API (tag vX.Y.Z -> X.Y.Z)
 latest_ver() {
     curl -sL --max-time 30 "https://api.github.com/repos/storytold/$1/releases/latest" \
         | grep -o '"tag_name": "[^"]*"' | cut -d'"' -f4 | sed 's/^v//'
 }
 
 installed_ver() {
-    # имя приложения в /Applications: wordcraft -> WordCraft и т.п.
+    # app name in /Applications: wordcraft -> WordCraft etc.
     local app
     case "$1" in
         wordcraft) app=WordCraft ;;
@@ -45,7 +45,7 @@ install_dmg() {
     mnt=$(hdiutil attach -nobrowse "$file" 2>/dev/null \
         | grep '/Volumes/' | sed 's/.*\(\/Volumes\/.*\)$/\1/' | tail -1)
     if [ -z "$mnt" ]; then
-        echo "   ❌ не смонтировался"
+        echo "   ❌ failed to mount"
         return 1
     fi
     app=$(ls -d "$mnt"/*.app 2>/dev/null | head -1)
@@ -53,7 +53,7 @@ install_dmg() {
         rm -rf "/Applications/$(basename "$app")"
         cp -R "$app" /Applications/ && echo "   ✅ $(basename "$app") → /Applications/"
     else
-        echo "   ❌ .app не найден в $mnt"
+        echo "   ❌ .app not found in $mnt"
     fi
     hdiutil detach "$mnt" -quiet 2>/dev/null
 }
@@ -61,36 +61,36 @@ install_dmg() {
 for name in $APPS; do
     VER=$(latest_ver "$name")
     if [ -z "$VER" ]; then
-        echo "── $name: не удалось получить версию с GitHub — пропускаю"
+        echo "── $name: could not get version from GitHub — skipping"
         continue
     fi
     CUR=$(installed_ver "$name")
     DMG="$name-$VER-macos-universal.dmg"
     if [ "$CUR" = "$VER" ] && [ "$FORCE" != "--force" ]; then
-        echo "── $name: v$VER установлена, актуально"
+        echo "── $name: v$VER installed, up to date"
         continue
     fi
     if [ -n "$CUR" ]; then
-        echo "── $name: обновление v$CUR → v$VER"
+        echo "── $name: updating v$CUR → v$VER"
     else
-        echo "── $name: установка v$VER"
+        echo "── $name: installing v$VER"
     fi
     if [ ! -f "$DIR/$DMG" ]; then
         curl -sL --max-time 600 -o "$DIR/$DMG" \
             "https://github.com/storytold/$name/releases/download/v$VER/$DMG" \
-            || { echo "   ❌ скачивание не удалось"; continue; }
+            || { echo "   ❌ download failed"; continue; }
     fi
     install_dmg "$DMG"
 done
 
 echo ""
-echo "Проверка:"
+echo "Verification:"
 for pair in "WordCraft wordcraft" "GridCraft gridcraft" "DeckCraft deckcraft" "PdfCraft pdfcraft" "FigCraft figcraft"; do
     set -- $pair
     V=$(installed_ver "$2")
-    [ -n "$V" ] && echo "  ✅ $1 v$V" || echo "  ❌ $1 не установлен"
+    [ -n "$V" ] && echo "  ✅ $1 v$V" || echo "  ❌ $1 not installed"
 done
 echo ""
-echo "CLI (headless, для MCP): $STACK_DIR/craft-cli/ — обновляются setup.sh,"
-echo "проверяются check-all.sh и update-all.sh."
-echo "После установки/обновления: перезапусти OpenCode."
+echo "CLI (headless, for MCP): $STACK_DIR/craft-cli/ — updated by setup.sh,"
+echo "checked by check-all.sh and update-all.sh."
+echo "After installing/updating: restart OpenCode."

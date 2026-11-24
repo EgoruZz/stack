@@ -1,9 +1,9 @@
 #!/bin/bash
-# Синхронизация ARIS-скиллов из клона в $STACK_DIR/skills-store/
-# Список скиллов: $STACK_DIR/aris-skills.txt (единый источник правды)
-# Использование:
-#   bash sync-aris.sh            # только синхронизация
-#   bash sync-aris.sh --update   # git pull клона + синхронизация
+# Sync ARIS skills from the clone into $STACK_DIR/skills-store/
+# Skill list: $STACK_DIR/aris-skills.txt (single source of truth)
+# Usage:
+#   bash sync-aris.sh            # sync only
+#   bash sync-aris.sh --update   # git pull the clone + sync
 
 set -uo pipefail
 
@@ -13,19 +13,19 @@ ARIS_REPO="$STACK_DIR/aris-research-repo"
 ARIS_LIST="$STACK_DIR/aris-skills.txt"
 
 if [ ! -f "$ARIS_LIST" ]; then
-    echo "ОШИБКА: $ARIS_LIST не найден"
+    echo "ERROR: $ARIS_LIST not found"
     exit 1
 fi
 
 if [ ! -d "$ARIS_REPO/skills" ]; then
-    echo "ОШИБКА: $ARIS_REPO/skills не найден (клон не установлен)"
-    echo "  Запусти: bash $STACK_DIR/setup.sh"
+    echo "ERROR: $ARIS_REPO/skills not found (clone not installed)"
+    echo "  Run: bash $STACK_DIR/setup.sh"
     exit 1
 fi
 
-# --update: сначала обновляем клон
+# --update: update the clone first
 if [ "${1:-}" = "--update" ]; then
-    (cd "$ARIS_REPO" && git pull --ff-only 2>/dev/null && echo "  ARIS репо обновлён" || echo "  ARIS репо: актуален или ошибка")
+    (cd "$ARIS_REPO" && git pull --ff-only 2>/dev/null && echo "  ARIS repo updated" || echo "  ARIS repo: already up to date or pull failed")
 fi
 
 mkdir -p "$SKILLS_DIR"
@@ -34,7 +34,7 @@ SYNCED=0
 MISSING=0
 
 while IFS= read -r skill || [ -n "$skill" ]; do
-    # Пропускаем комментарии и пустые строки
+    # Skip comments and empty lines
     [[ "$skill" =~ ^[[:space:]]*# ]] && continue
     [[ -z "${skill// }" ]] && continue
 
@@ -44,11 +44,11 @@ while IFS= read -r skill || [ -n "$skill" ]; do
         rsync -a --delete "$ARIS_REPO/skills/$skill/" "$SKILLS_DIR/$skill/" 2>/dev/null
         SYNCED=$((SYNCED + 1))
     else
-        echo "  $skill: не найден в ARIS репо — пропускаю"
+        echo "  $skill: not found in the ARIS repo — skipping"
         MISSING=$((MISSING + 1))
     fi
 done < "$ARIS_LIST"
 
-echo "  ARIS skills синхронизированы: $SYNCED"
-[ "$MISSING" -gt 0 ] && echo "  Не найдено в репо: $MISSING (проверь aris-skills.txt)"
+echo "  ARIS skills synced: $SYNCED"
+[ "$MISSING" -gt 0 ] && echo "  Not found in the repo: $MISSING (check aris-skills.txt)"
 exit 0

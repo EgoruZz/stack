@@ -14,7 +14,7 @@ STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REGISTRY="$STACK_DIR/projects.txt"
 
 if [ $# -eq 0 ]; then
-    echo "Использование: $0 <путь-к-проекту>"
+    echo "Usage: $0 <path-to-project>"
     exit 1
 fi
 
@@ -26,32 +26,32 @@ esac
 
 if [ ! -d "$INPUT_DIR" ]; then
     # Folder moved/deleted — detach is still possible: clean the registry only.
-    echo "⚠️ Папка не существует: $INPUT_DIR"
-    echo "   Отцеплю только запись в реестре (конфигов на диске уже нет)."
+    echo "⚠️ Folder does not exist: $INPUT_DIR"
+    echo "   Detaching the registry entry only (no config exists on disk)."
     if [ -f "$REGISTRY" ] && grep -qxF "$INPUT_DIR" "$REGISTRY"; then
         grep -vxF "$INPUT_DIR" "$REGISTRY" > "$REGISTRY.tmp" && mv "$REGISTRY.tmp" "$REGISTRY"
-        echo "  ✅ Убран из projects.txt"
+        echo "  ✅ Removed from projects.txt"
         exit 0
     else
-        echo "  ℹ️ В реестре не числился — делать нечего"
+        echo "  ℹ️ Not in the registry — nothing to do"
         exit 0
     fi
 fi
 PROJECT_DIR=$(cd "$INPUT_DIR" && pwd)
 
 if [ "$PROJECT_DIR" = "$STACK_DIR" ]; then
-    echo "❌ Нельзя отцепить сам стек"
+    echo "❌ Cannot detach the stack itself"
     exit 1
 fi
 
-echo "=== Отцепление стека: $PROJECT_DIR ==="
+echo "=== Detaching the stack: $PROJECT_DIR ==="
 
 # 1. OpenCode config
 if [ -d "$PROJECT_DIR/.opencode" ]; then
     rm -rf "$PROJECT_DIR/.opencode"
-    echo "  ✅ .opencode/ удалён (MCP и скиллы больше не видны в этой папке)"
+    echo "  ✅ .opencode/ removed (MCP and skills no longer visible in this folder)"
 else
-    echo "  ℹ️ .opencode/ не было"
+    echo "  ℹ️ No .opencode/ present"
 fi
 
 # 2. AGENTS.md: remove the stack section if present
@@ -63,20 +63,20 @@ p = sys.argv[1]
 s = open(p).read()
 s2 = re.sub(r'<!-- STACK:START -->.*?<!-- STACK:END -->\n?', '', s, flags=re.DOTALL)
 open(p, 'w').write(s2)
-print("  ✅ stack-секция убрана из AGENTS.md (остальное содержимое сохранено)")
+print("  ✅ stack section removed from AGENTS.md (the rest of the file is preserved)")
 PYEOF
 else
-    echo "  ℹ️ AGENTS.md без stack-секции"
+    echo "  ℹ️ AGENTS.md has no stack section"
 fi
 
 # 3. Registry
 if [ -f "$REGISTRY" ] && grep -qxF "$PROJECT_DIR" "$REGISTRY"; then
     grep -vxF "$PROJECT_DIR" "$REGISTRY" > "$REGISTRY.tmp" && mv "$REGISTRY.tmp" "$REGISTRY"
-    echo "  ✅ Убран из projects.txt"
+    echo "  ✅ Removed from projects.txt"
 else
-    echo "  ℹ️ В реестре не числился"
+    echo "  ℹ️ Was not in the registry"
 fi
 
 echo ""
-echo "✅ Готово: стек отцеплён от $PROJECT_DIR"
-echo "   Вернуть: bash $STACK_DIR/new-project.sh $PROJECT_DIR"
+echo "✅ Done: the stack is detached from $PROJECT_DIR"
+echo "   Re-attach: bash $STACK_DIR/new-project.sh $PROJECT_DIR"

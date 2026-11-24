@@ -1,95 +1,95 @@
 #!/bin/bash
-# Скрипт полного обновления всего стека
-# Запуск: cd $STACK_DIR && bash update-all.sh
-# Обновляет: brew, Apple CLT/систему, внешние репозитории, tldraw-mcp,
-#            Python venv, npm CLI, VS Code расширения, ARIS skills,
-#            standalone skills, Julia, Wolfram, Craft Apps
+# Full stack update script
+# Run: cd $STACK_DIR && bash update-all.sh
+# Updates: brew, Apple CLT/system, external repos, tldraw-mcp,
+#          Python venvs, npm CLIs, VS Code extensions, ARIS skills,
+#          standalone skills, Julia, Wolfram, Craft Apps
 
 set -uo pipefail
 
 STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "============================================"
-echo "  Обновление стека"
+echo "  Stack update"
 echo "============================================"
 echo ""
 
 # ═══════════════════════════════════════
-# 1. GIT PULL (сам репозиторий)
+# 1. GIT PULL (the repo itself)
 # ═══════════════════════════════════════
 
-echo ">>> 1/15 Репозиторий..."
+echo ">>> 1/15 Repository..."
 cd "$STACK_DIR"
-git pull --ff-only 2>/dev/null && echo "  Репозиторий обновлён" || echo "  Репозиторий уже актуален или ошибка"
+git pull --ff-only 2>/dev/null && echo "  Repository updated" || echo "  Repository already up to date or error"
 echo ""
 
 # ═══════════════════════════════════════
-# 2. HOMEBREW (только стек-пакеты)
+# 2. HOMEBREW (stack packages only)
 # ═══════════════════════════════════════
 
-echo ">>> 2/15 Homebrew (только стек-пакеты)..."
+echo ">>> 2/15 Homebrew (stack packages only)..."
 brew update
-brew upgrade node python@3.12 gh ffmpeg ripgrep anomalyco/tap/opencode-v2 2>/dev/null || echo "  brew: часть пакетов обновлена"
+brew upgrade node python@3.12 gh ffmpeg ripgrep anomalyco/tap/opencode-v2 2>/dev/null || echo "  brew: some packages updated"
 brew cleanup --prune=all --quiet 2>/dev/null
 echo ""
-echo ">>> 3/15 Apple (Command Line Tools, системные обновления)..."
-# CLT обновляются через softwareupdate (не через brew). Устаревший CLT
-# ломает сборку brew-формул из исходников (см. инцидент с pkgconf).
+echo ">>> 3/15 Apple (Command Line Tools, system updates)..."
+# CLT is updated via softwareupdate (not via brew). An outdated CLT
+# breaks building brew formulae from source (see the pkgconf incident).
 CLT_PATH=$(xcode-select -p 2>/dev/null)
 if [ -n "$CLT_PATH" ] && [ "$CLT_PATH" != "xcode-select: error: unable to get active developer directory..." ]; then
     CLT_VER=$(pkgutil --pkg-info=com.apple.pkg.CLTools_Executables 2>/dev/null | awk '/version:/ {print $2}')
-    echo "  CLT: ${CLT_VER:-версия не определена} ($CLT_PATH)"
+    echo "  CLT: ${CLT_VER:-version unknown} ($CLT_PATH)"
 else
-    echo "  ⚠️ CLT не активен — xcode-select --install"
+    echo "  ⚠️ CLT not active — xcode-select --install"
 fi
 SU_LIST=$(softwareupdate --list 2>/dev/null)
 CLT_LABEL=$(printf '%s' "$SU_LIST" | sed -n 's/.*Label: \(.*Command Line Tools[^,]*\).*/\1/p' | head -1)
 if [ -n "$CLT_LABEL" ]; then
-    echo "  Доступно обновление CLT: $CLT_LABEL"
+    echo "  CLT update available: $CLT_LABEL"
     if sudo -n true 2>/dev/null; then
-        softwareupdate -i "$CLT_LABEL" --quiet 2>/dev/null && echo "  ✅ CLT обновлён" || echo "  ❌ установка CLT не удалась — обнови вручную"
+        softwareupdate -i "$CLT_LABEL" --quiet 2>/dev/null && echo "  ✅ CLT updated" || echo "  ❌ CLT install failed — update manually"
     else
-        echo "  ⚠️ нужен sudo — запусти вручную: sudo softwareupdate -i \"$CLT_LABEL\""
+        echo "  ⚠️ sudo required — run manually: sudo softwareupdate -i \"$CLT_LABEL\""
     fi
 else
-    echo "  CLT: обновлений нет"
+    echo "  CLT: no updates"
 fi
 if printf '%s' "$SU_LIST" | grep -q "Label" && [ -z "$CLT_LABEL" ]; then
-    echo "  ⚠️ Есть обновления macOS — установи в System Settings → Software Update"
+    echo "  ⚠️ macOS updates available — install in System Settings → Software Update"
 fi
 echo ""
 
 # ═══════════════════════════════════════
-# 3. ВНЕШНИЕ MCP РЕПОЗИТОРИИ
+# 3. EXTERNAL MCP REPOS
 # ═══════════════════════════════════════
 
-echo ">>> 4/15 Внешние MCP репозитории..."
+echo ">>> 4/15 External MCP repositories..."
 for repo in paraview-mcp manim-mcp julia-mcp tldraw-mcp WolframLanguageForJupyter; do
     if [ -d "$STACK_DIR/$repo" ]; then
-        (cd "$STACK_DIR/$repo" && git pull --ff-only 2>/dev/null && echo "  $repo: обновлён" || echo "  $repo: актуален или ошибка")
+        (cd "$STACK_DIR/$repo" && git pull --ff-only 2>/dev/null && echo "  $repo: updated" || echo "  $repo: up to date or error")
     else
-        echo "  $repo: не найден, пропускаю"
+        echo "  $repo: not found, skipping"
     fi
 done
 echo ""
 
 # ═══════════════════════════════════════
-# 4. TLDRAW MCP СБОРКА
+# 4. TLDRAW MCP BUILD
 # ═══════════════════════════════════════
 
-echo ">>> 5/15 tldraw MCP сборка..."
+echo ">>> 5/15 tldraw MCP build..."
 if [ -d "$STACK_DIR/tldraw-mcp" ]; then
     cd "$STACK_DIR/tldraw-mcp"
-    npm install --silent || echo "  npm install: ошибка (проверь сеть)"
-    npm run build --silent || echo "  npm build: ошибка"
-    echo "  tldraw-mcp собран"
+    npm install --silent || echo "  npm install: error (check the network)"
+    npm run build --silent || echo "  npm build: error"
+    echo "  tldraw-mcp built"
 else
-    echo "  tldraw-mcp: не найден, пропускаю"
+    echo "  tldraw-mcp: not found, skipping"
 fi
 echo ""
 
 # ═══════════════════════════════════════
-# 5. PYTHON VENV (4 шт.)
+# 5. PYTHON VENVS (4)
 # ═══════════════════════════════════════
 
 echo ">>> 6/15 Python venv..."
@@ -98,13 +98,13 @@ update_venv() {
     local name=$1; shift
     local dir="$STACK_DIR/$name"
     if [ ! -d "$dir" ]; then
-        echo "  $name: не найден, пропускаю"
+        echo "  $name: not found, skipping"
         return
     fi
     source "$dir/bin/activate"
     pip install --upgrade --quiet "$@" 2>/dev/null
     deactivate
-    echo "  $name: обновлён"
+    echo "  $name: updated"
 }
 
 update_venv manim-env manim manimgl
@@ -115,9 +115,9 @@ if [ -d "$STACK_DIR/paraview-mcp-env" ]; then
     source "$STACK_DIR/paraview-mcp-env/bin/activate"
     pip install --upgrade --quiet -r "$STACK_DIR/paraview-mcp/requirements.txt" 2>/dev/null
     deactivate
-    echo "  paraview-mcp-env: обновлён"
+    echo "  paraview-mcp-env: updated"
 else
-    echo "  paraview-mcp-env: не найден, пропускаю"
+    echo "  paraview-mcp-env: not found, skipping"
 fi
 
 # Julia MCP venv
@@ -125,9 +125,9 @@ if [ -d "$STACK_DIR/julia-mcp-env" ]; then
     source "$STACK_DIR/julia-mcp-env/bin/activate"
     pip install --upgrade --quiet "mcp[cli]" 2>/dev/null
     deactivate
-    echo "  julia-mcp-env: обновлён"
+    echo "  julia-mcp-env: updated"
 else
-    echo "  julia-mcp-env: не найден, пропускаю"
+    echo "  julia-mcp-env: not found, skipping"
 fi
 echo ""
 
@@ -136,54 +136,54 @@ echo ""
 # ═══════════════════════════════════════
 
 echo ">>> 7/15 npm global CLI..."
-npm install -g --allow-scripts=puppeteer firecrawl-cli@latest @kitschpatrol/tldraw-cli@latest || echo "  npm: обновление частичное (возможно нужен sudo или проверь сеть)"
-echo "  firecrawl-cli: $(firecrawl --version 2>/dev/null || echo 'не установлен')"
-echo "  tldraw CLI: $(tldraw --version 2>/dev/null || echo 'не установлен')"
+npm install -g --allow-scripts=puppeteer firecrawl-cli@latest @kitschpatrol/tldraw-cli@latest || echo "  npm: partial update (sudo may be needed, or check the network)"
+echo "  firecrawl-cli: $(firecrawl --version 2>/dev/null || echo 'not installed')"
+echo "  tldraw CLI: $(tldraw --version 2>/dev/null || echo 'not installed')"
 
-# Firecrawl: обновление скиллов (core + build + workflows) из свежего CLI.
-# Ставятся во временные глобальные каталоги — consolidate-skills.sh (шаг 8)
-# переносит их в $STACK_DIR/skills-store и очищает глобальные каталоги.
+# Firecrawl: update skills (core + build + workflows) from the fresh CLI.
+# Installed into temporary global directories — consolidate-skills.sh (step 8)
+# moves them into $STACK_DIR/skills-store and cleans the global directories.
 echo "  Firecrawl skills..."
 firecrawl setup skills >/dev/null 2>&1 || true
 firecrawl setup build >/dev/null 2>&1 || true
 firecrawl setup workflows >/dev/null 2>&1 || true
 
-# Chrome под tldraw export — версия берётся из пина установленного tldraw-cli
+# Chrome for tldraw export — version comes from the pin of the installed tldraw-cli
 CHROME_VER=$(bash "$STACK_DIR/chrome-version.sh" 2>/dev/null)
 if [ -n "$CHROME_VER" ]; then
     if ls ~/.cache/puppeteer/chrome/ 2>/dev/null | grep -q "$CHROME_VER"; then
-        echo "  Chrome $CHROME_VER: уже установлен"
+        echo "  Chrome $CHROME_VER: already installed"
     else
-        echo "  Chrome $CHROME_VER: устанавливаю под tldraw export..."
-        npx -y puppeteer browsers install "chrome@$CHROME_VER" 2>/dev/null || echo "  Chrome: установка пропущена"
+        echo "  Chrome $CHROME_VER: installing for tldraw export..."
+        npx -y puppeteer browsers install "chrome@$CHROME_VER" 2>/dev/null || echo "  Chrome: install skipped"
     fi
 else
-    echo "  Chrome: tldraw-cli не найден, пропускаю"
+    echo "  Chrome: tldraw-cli not found, skipping"
 fi
 echo ""
 
 # ═══════════════════════════════════════
-# 8. VS CODE РАСШИРЕНИЯ
+# 8. VS CODE EXTENSIONS
 # ═══════════════════════════════════════
 
-echo ">>> 8/15 VS Code расширения..."
+echo ">>> 8/15 VS Code extensions..."
 if command -v code >/dev/null 2>&1; then
-    code --update-extensions >/dev/null 2>&1 && echo "  Расширения: обновлены" || echo "  Расширения: обновление пропущено"
-    echo "  VS Code сам обновляется автоматически (self-update)"
+    code --update-extensions >/dev/null 2>&1 && echo "  Extensions: updated" || echo "  Extensions: update skipped"
+    echo "  VS Code updates itself automatically (self-update)"
 else
-    echo "  code CLI не найден, пропускаю"
+    echo "  code CLI not found, skipping"
 fi
 echo ""
 
 # ═══════════════════════════════════════
-# 7. ARIS SKILLS (список из aris-skills.txt)
+# 7. ARIS SKILLS (list from aris-skills.txt)
 # ═══════════════════════════════════════
 
 echo ">>> 9/15 ARIS skills..."
 if [ -d "$STACK_DIR/aris-research-repo" ]; then
-    bash "$STACK_DIR/sync-aris.sh" --update || echo "  ARIS: синхронизация пропущена"
+    bash "$STACK_DIR/sync-aris.sh" --update || echo "  ARIS: sync skipped"
 else
-    echo "  ARIS: клон не найден, пропускаю"
+    echo "  ARIS: clone not found, skipping"
 fi
 echo ""
 
@@ -191,17 +191,17 @@ echo ""
 # 8. STANDALONE SKILLS
 # ═══════════════════════════════════════
 
-echo ">>> 10/15 Skills (консолидация в $STACK_DIR/skills-store)..."
-bash "$STACK_DIR/consolidate-skills.sh" || echo "  Консолидация: пропущена"
+echo ">>> 10/15 Skills (assemble into $STACK_DIR/skills-store)..."
+bash "$STACK_DIR/consolidate-skills.sh" || echo "  Consolidation: skipped"
 echo ""
 
 # ═══════════════════════════════════════
-# 9. JULIA (миграция окружения + IJulia)
+# 9. JULIA (environment migration + IJulia)
 # ═══════════════════════════════════════
 
 echo ">>> 11/15 Julia..."
 
-# Запоминаем текущее окружение
+# Remember the current environment
 OLD_ENV=""
 for d in ~/.julia/environments/v*; do
     [ -d "$d" ] && OLD_ENV="$d"
@@ -209,24 +209,25 @@ done
 
 juliaup update 2>/dev/null
 
-# Определяем новую версию Julia
+# Determine the new Julia version
 JULIA_VER=$(julia -e 'println(VERSION.major, ".", VERSION.minor)' 2>/dev/null)
 NEW_ENV="$HOME/.julia/environments/v$JULIA_VER"
 
-# Гарантируем существование нового окружения: после juliaup update директория
-# v$JULIA_VER ещё не создана — без этого миграция молча пропускалась бы.
+# Ensure the new environment exists: after juliaup update the
+# v$JULIA_VER directory is not yet created — without this the migration
+# would be silently skipped.
 mkdir -p "$NEW_ENV"
 if [ ! -f "$NEW_ENV/Project.toml" ]; then
-    printf '\n' > "$NEW_ENV/Project.toml"   # пустой манифест (без секции [deps])
+    printf '\n' > "$NEW_ENV/Project.toml"   # empty manifest (no [deps] section)
 fi
 
-# Если окружение новое (пустое) — мигрируем пакеты из старого
+# If the environment is new (empty) — migrate packages from the old one
 if [ -d "$NEW_ENV" ] && [ -n "$OLD_ENV" ] && [ "$OLD_ENV" != "$NEW_ENV" ]; then
     if grep -q "^\[" "$NEW_ENV/Project.toml" 2>/dev/null; then
-        echo "  Julia v$JULIA_VER окружение уже содержит пакеты"
+        echo "  Julia v$JULIA_VER environment already contains packages"
     elif grep -q "^\[" "$OLD_ENV/Project.toml" 2>/dev/null; then
-        echo "  Миграция пакетов: $(basename "$OLD_ENV") → $(basename "$NEW_ENV")"
-        # Извлекаем имена пакетов из [deps] секции и создаём Julia-массив
+        echo "  Migrating packages: $(basename "$OLD_ENV") → $(basename "$NEW_ENV")"
+        # Extract package names from the [deps] section and build a Julia array
         PACKAGES_JL=$(python3 - "$OLD_ENV/Project.toml" << 'PYEOF'
 import sys
 with open(sys.argv[1]) as f:
@@ -246,29 +247,29 @@ print('[' + ', '.join('"' + p + '"' for p in packages) + ']')
 PYEOF
 )
         if [ -n "$PACKAGES_JL" ] && [ "$PACKAGES_JL" != "[]" ]; then
-            echo "  Переношу: $PACKAGES_JL"
-            julia -e "using Pkg; Pkg.add($PACKAGES_JL)" 2>/dev/null || echo "  Миграция: пропущена (ошибка)"
+            echo "  Migrating: $PACKAGES_JL"
+            julia -e "using Pkg; Pkg.add($PACKAGES_JL)" 2>/dev/null || echo "  Migration: skipped (error)"
         fi
     fi
 fi
 
-# Обновляем пакеты в текущем окружении
-julia -e 'using Pkg; Pkg.update()' 2>/dev/null || echo "  Julia packages: обновление пропущено"
+# Update packages in the current environment
+julia -e 'using Pkg; Pkg.update()' 2>/dev/null || echo "  Julia packages: update skipped"
 
-# Проверяем и собираем IJulia если нужно
+# Check and build IJulia if needed
 julia -e '
 try
     using IJulia
     println("  IJulia: OK")
 catch
-    println("  IJulia: собираю и регистрирую kernel...")
+    println("  IJulia: building and registering kernel...")
     using Pkg
     Pkg.build("IJulia")
     using IJulia
     installkernel("Julia $(Base.VERSION.major).$(Base.VERSION.minor)")
-    println("  IJulia kernel установлен")
+    println("  IJulia kernel installed")
 end
-' 2>/dev/null || echo "  IJulia: пропущен"
+' 2>/dev/null || echo "  IJulia: skipped"
 echo ""
 
 # ═══════════════════════════════════════
@@ -285,21 +286,21 @@ if [ -n "$WOLFRAM_VER" ]; then
         WEXP=$(date -j -f "%Y-%m-%d" "$WYEAR-$(printf '%02d' $WMONTH)-$(printf '%02d' $WDAY)" +%s 2>/dev/null)
         WDAYS=$(( ($WEXP - $(date +%s)) / 86400 ))
         if [ "$WDAYS" -lt 0 ]; then
-            echo "  ⚠️ Лицензия Wolfram ИСТЕКЛА — MCP не подключится! Продли: https://www.wolfram.com/engine/ и запусти wolframscript -activate"
+            echo "  ⚠️ Wolfram license EXPIRED — the MCP will not connect! Renew: https://www.wolfram.com/engine/ and run wolframscript -activate"
         elif [ "$WDAYS" -lt 14 ]; then
-            echo "  ⚠️ Лицензия Wolfram: $WDAYS дн. — продлевай: https://www.wolfram.com/engine/"
+            echo "  ⚠️ Wolfram license: $WDAYS days — renew: https://www.wolfram.com/engine/"
         else
-            echo "  Лицензия Wolfram: $WDAYS дн."
+            echo "  Wolfram license: $WDAYS days"
         fi
     fi
 else
-    echo "  Wolfram: обновление пропущено (проверь лицензию)"
+    echo "  Wolfram: update skipped (check the license)"
 fi
 echo ""
 
-# Craft Apps (WordCraft, GridCraft, DeckCraft, PdfCraft, FigCraft): сравниваем
-# установленную версию с последним GitHub-релизом. GUI-обновления идут
-# через craft-install.sh — здесь только проверка + headless-CLI.
+# Craft Apps (WordCraft, GridCraft, DeckCraft, PdfCraft, FigCraft): compare
+# the installed version with the latest GitHub release. GUI updates go
+# through craft-install.sh — here only checking + headless CLI.
 echo "  Craft Apps..."
 for repo in wordcraft gridcraft deckcraft pdfcraft figcraft; do
     case "$repo" in
@@ -315,14 +316,14 @@ for repo in wordcraft gridcraft deckcraft pdfcraft figcraft; do
     LATEST=$(curl -s --max-time 20 "https://api.github.com/repos/storytold/$repo/releases/latest" \
         | grep -o '"tag_name": "[^"]*"' | cut -d'"' -f4 | sed 's/^v//')
     if [ -z "$INSTALLED" ]; then
-        echo "  $APP_NAME: не установлен (ставится: bash $STACK_DIR/craft-install.sh)"
+        echo "  $APP_NAME: not installed (install: bash $STACK_DIR/craft-install.sh)"
     elif [ -n "$LATEST" ] && [ "$INSTALLED" != "$LATEST" ]; then
-        echo "  $APP_NAME: $INSTALLED → $LATEST доступна — обнови: bash $STACK_DIR/craft-install.sh"
+        echo "  $APP_NAME: $INSTALLED → $LATEST available — update: bash $STACK_DIR/craft-install.sh"
     else
-        echo "  $APP_NAME: $INSTALLED актуальна"
+        echo "  $APP_NAME: $INSTALLED up to date"
     fi
-    # Headless-CLI: синхронизируем со свежим релизом (ставит/обновляет при
-    # несовпадении с $LATEST)
+    # Headless CLI: sync with the fresh release (installs/updates when
+    # it differs from $LATEST)
     CLIBIN="$STACK_DIR/craft-cli/$repo-cli"
     CLIVER="$LATEST"
     NEED_CLI=0
@@ -339,54 +340,54 @@ for repo in wordcraft gridcraft deckcraft pdfcraft figcraft; do
             unzip -q -o "$TMPZIP" -d "$STACK_DIR/craft-cli/" \
                 && ln -sfn "$repo-cli-$CLIVER-macos-universal/$repo-cli" "$CLIBIN" \
                 && chmod +x "$STACK_DIR/craft-cli/$repo-cli-$CLIVER-macos-universal/$repo-cli" \
-                && echo "  $APP_NAME CLI: установлен/обновлён до $CLIVER"
+                && echo "  $APP_NAME CLI: installed/updated to $CLIVER"
             rm -f "$TMPZIP"
         else
-            echo "  $APP_NAME CLI: скачивание не удалось"
+            echo "  $APP_NAME CLI: download failed"
         fi
     fi
 done
-# ── Firecrawl: кредиты учётки (обновляются раз в месяц) ──
-echo "  Firecrawl кредиты..."
+# ── Firecrawl: account credits (refresh monthly) ──
+echo "  Firecrawl credits..."
 FC=$(firecrawl credits 2>/dev/null | grep -m1 "Remaining Credits" | grep -o "[0-9,]\+" | tr -d ',')
 if [ -n "$FC" ]; then
-    echo "  Firecrawl: осталось $FC кредитов"
-    [ "$FC" -lt 100 ] 2>/dev/null && echo "  ⚠️ кредиты кончаются — без логина работает бесплатный tier"
+    echo "  Firecrawl: $FC credits left"
+    [ "$FC" -lt 100 ] 2>/dev/null && echo "  ⚠️ credits running out — without login only the free tier works"
 else
-    echo "  Firecrawl кредиты: не удалось получить (нет логина?)"
+    echo "  Firecrawl credits: could not get (not logged in?)"
 fi
 
-# ── Срок подписки ISP-прокси ──
-echo "  Прокси..."
-bash "$STACK_DIR/proxy.sh" expiry 2>/dev/null || echo "  ⚠️ проверка прокси не прошла"
+# ── ISP proxy subscription expiry ──
+echo "  Proxy..."
+bash "$STACK_DIR/proxy.sh" expiry 2>/dev/null || echo "  ⚠️ proxy check failed"
 echo ""
 
 # ═══════════════════════════════════════
-# 11. ПРОВЕРКА
+# 11. CHECK
 # ═══════════════════════════════════════
 
-echo ">>> 13/15 Проверка стека..."
+echo ">>> 13/15 Stack check..."
 bash "$STACK_DIR/check-all.sh"
 
 # ═══════════════════════════════════════
-# 12. СИНХРОНИЗАЦИЯ AGENTS.md
+# 12. AGENTS.md SYNC
 # ═══════════════════════════════════════
 
 echo ""
-echo ">>> 14/15 Синхронизация AGENTS.md..."
+echo ">>> 14/15 AGENTS.md sync..."
 bash "$STACK_DIR/sync-agents.sh" --no-hint
 
 # ═══════════════════════════════════════
-# 13. ФИНАЛ
+# 13. FINAL
 # ═══════════════════════════════════════
 
 echo ""
-echo ">>> 15/15 Финал..."
+echo ">>> 15/15 Final..."
 echo "============================================"
-echo "  Обновление завершено!"
+echo "  Update complete!"
 echo "============================================"
 echo ""
-echo "⚠️  Перезапусти OpenCode для применения изменений:"
-echo "  1. Закрой все открытые сессии OpenCode"
-echo "  2. Запусти заново: cd ~/проект && opencode"
+echo "⚠️  Restart OpenCode to apply the changes:"
+echo "  1. Close all open OpenCode sessions"
+echo "  2. Start again: cd ~/project && opencode"
 echo ""

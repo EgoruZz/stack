@@ -1,9 +1,9 @@
 #!/bin/bash
-# Определяет версию Chrome, закреплённую установленным tldraw-cli
-# (через его bundled puppeteer). Печатает версию или ничего.
-# Использование:
-#   VER=$(bash $STACK_DIR/chrome-version.sh)     # получить версию
-#   bash $STACK_DIR/chrome-version.sh            # напечатать
+# Detect the Chrome version pinned by the installed tldraw-cli
+# (via its bundled puppeteer). Prints the version or nothing.
+# Usage:
+#   VER=$(bash $STACK_DIR/chrome-version.sh)     # get version
+#   bash $STACK_DIR/chrome-version.sh            # print
 
 set -uo pipefail
 
@@ -14,7 +14,7 @@ if [ ! -d "$TLDRAW_PUPPETEER" ]; then
     exit 1
 fi
 
-# executablePath() отдаёт путь с закреплённой версией:
+# executablePath() returns a path with the pinned version:
 # ~/.cache/puppeteer/chrome/mac_arm-<version>/...
 CHROME_PATH=$(node -e "require('$TLDRAW_PUPPETEER').executablePath().then(p => console.log(p)).catch(() => process.exit(1))" 2>/dev/null)
 
@@ -22,7 +22,7 @@ if [ -z "$CHROME_PATH" ]; then
     exit 1
 fi
 
-# Извлекаем версию X.Y.Z.W из пути
+# Extract the X.Y.Z.W version from the path
 VER=$(echo "$CHROME_PATH" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' | head -1)
 
 if [ -n "$VER" ]; then

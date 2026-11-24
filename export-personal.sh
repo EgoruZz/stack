@@ -18,7 +18,7 @@ STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEST="${1:-$HOME/stack-personal-backup-$(date +%F)}"
 
 if [ -e "$DEST" ] && [ -n "$(ls -A "$DEST" 2>/dev/null)" ]; then
-    echo "❌ Целевая папка не пуста: $DEST — укажи другую"
+    echo "❌ Target folder is not empty: $DEST — choose another one"
     exit 1
 fi
 mkdir -p "$DEST"
@@ -28,22 +28,22 @@ copy() {
     if [ -e "$1" ]; then
         cp -R "$1" "$DEST/" && echo "  ✅ $1" && COPIED=$((COPIED + 1))
     else
-        echo "  ℹ️ нет: $1"
+        echo "  ℹ️ missing: $1"
     fi
 }
 
-echo "=== Сбор личных данных стека → $DEST ==="
+echo "=== Collecting stack personal data → $DEST ==="
 copy "$STACK_DIR/projects.txt"
 copy "$STACK_DIR/first-start.txt"
 copy "$HOME/.stack-secrets.sh"
 copy "$HOME/skills"
 
 echo ""
-echo "✅ Готово ($COPIED шт.): $DEST"
+echo "✅ Done ($COPIED items): $DEST"
 echo ""
-echo "Восстановление на другой машине (после setup.sh):"
-echo "  cp <папка>/projects.txt <папка>/first-start.txt \$STACK_DIR/"
-echo "  cp <папка>/.stack-secrets.sh ~/"
-echo "  cp -R <папка>/skills ~/   # если был tldraw-offline"
+echo "Restore on another machine (after setup.sh):"
+echo "  cp <folder>/projects.txt <folder>/first-start.txt \$STACK_DIR/"
+echo "  cp <folder>/.stack-secrets.sh ~/"
+echo "  cp -R <folder>/skills ~/   # if tldraw-offline was present"
 echo "  bash \$STACK_DIR/apply-first-start.sh"
 echo "  bash \$STACK_DIR/sync-agents.sh"

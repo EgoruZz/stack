@@ -1,11 +1,11 @@
 #!/bin/bash
-# Проверка что весь стэк работает
-# Запуск: cd $STACK_DIR && bash check-all.sh
+# Check that the whole stack works
+# Run: cd $STACK_DIR && bash check-all.sh
 
 STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export PATH="$HOME/.juliaup/bin:$PATH"
 
-echo "=== Проверка стека ==="
+echo "=== Stack check ==="
 echo ""
 
 # Wolfram
@@ -13,7 +13,7 @@ echo -n "Wolfram: "
 if command -v wolframscript &>/dev/null && wolframscript -version >/dev/null 2>&1; then
     echo "✅ $(wolframscript -version 2>/dev/null)"
 else
-    echo "❌ не найден"
+    echo "❌ not found"
 fi
 
 # ParaView
@@ -24,11 +24,11 @@ if [ -n "$PVAPP" ] && [ -x "$PVAPP/Contents/bin/pvpython" ]; then
     if [ -n "$PV_VER" ]; then
         echo "✅ $PV_VER"
     else
-        # pvpython может не поддерживать --version — сам факт наличия бинаря достаточен
+        # pvpython may not support --version — the mere presence of the binary is enough
         echo "✅ $(basename "$PVAPP")"
     fi
 else
-    echo "❌ не найден"
+    echo "❌ not found"
 fi
 
 # Julia
@@ -36,7 +36,7 @@ echo -n "Julia: "
 if command -v julia &>/dev/null; then
     echo "✅ $(julia --version 2>/dev/null)"
 else
-    echo "❌ не найден"
+    echo "❌ not found"
 fi
 
 # LaTeX
@@ -44,7 +44,7 @@ echo -n "LaTeX: "
 if command -v pdflatex &>/dev/null; then
     echo "✅ $(pdflatex --version 2>/dev/null | head -1)"
 else
-    echo "❌ не найден"
+    echo "❌ not found"
 fi
 
 # Manim
@@ -55,11 +55,11 @@ if [ -f $STACK_DIR/manim-env/bin/activate ]; then
         MANIM_VER=$(python3 -c "import manim; print(manim.__version__)" 2>/dev/null)
         echo "✅ v$MANIM_VER"
     else
-        echo "❌ ошибка импорта"
+        echo "❌ import error"
     fi
     deactivate 2>/dev/null
 else
-    echo "❌ venv не найден"
+    echo "❌ venv not found"
 fi
 
 # ManimGL
@@ -69,11 +69,11 @@ if [ -f $STACK_DIR/manim-env/bin/activate ]; then
     if python3 -c "import manimlib" >/dev/null 2>&1; then
         echo "✅ OK"
     else
-        echo "❌ ошибка импорта"
+        echo "❌ import error"
     fi
     deactivate 2>/dev/null
 else
-    echo "❌ venv не найден"
+    echo "❌ venv not found"
 fi
 
 # Jupyter
@@ -83,11 +83,11 @@ if [ -f $STACK_DIR/jupyter-env/bin/activate ]; then
     if jupyter --version >/dev/null 2>&1; then
         echo "✅ $(jupyter --version 2>/dev/null | head -1)"
     else
-        echo "❌ ошибка"
+        echo "❌ error"
     fi
     deactivate 2>/dev/null
 else
-    echo "❌ venv не найден"
+    echo "❌ venv not found"
 fi
 
 # VS Code
@@ -97,13 +97,13 @@ if [ -d "/Applications/Visual Studio Code.app" ]; then
     if [ -n "$VS_VER" ]; then
         echo "✅ $VS_VER"
     else
-        echo "✅ установлен"
+        echo "✅ installed"
     fi
 else
-    echo "❌ не найден"
+    echo "❌ not found"
 fi
 
-# VS Code расширения стека
+# Stack VS Code extensions
 echo -n "VS Code ext: "
 if command -v code >/dev/null 2>&1; then
     VS_EXTS=$(code --list-extensions 2>/dev/null)
@@ -115,10 +115,10 @@ if command -v code >/dev/null 2>&1; then
     if [ -z "$MISSING_EXT" ]; then
         echo "✅ 6/6"
     else
-        echo "⚠️ не хватает:$MISSING_EXT"
+        echo "⚠️ missing:$MISSING_EXT"
     fi
 else
-    echo "❌ code CLI не найден"
+    echo "❌ code CLI not found"
 fi
 
 # OpenCode
@@ -126,7 +126,7 @@ echo -n "OpenCode: "
 if command -v opencode >/dev/null 2>&1; then
     echo "✅ $(which opencode)"
 else
-    echo "❌ не найден"
+    echo "❌ not found"
 fi
 
 # Firecrawl
@@ -134,7 +134,7 @@ echo -n "Firecrawl: "
 if command -v firecrawl >/dev/null 2>&1; then
     echo "✅ $(firecrawl --version 2>/dev/null)"
 else
-    echo "❌ не найден"
+    echo "❌ not found"
 fi
 
 # tldraw CLI
@@ -142,7 +142,7 @@ echo -n "tldraw CLI: "
 if command -v tldraw >/dev/null 2>&1; then
     echo "✅ $(tldraw --version 2>/dev/null)"
 else
-    echo "❌ не найден"
+    echo "❌ not found"
 fi
 
 # Craft Apps (ArtCraft office suite)
@@ -158,10 +158,10 @@ done
 if [ "$CRAFT_OK" -eq "$CRAFT_ALL" ] && [ "$CLI_OK" -eq "$CRAFT_ALL" ]; then
     echo "✅ 5/5 apps, 5/5 CLI"
 else
-    echo "⚠️ apps $CRAFT_OK/5, CLI $CLI_OK/5 — GUI: bash $STACK_DIR/craft-install.sh, CLI уже в $STACK_DIR/craft-cli/"
+    echo "⚠️ apps $CRAFT_OK/5, CLI $CLI_OK/5 — GUI: bash $STACK_DIR/craft-install.sh, CLI already at $STACK_DIR/craft-cli/"
 fi
 
-# Хранилище скиллов
+# Skills store
 echo -n "Skills store: "
 if [ -d $STACK_DIR/skills-store ]; then
     N=$(ls $STACK_DIR/skills-store | wc -l | tr -d ' ')
@@ -171,18 +171,18 @@ if [ -d $STACK_DIR/skills-store ]; then
         # launch: on a fresh machine it is absent until then — not an error,
         # but the user should know the 60th skill will appear later.
         if [ ! -d $STACK_DIR/skills-store/tldraw-offline ]; then
-            echo "✅ $N скиллов (глобальные каталоги чисты; 60-й — tldraw-offline — появится после первого запуска tldraw Desktop, затем bash $STACK_DIR/consolidate-skills.sh)"
+            echo "✅ $N skills (global dirs clean; the 60th — tldraw-offline — will appear after the first tldraw Desktop launch, then bash $STACK_DIR/consolidate-skills.sh)"
         else
-            echo "✅ $N скиллов (глобальные каталоги чисты)"
+            echo "✅ $N skills (global dirs clean)"
         fi
     elif [ "$N" -lt 50 ]; then
-        echo "⚠️ только $N скиллов — запусти: bash $STACK_DIR/consolidate-skills.sh"
+        echo "⚠️ only $N skills — run: bash $STACK_DIR/consolidate-skills.sh"
     else
-        echo "⚠️ в ~/.config/opencode/skills $GLOBAL скиллов — запусти: bash $STACK_DIR/consolidate-skills.sh"
+        echo "⚠️ $GLOBAL skills in ~/.config/opencode/skills — run: bash $STACK_DIR/consolidate-skills.sh"
     fi
 else
-    echo "❌ $STACK_DIR/skills-store не найден"
+    echo "❌ $STACK_DIR/skills-store not found"
 fi
 
 echo ""
-echo "=== Готово ==="
+echo "=== Done ==="

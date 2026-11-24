@@ -1,756 +1,133 @@
-# Полная документация стека
+# STACK.md — full tool reference
 
-> [!NOTE]
-> Путь стека произволен: скрипты находят свой корень сами, конфиги проектов получают абсолютные пути при attach. В этой документации `~/stack` — сокращение для «папка, куда склонирован стек» (`STACK_DIR`); подставляй свой реальный путь.
+> Paths: the stack lives wherever you cloned it (`STACK_DIR`, e.g. `~/stack`). Below, `$STACK` means that folder. Personal data lives outside the repo (`~/.stack-secrets.sh`, chmod 600).
 
 ## 1. Wolfram Language / Engine
 
-### Как я использую
-- `wolframscript -code '...'` — выполняю код напрямую
-- MCP сервер `Wolfram` в OpenCode — автоматически вызываю когда нужен расчёт
-- Jupyter kernel `wolframlanguage15` — пишу ноутбуки
-
-### Как ты используешь
-- **CLI:** `wolframscript` → вводишь код → `Ctrl+D` для выхода
-- **Jupyter:** `source ~/stack/jupyter-env/bin/activate && jupyter-lab` → выбрать kernel Wolfram Language 15
-- **VS Code:** `Cmd+Shift+P` → New Jupyter Notebook → выбрать kernel Wolfram
-- **GUI:** открыть `Wolfram Engine.app` из Applications
-
-### Как вместе
-- Ты пишешь "построй график sin(x)" → я пишу код → ты запускаешь
-- Или я выполняю через MCP → результат сразу в чате
-
-### Визуализация
-- Jupyter: прямо в ячейке (интерактивная)
-- wolframscript: `wolframscript -code 'Export["plot.png", Plot[Sin[x],{x,0,2Pi}]]'`
-- Просмотр: `open plot.png`
-
-### Горячие клавиши (Jupyter)
-- `Shift+Enter` — выполнить ячейку
-- `Esc` — выйти из ячейки
-- `A` — добавить ячейку сверху
-- `B` — добавить ячейку снизу
-- `DD` — удалить ячейку
-- `M` — markdown ячейка
-- `Y` — code ячейка
-
-### Важные ссылки
-- Документация: https://reference.wolfram.com/language/
-- Wolfram|Alpha: https://www.wolframalpha.com
-- Function Repository: https://resources.wolframcloud.com/FunctionRepository
-- Продление лицензии: https://www.wolfram.com/engine/
-
-### Обновление
-```bash
-# Wolfram Engine
-brew upgrade --cask wolfram-engine
-
-# Пакеты Wolfram
-wolframscript -code 'PacletInstall["Wolfram/AgentTools"]'
-```
-
----
+- Free developer license. CLI: `wolframscript -code '...'`. MCP server: `Wolfram` (computation via AgentTools). Jupyter kernel: `wolframlanguage15`.
+- The agent: writes `.wl` files, runs wolframscript, calls the MCP. You: run `wolframscript` interactively, view notebooks in the Wolfram desktop apps.
+- License: renews every ~40 days at https://www.wolfram.com/engine/. Check: `wolframscript -code 'Print[$LicenseExpirationDate]'`; expiry tracker: `bash $STACK/check-wolfram-license.sh`. License data lives in `~/Library/Wolfram*` and survives resets. Expired → renew on the site → `wolframscript -activate` (interactive; non-interactive if `~/.stack-wolfram.conf` has WOLFRAM_ID/PASS).
+- Packages: `wolframscript -code 'PacletInstall["PackageName"]'`; custom packages in `$STACK/WolframLanguage/`. Docs: https://reference.wolfram.com/language/
 
 ## 2. Manim
 
-### Версии
-- **Manim** (community edition) — основная, больше возможностей, проще в использовании
-- **ManimGL** (3Blue1Brown) — OpenGL, оригинальная версия
-
-### Как я использую
-- Пишу `.py` файлы с кодом анимации
-- Ты запускаешь: `manim script.py SceneName` (community) или `manimgl script.py SceneName` (GL)
-
-### Как ты используешь
-```bash
-# Активация окружения
-source ~/stack/manim-env/bin/activate
-# Или
-source ~/stack/manim-env/bin/activate
-
-# Community edition (рекомендуется)
-manim my_animation.py CircleToSquare
-
-# С превью (откроет окно)
-manim -p my_animation.py CircleToSquare
-
-# Низкое качество (быстро)
-manim -ql my_animation.py CircleToSquare
-
-# Высокое качество
-manim -qh my_animation.py CircleToSquare
-
-# ManimGL (OpenGL версия)
-manimgl my_animation.py CircleToSquare
-```
-
-### Как вместе
-- Ты: "сделай анимацию вращения куба"
-- Я: пишу код в файл `cube_rotation.py`
-- Ты: `manim cube_rotation.py CubeRotation`
-- Результат: видео в `media/videos/`
-
-### Визуализация
-- Плеер открывается автоматически после рендера (с флагом -p)
-- Файлы: `media/videos/<имя_файла>/1080p60/<SceneName>.mp4`
-- Превью: `open media/videos/.../*.mp4`
-
-### Структура кода (community)
-```python
-from manim import *
-
-class MyScene(Scene):
-    def construct(self):
-        circle = Circle()
-        self.play(Create(circle))
-        self.wait(2)
-```
-
-### Структура кода (ManimGL)
-```python
-from manimlib import *
-
-class MyScene(Scene):
-    def construct(self):
-        circle = Circle()
-        self.play(ShowCreation(circle))
-        self.wait(2)
-```
-
-### Горячие клавиши (ManimGL плеер)
-- `Space` — пауза/продолжить
-- `R` — перемотка назад
-- `F` — полноэкранный режим
-- `Q` — выход
-- `→` — перемотка вперёд
-- `←` — перемотка назад
-
-### Важные ссылки
-- Документация (community): https://docs.manim.community/
-- GitHub (community): https://github.com/ManimCommunity/manim
-- GitHub (3b1b): https://github.com/3b1b/manim
-- Примеры: https://github.com/ManimCommunity/manim/tree/main/examples
-
-### Обновление
-```bash
-source ~/stack/manim-env/bin/activate
-pip install --upgrade manim manimgl
-```
-
----
+- **Manim** (community) — primary, headless: `manim script.py SceneName` → `.mp4`/`.png` in `media/`. MCP server `manim` renders to file (temp dirs auto-clean after 1h; `cleanup_manim_temp_dir` for manual cleanup).
+- **ManimGL** (3Blue1Brown) — separate interactive CLI: `manimgl script.py SceneName`; player keys: `←/→` seek, `s` frame, `w` picture, `q` quit. No MCP uses it.
+- Env: `source $STACK/manim-env/bin/activate`. Update: `pip install --upgrade manim manimgl`.
+- Code structure: a `Scene` class with `construct()`; `self.play(...)`, `self.wait(...)`. Links: https://docs.manim.community/ · https://github.com/3b1b/manim
 
 ## 3. ParaView
 
-### Как я использую
-- Пишу скрипты на Python (`paraview.simple`)
-- MCP сервер `ParaView` — управляю пайплайном через MCP (load_data, create_source, create_isosurface, create_slice, color_by и др.)
-
-### Как ты используешь
-```bash
-# Определи путь к ParaView
-PVAPP=$(ls -d /Applications/ParaView-*.app 2>/dev/null | head -1)
-
-# GUI
-open "$PVAPP"
-
-# Скрипт через pvpython
-"$PVAPP/Contents/bin/pvpython" my_script.py
-
-# Или добавь в PATH
-export PATH="$PVAPP/Contents/bin:$PATH"
-pvpython my_script.py
-```
-
-### MCP workflow (рекомендуемый)
-Я управляю пайплайном через MCP, ты контролируешь визуал в GUI.
-
-**Запуск:**
-```bash
-# 1. Ты: открой ParaView GUI
-PVAPP=$(ls -d /Applications/ParaView-*.app 2>/dev/null | head -1)
-open "$PVAPP"
-
-# 2. Ты (или я): запусти pvserver в отдельном терминале
-"$PVAPP/Contents/bin/pvserver" --multi-clients --server-port=11111 &
-
-# 3. Ты: в GUI → File → Connect → localhost:11111
-
-# 4. Ты (или я): запусти TCP-мост (нужен pvpython)
-"$PVAPP/Contents/bin/pvpython" ~/stack/paraview-mcp/paraview_bridge.py &
-
-# 5. MCP сервер (ParaView) подключается к мосту автоматически при вызове инструментов
-```
-
-**Завершение:**
-```bash
-# 1. Ты: закрой GUI (просто закрой окно)
-# 2. Остановить серверы:
-kill $(pgrep -f pvserver) $(pgrep -f paraview_bridge)
-```
-
-**Скриншоты:** MCP скриншоты не доступны. Договорённость:
-- Нажимай `P` в GUI для сохранения скриншота
-- Сохраняй в `~/stack/paraview-mcp/screenshots/` с понятным именем
-- Говори агенту путь к файлу — он сможет его прочитать и описать
-
-### Как вместе
-- Ты: "загрузи VTK файл и покажи распределение температуры"
-- Я: через MCP загружаю данные, создаю фильтры, раскрашиваю
-- Ты: видишь результат в GUI, делаешь скриншот через `P`
-
-### Визуализация
-- GUI: полноценное 3D окно
-- Скриншоты: `P` в GUI
-- Скрипты: `SaveScreenshot("output.png", view)`
-
-### Пример скрипта (без MCP)
-```python
-from paraview.simple import *
-
-reader = XMLUnstructuredGridReader(FileName='data.vtu')
-display = Show(reader)
-ColorBy(display, ('POINTS', 'Temperature'))
-Render()
-SaveScreenshot('output.png', GetActiveView())
-```
-
-### Горячие клавиши (GUI)
-- `Ctrl+R` — рендер
-- `Ctrl+S` — сохранить
-- `F` — фокус на объект
-- `P` — скриншот
-- `Ctrl+Z` — отмена
-- `Space` — rotate view
-
-### Важные ссылки
-- Документация: https://docs.paraview.org/
-- Python API: https://docs.paraview.org/en/latest/Python/
-- Download: https://www.paraview.org/download/
-
-### Обновление
-```bash
-# ParaView обновляется через скачивание новой версии с сайта:
-# https://www.paraview.org/download/
-# После установки обнови путь в конфиге, если версия изменилась
-```
-
----
+- GUI + pvpython. Auto-detect: `PVAPP=$(ls -d /Applications/ParaView-*.app | head -1)`. Python API: `paraview.simple`.
+- **MCP startup workflow (required):**
+  ```bash
+  PVAPP=$(ls -d /Applications/ParaView-*.app | head -1)
+  open "$PVAPP"                                                    # 1. GUI
+  nohup "$PVAPP/Contents/bin/pvserver" --multi-clients --server-port=11111 &   # 2. pvserver
+  # 3. GUI: File → Connect → localhost:11111
+  "$PVAPP/Contents/bin/pvpython" $STACK/paraview-mcp/paraview_bridge.py       # 4. TCP bridge
+  ```
+  Shutdown: close the GUI; `kill $(pgrep -f pvserver) $(pgrep -f paraview_bridge)`.
+- Screenshots: MCP screenshots are NOT available (bridge runs in a separate pvprocess). Press `P` in the GUI to save into `$STACK/paraview-mcp/screenshots/` and give the agent the path.
+- MCP tools: load_data, create_source, create_isosurface, create_slice, toggle_volume_rendering, color_by, rotate_camera, reset_camera, plot_over_line, warp_by_vector, create_streamline, get_pipeline.
+- Env: `$STACK/paraview-mcp-env`. Update: `brew upgrade --cask paraview` + `pip install -U` in that env. Docs: https://docs.paraview.org/
 
 ## 4. Julia
 
-### Как я использую
-- `~/.juliaup/bin/julialauncher -e '...'` — выполняю код
-- MCP сервер `julia` в OpenCode — persistent сессии
-
-### Как ты используешь
-```bash
-# Запуск REPL
-julia
-
-# Выполнение скрипта
-julia my_script.jl
-
-# Выполнение кода
-julia -e 'using LinearAlgebra; println(det([1 2; 3 4]))'
-
-# Установка пакетов (в REPL)
-using Pkg
-Pkg.add("Plots")
-```
-
-### Как вместе
-- Ты: "реши систему уравнений"
-- Я: пишу код или выполняю через MCP
-- Результат: прямо в чате или в файле
-
-### Визуализация
-```julia
-using Plots
-plot(sin, 0, 2π)
-savefig("plot.png")
-```
-- Jupyter: прямо в ячейке
-- Отдельное окно: `plot()` открывает GUI
-
-### Горячие клавиши (REPL)
-- `Ctrl+C` — прервать
-- `Ctrl+D` — выход
-- `;` — shell mode
-- `?` — help mode
-- `Ctrl+R` — поиск истории
-- `Tab` — автодополнение
-
-### Важные ссылки
-- Документация: https://docs.julialang.org/
-- Пакеты: https://juliahub.com/
-- Plots: https://docs.juliaplots.org/
-- DifferentialEquations: https://diffeq.sciml.ai/
-
-### Обновление
-```bash
-juliaup update
-```
-
----
+- CLI: `julia` (via juliaup). MCP server: `julia` (persistent REPL sessions).
+- 20 preinstalled packages: LinearAlgebra, SparseArrays, Plots, DifferentialEquations, StaticArrays, Optim, JuMP, IJulia, Flux, Turing, DataFrames, CSV, ForwardDiff, SymPy, SpecialFunctions, StatsBase, Distributions, Polynomials, FFTW, IterativeSolvers.
+- `using Pkg; Pkg.add("Name")` · `Pkg.status()` · `Pkg.update()`. REPL keys: `]` pkg mode, `?` help, `Ctrl+D` exit. Docs: https://docs.julialang.org/
 
 ## 5. JupyterLab
 
-### Как я использую
-- Пишу `.ipynb` ноутбуки
-- Ты запускаешь и смотришь результат
-
-### Как ты используешь
-```bash
-# Запуск
-source ~/stack/jupyter-env/bin/activate && jupyter-lab
-
-source ~/stack/jupyter-env/bin/activate && jupyter-lab
-
-# Остановка: Ctrl+C в терминале
-```
-
-### Как вместе
-- Я пишу ноутбук → ты открываешь → правишь → вместе дорабатываем
-- Или я выполняю ячейки через MCP
-
-### Визуализация
-- Графики прямо в ячейках (matplotlib, plotly)
-- 3D: `ipyvolume`, `plotly`
-- Интерактивные виджеты: `ipywidgets`
-- Анимации: `matplotlib.animation`
-
-### Горячие клавиши (JupyterLab)
-- `Shift+Enter` — выполнить ячейку
-- `Ctrl+Enter` — выполнить и остаться
-- `Esc` — command mode
-- `A` — ячейка сверху
-- `B` — ячейка снизу
-- `DD` — удалить
-- `M` — markdown
-- `Y` — code
-- `Ctrl+Shift+-` — разбить ячейку
-- `Shift+M` — объединить ячейки
-
-### Важные ссылки
-- Документация: https://jupyterlab.readthedocs.io/
-- shortcuts: https://jupyterlab.readthedocs.io/en/stable/user/shortcuts.html
-
-### Обновление
-```bash
-source ~/stack/jupyter-env/bin/activate
-pip install --upgrade jupyterlab
-```
-
----
+- Run: `source $STACK/jupyter-env/bin/activate && jupyter-lab` (stop: Ctrl+C). Kernels: Python 3.12 + Wolfram Language 15.
+- Packages: numpy, matplotlib, pandas, sympy, plotly, ipywidgets, openpyxl, markitdown.
+- Keys: `Shift+Enter` run, `A/B` cell above/below, `DD` delete, `M/Y` markdown/code, `Shift+M` merge.
+- The agent writes `.ipynb`; you open and run; or the agent executes cells via MCP. Update: `pip install --upgrade jupyterlab`. Docs: https://jupyterlab.readthedocs.io/
 
 ## 6. LaTeX (MacTeX)
 
-### Как я использую
-- Пишу `.tex` файлы
-- Ты компилируешь: `pdflatex document.tex`
-
-### Как ты используешь
-```bash
-# Компиляция
-pdflatex document.tex
-
-# С библиографией
-pdflatex document.tex
-bibtex document
-pdflatex document.tex
-pdflatex document.tex
-
-# Или через latexmk (автоматически)
-latexmk document.tex
-```
-
-### Как вместе
-- Ты: "напиши отчёт по физике"
-- Я: пишу `.tex` файл
-- Ты: `pdflatex report.tex && open report.pdf`
-
-### Визуализация
-- PDF viewer: `open report.pdf`
-- VS Code: расширение LaTeX Workshop показывает превью
-
-### Горячие клавиши (LaTeX Workshop)
-- `Cmd+L Cmd+C` — компиляция
-- `Cmd+L Cmd+V` — превью PDF
-- `Cmd+L Cmd+R` — build & view
-
-### Важные ссылки
-- Overleaf (онлайн): https://www.overleaf.com/
-- Документация: https://www.latex-project.org/help/documentation/
-- Wikibook: https://en.wikibooks.org/wiki/LaTeX
-
-### Обновление
-```bash
-brew upgrade --cask mactex
-```
-
----
+- `pdflatex document.tex` · bibliography: `pdflatex → bibtex → pdflatex ×2` or `latexmk document.tex`.
+- VS Code LaTeX Workshop: `Cmd+L Cmd+C` compile, `Cmd+L Cmd+V` preview.
+- Update: `brew upgrade --cask mactex`. Links: https://www.latex-project.org/help/documentation/ · https://en.wikibooks.org/wiki/LaTeX
 
 ## 7. VS Code
 
-### Расширения (установлены)
-| Расширение | Назначение |
+Extensions installed: Jupyter, Python, Julia, LaTeX Workshop, Wolfram Language. Config: `~/Library/Application Support/Code/User/settings.json`.
+Keys: `Cmd+P` file, `Cmd+Shift+P` command, `` Cmd+` `` terminal, `Cmd+Shift+F` search, `Ctrl+G` line, `Alt+↑/↓` move line, `Cmd+/` comment.
+
+## 8. OpenCode + MCP servers (10)
+
+| Server | Function |
 |:---:|:---:|
-| Jupyter | Ноутбуки прямо в VS Code |
-| Python | Автодополнение, отладка |
-| Julia | Julia language support |
-| LaTeX Workshop | Компиляция LaTeX |
-| Wolfram Language | Подсветка, MCP |
+| Wolfram | Wolfram Language computation (AgentTools) |
+| julia | Persistent Julia sessions |
+| manim | Headless animation rendering |
+| ParaView | 3D visualization (TCP bridge, workflow above) |
+| tldraw | Whiteboard canvas, 30+ tools |
+| wordcraft · gridcraft · deckcraft · pdfcraft · figcraft | Office documents via Craft Apps |
 
-### Как использовать
-1. Открыть папку проекта: `code ~/projects/my-project`
-2. `Cmd+Shift+P` → выбрать действие
-3. `Cmd+P` → быстрый переход к файлу
-4. `Cmd+Shift+F` — поиск по всем файлам
-5. `` Cmd+` `` — терминал
+- Config lives in each project's `.opencode/opencode.json` (generated by `gen-opencode-config.sh` with absolute paths); global config stays clean.
+- tldraw MCP works with an in-memory document and `.tldr` files — it is NOT a live controller of an already-open desktop canvas. PNG/SVG export via `@kitschpatrol/tldraw-cli` — verify schema compatibility after CLI updates.
+- Manim MCP renders headless (community `manim`); ManimGL is not used by it.
+- Code diagnostics: run compilers/linters directly (`bash -n`, `python`, `npm run build`, `julia`, `pdflatex`).
+- Skills: 60 in `$STACK/skills-store` — render-visual, data-analysis, craft-office, grill-me, deep-mind, epistemic-rigor, dag-hallucination-detector, aris-research-pipeline, firecrawl-*, tldraw-offline. Research pipeline is local-only (local subagents, not independent cross-model review).
+- render-visual Chromium check: `node $STACK/skills-store/render-visual/scripts/doctor.mjs` (with CHROME_PATH from Playwright cache).
 
-### Горячие клавиши (VS Code)
-- `Cmd+P` — быстрый переход к файлу
-- `Cmd+Shift+P` — команда
-- `Cmd+K Cmd+S` — горячие клавиши
-- `` Cmd+` `` — терминал
-- `Cmd+Shift+F` — поиск
-- `Cmd+F` — поиск в файле
-- `Ctrl+G` — перейти к строке
-- `Cmd+D` — следующее совпадение
-- `Alt+↑/↓` — переместить строку
-- `Shift+Alt+↑/↓` — дублировать строку
-- `Cmd+/` — комментарий
-- `Cmd+Shift+K` — удалить строку
+## 8b. Craft Apps — office documents (ArtCraft)
 
----
+Native open-source Rust apps: [getartcraft.com](https://getartcraft.com). GUI: `bash $STACK/craft-install.sh`. Headless CLI: `$STACK/craft-cli/<name>-cli`.
 
-## 8. OpenCode (AI ассистент)
-
-### MCP серверы (настроены)
-| Сервер | Статус | Функция |
-|:---:|:---:|:---:|
-| Wolfram | ✅ | Выполнение Wolfram Language |
-| Julia | ✅ | Persistent Julia сессии |
-| Manim | ✅ | Генерация анимаций (headless) |
-| ParaView | ✅ | Визуализация данных (через TCP-мост) |
-| tldraw | ✅ | Управление canvas, диаграммы (30 инструментов) |
-| wordcraft | ✅ | Word-документы: .docx создание/правки/конвертация |
-| figcraft | ✅ | UI-дизайн: frames, auto-layout, прототипы |
-| gridcraft | ✅ | Excel-файлы: .xlsx, формулы, PivotTables |
-| deckcraft | ✅ | Презентации: .pptx сборка и экспорт |
-| pdfcraft | ✅ | PDF: объединение, разделение, защита |
-
-### tldraw MCP — инструменты
-| Инструмент | Описание |
-|:---:|:---:|
-| `tldraw_create_geo` | Геометрические shapes (rectangle, ellipse, diamond, star...) |
-| `tldraw_create_text` | Текстовые labels |
-| `tldraw_create_arrow` | Стрелки с привязками к shapes |
-| `tldraw_create_note` | Sticky notes |
-| `tldraw_create_frame` | Frames для группировки |
-| `tldraw_move_shapes` | Перемещение shapes |
-| `tldraw_group_shapes` | Группировка shapes |
-| `tldraw_set_camera` | Позиция и зум камеры |
-
-MCP работает с in-memory документом и `.tldr` файлами. Это не live-контроллер
-уже открытого desktop canvas. Экспорт через `tldraw` CLI требует совместимой
-версии схемы; текущий стек сохраняет `.tldr`, но PNG/SVG export после генерации
-нужно проверять отдельно.
-
-### ParaView MCP — workflow
-```bash
-# === ЗАПУСК ===
-# 1. Ты: открой ParaView GUI
-PVAPP=$(ls -d /Applications/ParaView-*.app 2>/dev/null | head -1)
-open "$PVAPP"
-
-# 2. Ты (или я): запусти pvserver в отдельном терминале
-nohup "$PVAPP/Contents/bin/pvserver" --multi-clients --server-port=11111 > /tmp/pvserver.log 2>&1 &
-
-# 3. Ты: File → Connect → localhost:11111
-
-# 4. Ты (или я): запусти TCP-мост (нужен pvpython)
-"$PVAPP/Contents/bin/pvpython" ~/stack/paraview-mcp/paraview_bridge.py &
-
-# 5. MCP сервер (ParaView) подключается к мосту автоматически при вызове инструментов
-
-# === ЗАВЕРШЕНИЕ ===
-# 1. Ты: закрой GUI (просто закрой окно)
-# 2. Остановить серверы:
-kill $(pgrep -f pvserver) $(pgrep -f paraview_bridge)
-```
-
-### ParaView MCP — скриншоты
-MCP скриншоты не доступны. Договорённость:
-- Нажимай `P` в GUI для сохранения скриншота
-- Сохраняй в `~/stack/paraview-mcp/screenshots/` с понятным именем
-- Говори агенту путь к файлу — он сможет его прочитать и описать
-
-### Manim MCP — как работает
-- MCP сервер использует `manim` (community edition) для headless рендера
-- Анимация рендерится в файл без открытия окна
-- Результат: `.mp4` или `.png` в папке `media/`
-- Temp-директории: auto-cleaned через 1 час; также доступен ручной `cleanup_manim_temp_dir`
-- ManimGL остаётся отдельным интерактивным CLI (`manimgl`) и не используется этим MCP сервером
-
-### Как использовать
-- Пиши мне что нужно → я выполняю через MCP или пишу скрипты
-- `AGENTS.md` в проекте → я знаю контекст
-
-### Skills (установлены)
-- `render-visual` — polished PNG/SVG/PDF, слайды, схемы и GIF
-- `xlsx` — Excel/CSV/TSV с формулами и проверкой
-- `data-analysis` — EDA, визуализация данных, отчёты и гипотезы
-- `grill-me` — проверка планов и скрытых допущений
-- `deep-mind` + `epistemic-rigor` — критическое мышление и anti-sycophancy
-- `dag-hallucination-detector` — проверка цитат, URL, статистики и противоречий
-- `aris-research-pipeline` — research pipeline в local-only режиме
-- `firecrawl-*` — live web research, scraping и workflow deliverables
-- Хранилище: `ls ~/stack/skills-store` (60 скиллов, проектные)
-
-### Ограничения research pipeline
-- Codex CLI/MCP намеренно не установлен: он не нужен для обычной работы и может требовать отдельную оплату/авторизацию.
-- ARIS использует локальные OpenCode subagents для review. Это многораундовая проверка, но не независимая cross-model экспертиза.
-- Если нужен именно внешний независимый reviewer, это отдельная опциональная настройка, а не часть текущего стека.
-
-### Проверка визуальных зависимостей
-```bash
-# render-visual использует Chromium из Playwright
-CHROME_PATH="$HOME/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell" \
-  node ~/stack/skills-store/render-visual/scripts/doctor.mjs
-
-# tldraw CLI
-```
-
----
-
-## 8b. Craft Apps — офисные документы (ArtCraft)
-
-Word/Excel/PowerPoint/PDF как нативные open-source Rust-приложения из [ArtCraft](https://getartcraft.com). GUI ставится/обновляется скриптом `bash ~/stack/craft-install.sh` в своём терминале (аналог Launcher без GUI); headless-CLI — автоматически в `~/stack/craft-cli/` (setup.sh, шаг 7).
-
-| Приложение | Формат | CLI | MCP-сервер |
+| App | Format | CLI | MCP |
 |:---:|:---:|:---:|:---:|
-| WordCraft | .docx (+.odt/.rtf/.html/.md/.tex/.txt, PDF-экспорт, цитирования APA/MLA/Chicago/IEEE, Zotero) | `~/stack/craft-cli/wordcraft-cli` | `wordcraft` |
-| GridCraft | .xlsx (+.csv; PivotTables, 500+ функций, графики) | `~/stack/craft-cli/gridcraft-cli` | `gridcraft` |
-| DeckCraft | .pptx (+.potx, экспорт PDF/PNG/GIF) | `~/stack/craft-cli/deckcraft-cli` | `deckcraft` |
-| PdfCraft | .pdf (объединение/разделение/защита/комментарии) | `~/stack/craft-cli/pdfcraft-cli` | `pdfcraft` |
-| FigCraft | интерфейсы/прототипы (.figcraft, экспорт PNG/SVG) | `~/stack/craft-cli/figcraft-cli` | `figcraft` |
+| WordCraft | .docx (+.odt/.rtf/.html/.md/.tex, PDF export, APA/MLA/Chicago/IEEE citations, Zotero) | wordcraft-cli | wordcraft |
+| GridCraft | .xlsx (+.csv; PivotTables, 500+ functions, charts) | gridcraft-cli | gridcraft |
+| DeckCraft | .pptx (+.potx; PDF/PNG/GIF export) | deckcraft-cli | deckcraft |
+| PdfCraft | .pdf (merge/split/protect/comments) | pdfcraft-cli | pdfcraft |
+| FigCraft | UI/prototypes (.figcraft; PNG/SVG export) | figcraft-cli | figcraft |
 
 ```bash
-# CLI без окна (головной режим — по умолчанию для агента)
-~/stack/craft-cli/wordcraft-cli convert report.docx report.pdf
-~/stack/craft-cli/deckcraft-cli convert deck.pptx deck.pdf
-~/stack/craft-cli/wordcraft-cli inspect report.docx        # структура как JSON
-~/stack/craft-cli/wordcraft-cli commands --json            # все команды приложения
-~/stack/craft-cli/wordcraft-cli run --file report.docx --cmd 'select.text={"text":"X"}' --cmd format.bold --save out.docx
-
-# Live-режим: агент правит документ в открытом окне (ты видишь в реальном времени)
+$STACK/craft-cli/wordcraft-cli convert report.docx report.pdf
+$STACK/craft-cli/wordcraft-cli inspect report.docx     # structure as JSON
+$STACK/craft-cli/wordcraft-cli commands --json         # all app commands
+# Live mode (agent edits a document in an open window):
 /Applications/WordCraft.app/Contents/MacOS/wordcraft --control 7981
-# MCP-команда агента: ~/stack/craft-cli/wordcraft-cli mcp --connect 127.0.0.1:7981
-# порты: wordcraft 7981 · gridcraft 7982 · deckcraft 7983 · pdfcraft 7984 · figcraft 7985
-
-# Обновление GUI-приложений: bash ~/stack/craft-install.sh (сам находит свежие версии)
+# ports: wordcraft 7981 · gridcraft 7982 · deckcraft 7983 · pdfcraft 7984 · figcraft 7985
 ```
 
-Важно: приложения в статусе alpha — сложные файлы из MS Office могут отображаться не идеально; храни копии важных документов. Компиляция .tex остаётся за pdflatex. Подробный workflow для агента — скилл `craft-office`.
+The apps are pre-release: complex MS Office files open best-effort — keep backups. Final office deliverables go through Craft Apps, not python scripts. `.tex` compilation stays pdflatex. Detailed agent workflow: the `craft-office` skill.
 
----
+## Network (proxy.sh)
 
-## Сеть (proxy.sh)
-
-ISP-прокси (proxy.market, Singapore) задаётся в `.zshrc` (STACK_PROXY_*). Локальный трафик стека (все MCP, localhost) через прокси НЕ идёт (no_proxy в .zshrc).
+ISP proxy (proxy.market) is set in `.zshrc` (STACK_PROXY_*); local stack traffic (all MCP, localhost) goes direct (no_proxy).
 
 ```bash
-bash ~/stack/proxy.sh status    # состояние маршрутов
-bash ~/stack/proxy.sh git on    # git → github через прокси
-bash ~/stack/proxy.sh git off   # git напрямую
-bash ~/stack/proxy.sh test      # живой тест + внешний IP
+bash $STACK/proxy.sh status    # routes state
+bash $STACK/proxy.sh git on    # git → github via proxy (off = direct)
+bash $STACK/proxy.sh test      # live test + external IP
+bash $STACK/proxy.sh expiry    # subscription expiry
 ```
 
-Если сеть недоступна из терминала — VPN-клиент (fake-IP) или мёртвый прокси; сначала `proxy.sh test`, затем проверь VPN.
+If the network is down from the terminal — VPN client (fake-IP) or a dead proxy: run `proxy.sh test` first, then check the VPN.
 
-## Опциональные вещи: кто и когда
+## First-start data checklist (agent-driven)
 
-| Вещь | Кому опционально | Когда нужно | Как |
-|:---:|:---:|:---:|:---:|
-| `firecrawl login` | пользователю | если нужен полный лимит кредитов | `firecrawl login --browser`; без входа — минимальный анонимный лимит |
-| Wolfram ID в форме | пользователю | для неинтерактивной активации лицензии агентом | поле формы; иначе активация вручную `wolframscript -activate` |
-| Live-режим Craft Apps | пользователю | правки агента в открытом окне | `<app> --control 798X` + `--connect`; по умолчанию headless |
-| Песочница-зеркало | разработчику | проверка обновлений «глазами пользователя» | клон в чистой HOME; тянуть main после значимых изменений |
-| Release (workflow.txt шаг 15) | разработчику | по накоплению изменений, не на каждый PR | `git tag vX.Y.Z` + `gh release create`; патч — update-all, минор — + setup.sh |
-| Issue-шаблоны, CODE_OF_CONDUCT | разработчику | если начнут приходить много чужих issues | `.github/ISSUE_TEMPLATE` |
-| Переводы интерфейса доков | пользователю | по желанию | см. README i18n |
+After `setup.sh` the stack needs **personal** data — deliberately never in the repo. The AI agent leads this (see AGENTS.md "FIRST START"): it asks for the proxy line (`host:port:login:password`), git identity, optional Wolfram ID, writes `$STACK/first-start.txt`, runs `apply-first-start.sh`, verifies `proxy.sh test`. What only the user can do: sudo password prompts, browser logins (gh device, Firecrawl, Wolfram sign-in), and model-provider auth in OpenCode itself.
 
-## Правила внесения изменений (коротко)
-
-Любой (владелец, агент, пользователь) правит по одному и тому же протоколу — он простой:
-
-1. **Проверка**: `bash -n <скрипт>.sh` и `bash ~/stack/check-all.sh` — это делает и агент автоматически
-2. **Идемпотентность**: повторный запуск скрипта безопасен — всегда
-3. **Секреты**: никогда в репозитории — только шаблоны; персональное в `~/.stack-secrets.sh` / `.zshrc` (600)
-4. **Согласованность доков**: счётчики CLI/MCP/скиллы/шаги одинаковы в README, AGENTS.md, STACK.md
-5. **Один PR = один смысловой блок** (workflow.txt)
-
-## Первый старт нового пользователя (чек-лист данных)
-
-После `setup.sh` стеку не хватает **персональных** данных — они принципиально не входят в репозиторий:
-
-| Что | Зачем | Как задать |
-|:---:|:---:|:---:|
-| Прокси (host/user/pass/expiry) | маршрутизация внешнего трафика | создать `~/.stack-secrets.sh` (шаблон ниже); проверить: `bash ~/stack/proxy.sh test` |
-| OpenCode + провайдеры/ключи моделей | агент без моделей не отвечает | установить с opencode.ai, `opencode auth` (или env-ключи) |
-| Wolfram Engine + лицензия | Wolfram MCP | `brew install --cask wolfram-engine`, `wolframscript` — логин Wolfram ID; продление каждые ~40 дней |
-| Firecrawl auth | полный тариф вместо free | `firecrawl login --browser` (опционально) |
-| git identity | коммиты/PR | `git config --global user.name/email` |
-| ParaView, MacTeX | визуализация, LaTeX | ручные шаги из README |
-| Личные сессии (`~/.opencode-sessions`) | функция `os()` в личном `.zshrc` | персонально, не часть стека |
-
-Шаблон `~/.stack-secrets.sh` (chmod 600, gitignored):
+## Common commands
 
 ```bash
-PROXY_HOST="..."
-PROXY_USER="..."
-PROXY_PASS="..."
-PROXY_EXPIRES="YYYY-MM-DD HH:MM +ZZZZ"
+cd $STACK && bash update-all.sh   # update everything (15 steps, see below)
+cd $STACK && bash check-all.sh    # health check — everything must be ✅
 ```
 
-## Общие команды
+`update-all.sh` covers: Homebrew packages + cleanup · Apple CLT/system updates (sudo) · external MCP repos · tldraw-mcp build · Python venvs (manim/jupyter/paraview/julia) · npm global CLIs + Chrome for tldraw · VS Code extensions · skills (ARIS + standalone) · Julia packages · Wolfram paclets · Craft Apps versions + headless CLIs · projects sync · expiry report (proxy, Wolfram).
 
-### Обновить всё (одной командой)
-```bash
-cd ~/stack && bash update-all.sh
-```
+## Change rules (short)
 
-Обновляет все компоненты:
-- Homebrew пакеты (node, python, gh, ffmpeg, ripgrep и др.) + `brew cleanup`
-- Command Line Tools и системные обновления (через softwareupdate; CLT требует sudo)
-- Внешние MCP репозитории (paraview-mcp, manim-mcp, julia-mcp, tldraw-mcp, WolframLanguageForJupyter)
-- tldraw-mcp сборка (npm install + build)
-- Python venv (manim-env, jupyter-env, paraview-mcp-env, julia-mcp-env)
-- npm global CLI (firecrawl-cli, tldraw CLI) + Chrome под tldraw export
-- VS Code расширения
-- ARIS skills + standalone skills
-- Julia пакеты
-- Wolfram paclets
-- Craft Apps: версии + headless-CLI (GUI — `craft-install.sh`)
-- AGENTS.md синхронизация (все проекты)
-
-> [!IMPORTANT]
-> После обновления перезапусти OpenCode — для применения изменений MCP и skills.
-
-### Проверить что всё работает
-```bash
-cd ~/stack && bash check-all.sh
-```
-
-### Или вручную
-```bash
-echo "=== Wolfram ===" && wolframscript -version
-echo "=== ParaView ===" && "$(ls -d /Applications/ParaView-*.app 2>/dev/null | head -1)/Contents/bin/pvpython" --version 2>/dev/null || echo "не найден"
-echo "=== Julia ===" && julia --version
-echo "=== LaTeX ===" && pdflatex --version | head -1
-echo "=== Manim ===" && source ~/stack/manim-env/bin/activate && python3 -c "import manim; print('Manim', manim.__version__)"
-echo "=== ManimGL ===" && source ~/stack/manim-env/bin/activate && python3 -c "import manimlib; print('OK')"
-echo "=== Jupyter ===" && source ~/stack/jupyter-env/bin/activate && jupyter --version | head -1
-```
-
----
-
-## 9. Управление проектами и пакетами
-
-### Структура проектов
-
-Проекты хранятся **в любом месте** (`~/projects/`, `~/learn/`, `~/work/` и т.д.).
-Каждый проект содержит `AGENTS.md` — OpenCode читает его при запуске.
-
-```
-Реестр проектов: ~/stack/projects.txt  (по одному пути на строку)
-```
-
-### Управление проектами
-
-```bash
-# Создать новый проект (где угодно)
-~/stack/new-project.sh ~/projects/my-calculation
-~/stack/new-project.sh ~/work/analysis
-
-# Зарегистрировать существующий проект
-~/stack/new-project.sh ~/learn
-
-# Синхронизировать AGENTS.md во все проекты
-bash ~/stack/sync-agents.sh
-```
-
-### Добавление пакетов
-
-#### Python (Manim / Jupyter)
-```bash
-# Активировать окружение
-source ~/stack/manim-env/bin/activate  # для Manim
-source ~/stack/jupyter-env/bin/activate  # для Jupyter
-
-# Установить пакет
-pip install numpy
-pip install pandas matplotlib seaborn
-
-# Установить из requirements.txt
-pip install -r requirements.txt
-```
-
-#### Julia
-```bash
-julia
-using Pkg
-Pkg.add("PackageName")
-Pkg.add(["Package1", "Package2"])  # несколько сразу
-```
-
-#### Wolfram
-```bash
-wolframscript -code 'PacletInstall["PackageName"]'
-```
-
-### Обновление пакетов
-
-```bash
-# Всё сразу
-cd ~/stack && bash update-all.sh
-
-# Или по отдельности
-source ~/stack/manim-env/bin/activate && pip install --upgrade manim manimgl
-source ~/stack/jupyter-env/bin/activate && pip install --upgrade jupyterlab numpy matplotlib
-juliaup update
-wolframscript -code 'PacletInstall["Wolfram/AgentTools"]'
-```
-
-### Просмотр установленных пакетов
-
-```bash
-# Python
-source ~/stack/manim-env/bin/activate && pip list
-source ~/stack/jupyter-env/bin/activate && pip list
-
-# Julia
-julia -e 'using Pkg; Pkg.status()'
-
-# Wolfram
-wolframscript -code 'PacletInformation[]'
-```
-
-### Удаление пакетов
-
-```bash
-pip uninstall package_name
-# Julia:
-julia -e 'using Pkg; Pkg.rm("PackageName")'
-```
-
-### Проверка зависимостей
-
-```bash
-# Python - проверить что всё импортируется
-source ~/stack/manim-env/bin/activate && python3 -c "import manim; import numpy; import scipy; print('OK')"
-
-# Julia
-julia -e 'using Pkg; Pkg.test("PackageName")'
-```
+1. **Check**: `bash -n <script>.sh` + `bash $STACK/check-all.sh` (the agent does this automatically)
+2. **Idempotency**: re-running any script must be safe — always
+3. **Secrets**: never in the repo — templates only; personal data in `~/.stack-secrets.sh` / `.zshrc` (chmod 600)
+4. **Path-agnostic**: scripts self-locate their root; no hardcoded `$HOME/stack` in code; project configs get absolute paths; `AGENTS.template.md` (with `{{STACK}}`) is the source, `AGENTS.md` is a generated local render
+5. **Consistent docs**: CLI/MCP/skills/step counters match across README, AGENTS.template.md, STACK.md
+6. **One PR = one logical change** (workflow.txt)
