@@ -114,10 +114,25 @@ $ cd ~/stack
 $ bash setup.sh
 ```
 
+- The repository is public: `git clone` works over HTTPS, no SSH keys needed
 - It asks for a password only where the system requires one
 - At the end a health check runs — every component must be ✅ — not ❌
 - The first-start form is applied automatically if `first-start.txt` is filled in
 - GitHub CLI is authorized with full scopes automatically (one-time login on the first run)
+
+**After `setup.sh` — five manual steps (details in [Manual steps](#-manual-steps)):**
+
+1. **New terminal window** — so `brew` and the installed tools appear in `PATH`
+2. **First-start form** — `cp ~/stack/first-start.template.txt ~/stack/first-start.txt` → fill in (proxy, Wolfram ID, git identity) → `bash ~/stack/apply-first-start.sh`; then `bash ~/stack/proxy.sh test`
+3. **Craft Apps GUI** — `bash ~/stack/craft-install.sh` in your own terminal
+4. **Wolfram activation** — run `wolframscript`, sign in with a Wolfram ID (optional: fill `WOLFRAM_ID`/`WOLFRAM_PASS` in the form first — then activation goes non-interactive)
+5. **Restart OpenCode** — quit and start it again in the project folder, so MCP servers and skills are applied
+
+Then the first session:
+
+```shell
+$ cd ~/stack && opencode
+```
 
 <h2 align="center">📦 What's inside</h2>
 

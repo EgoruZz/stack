@@ -371,7 +371,8 @@ else
     echo "  nano ~/stack/first-start.txt && bash ~/stack/apply-first-start.sh"
 fi
 echo "Ручные шаги (если ещё не сделаны):"
-echo "  1. Форма первого старта: cp ~/stack/first-start.template.txt ~/stack/first-start.txt → заполнить → bash ~/stack/apply-first-start.sh"
+echo "  0. Открой НОВОЕ окно терминала (чтобы brew и инструменты попали в PATH)"
+echo "  1. Форма первого старта: cp ~/stack/first-start.template.txt ~/stack/first-start.txt → заполнить → bash ~/stack/apply-first-start.sh; проверка: bash ~/stack/proxy.sh test"
 echo "  2. Craft Apps GUI: bash ~/stack/craft-install.sh"
 echo "  3. Wolfram активация: wolframscript (вход с Wolfram ID)"
 echo "  4. Firecrawl (опционально): firecrawl login --browser"
