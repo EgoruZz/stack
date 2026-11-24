@@ -28,7 +28,7 @@ while IFS= read -r line || [ -n "$line" ]; do
 done < "$FORM"
 
 # НЕ заданные в форме поля -> пусто (set -u safe)
-for v in PROXY_HOST PROXY_USER PROXY_PASS PROXY_EXPIRES GIT_NAME GIT_EMAIL WOLFRAM_ID WOLFRAM_PASS; do
+for v in PROXY_HOST PROXY_USER PROXY_PASS PROXY_EXPIRES GIT_NAME GIT_EMAIL WOLFRAM_ID WOLFRAM_PASS AGENT_SUDO; do
     eval "test -n \"\${$v+x}\" || $v=''"
 done
 # Прокси ОПЦИОНАЛЕН: либо заполнены все поля блока, либо ни одного
@@ -81,5 +81,23 @@ fi
 
 echo ""
 echo "Готово. Проверка: bash ~/stack/proxy.sh test && bash ~/stack/check-all.sh"
+
+# Sudo без пароля для агента (опционально)
+SUDOERS="/etc/sudoers.d/stack-agent"
+SUDOERS_TPL="$HOME/.stack-sudoers.tpl"
+if [ "$AGENT_SUDO" = "full" ]; then
+    echo "$USER ALL=(ALL) NOPASSWD: ALL" > "$SUDOERS_TPL"
+    echo ""
+    echo "⚠️  Выбран AGENT_SUDO=full: агент и все процессы от твоего пользователя"
+    echo "    получат root без пароля. Если это осознанное решение — выполни:"
+    echo "      sudo install -m 440 \"$SUDOERS_TPL\" $SUDOERS"
+    echo "    (sudo спросит пароль один раз — дальше у агента sudo будет без пароля)"
+    echo "    Отменить: sudo rm -f $SUDOERS && rm -f $SUDOERS_TPL"
+elif [ -f "$SUDOERS" ]; then
+    echo ""
+    echo "ℹ️  Sudoers-файл $SUDOERS существует, но AGENT_SUDO != full."
+    echo "    Убрать бессрочный NOPASSWD: sudo rm -f $SUDOERS"
+fi
+
 echo "Форма $FORM оставляется на месте: если данные сменятся (другой прокси,"
 echo "аккаунт, срок подписки) — просто отредактируй её и запусти снова."

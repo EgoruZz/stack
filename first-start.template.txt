@@ -18,3 +18,9 @@ WOLFRAM_PASS=
 # ── git identity (для коммитов и PR) ──
 GIT_NAME=
 GIT_EMAIL=
+#
+# ── Sudo без пароля для агента (опционально) ──
+# AGENT_SUDO=full    → NOPASSWD: ALL (удобно; ВСЁ, что запускается от тебя, получит root)
+# AGENT_SUDO=none    → без изменений (пароль запрашивается вручную; обновления CLT — сам)
+# Значение AGENT_SUDO=none/пусто = безопасный дефолт.
+AGENT_SUDO=none
