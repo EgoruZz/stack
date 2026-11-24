@@ -101,11 +101,7 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
     },
     "ParaView": {
       "type": "local",
-      "command": ["__STACK__/paraview-mcp-env/bin/python", "__STACK__/paraview-mcp/paraview_mcp_server.py"],
-      "environment": {
-        "PYTHONPATH": "__PARAVIEW_PYTHON__:__PARAVIEW_PYLIB__:__STACK__/paraview-mcp-env/lib/python3.12/site-packages",
-        "DYLD_LIBRARY_PATH": "__PARAVIEW_LIBS__:__PARAVIEW_FRAMEWORKS__"
-      },
+      "command": ["bash", "__STACK__/paraview-run.sh"],
       "enabled": true,
       "timeout": 60000
     },

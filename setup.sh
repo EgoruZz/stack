@@ -79,7 +79,10 @@ juliaup default release 2>/dev/null || echo "  Julia default already configured"
 if command -v zsh &>/dev/null; then
     [ -f "$HOME/.zshrc" ] || touch "$HOME/.zshrc"
     if ! grep -q "stack/proxy.sh" "$HOME/.zshrc" 2>/dev/null; then
-        cat >> "$HOME/.zshrc" << 'PROXYBLOCK'
+        # Unquoted heredoc: $STACK_DIR is substituted NOW with the real path
+        # (a literal "$STACK_DIR" in .zshrc resolves to nothing in zsh and
+        # breaks `source /proxy.sh` on every terminal start).
+        cat >> "$HOME/.zshrc" << PROXYBLOCK
 
 # === Stack network (managed; details: $STACK_DIR/proxy.sh) ===
 export TZ="Asia/Singapore"

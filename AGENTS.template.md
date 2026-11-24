@@ -75,9 +75,9 @@ Interactive-by-design (only the user can do them): sudo password prompts, browse
 ### ParaView
 - Auto-detected: `PVAPP=$(ls -d /Applications/ParaView-*.app | head -1)`; pvpython: `$PVAPP/Contents/bin/pvpython`; API: `paraview.simple`
 - MCP server: `ParaView`; env: `{{STACK}}/paraview-mcp-env`
-- Screenshots: `{{STACK}}/paraview-mcp/screenshots/` (MCP screenshots are NOT available — the bridge runs in a separate pvprocess; ask the user to press P in the GUI, then read the file)
-- **Startup workflow (required):** 1) `open "$PVAPP"` 2) `"$PVAPP/Contents/bin/pvserver" --multi-clients --server-port=11111` 3) GUI: File → Connect → localhost:11111 4) `"$PVAPP/Contents/bin/pvpython" {{STACK}}/paraview-mcp/paraview_bridge.py` — the MCP connects automatically
-- **Shutdown:** close the GUI; `kill $(pgrep -f pvserver)`; `kill $(pgrep -f paraview_bridge)`
+- **The MCP config launches `bash {{STACK}}/paraview-run.sh`** — the wrapper sets PYTHONPATH/DYLD_LIBRARY_PATH (incompatibilities between the app python and a venv) and auto-starts a headless pvserver on :11111 if none is running. So the MCP works out of the box, no GUI needed.
+- Screenshots with the GUI visible: open the GUI, File → Connect → localhost:11111, press P — then read `{{STACK}}/paraview-mcp/screenshots/`
+- **Shutdown:** close the GUI; `kill $(pgrep -f pvserver)`
 - MCP tools: load_data, create_source, create_isosurface, create_slice, toggle_volume_rendering, color_by, rotate_camera, reset_camera, plot_over_line, warp_by_vector, create_streamline, get_pipeline, …
 
 ### LaTeX
