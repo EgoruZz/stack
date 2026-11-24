@@ -95,7 +95,7 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
     "manim": {
       "type": "local",
       "command": ["__STACK__/manim-env/bin/python", "__STACK__/manim-mcp/src/manim_server.py"],
-      "environment": {"PATH": "__STACK__/manim-env/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"},
+      "environment": {"PATH": "__STACK__/manim-env/bin:__BREWBIN__:/usr/bin:/bin:/usr/sbin:/sbin"},
       "enabled": true,
       "timeout": 120000
     },
@@ -149,6 +149,8 @@ CONF
 # Substitute the computed paths (quoted heredoc keeps {env:HOME} intact)
 PVAPP="$(ls -d /Applications/ParaView-*.app 2>/dev/null | head -1)"
 PVPYTHON="$PVAPP/Contents/bin/pvpython"
+BREWBIN="$(dirname "$(command -v brew 2>/dev/null)" 2>/dev/null)"
+[ -n "$BREWBIN" ] || BREWBIN="/opt/homebrew/bin"
 sed -i '' \
     -e "s|__WOLFRAM_BIN__|$WOLFRAM_BIN|g" \
     -e "s|__SCHEMA__|\$schema|g" \
@@ -158,6 +160,7 @@ sed -i '' \
     -e "s|__PARAVIEW_PYLIB__|$PVAPP/Contents/Libraries/lib/python3.12|g" \
     -e "s|__PARAVIEW_LIBS__|$PVAPP/Contents/Libraries|g" \
     -e "s|__PARAVIEW_FRAMEWORKS__|$PVAPP/Contents/Frameworks|g" \
+    -e "s|__BREWBIN__|$BREWBIN|g" \
     "$TARGET/.opencode/opencode.json"
 
 # JSON validation
