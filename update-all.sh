@@ -1,8 +1,9 @@
 #!/bin/bash
 # Скрипт полного обновления всего стека
 # Запуск: cd ~/stack && bash update-all.sh
-# Обновляет: brew, внешние репозитории, tldraw-mcp, Python venv, npm CLI,
-#            ARIS skills, standalone skills, Julia, Wolfram
+# Обновляет: brew, Apple CLT/систему, внешние репозитории, tldraw-mcp,
+#            Python venv, npm CLI, VS Code расширения, ARIS skills,
+#            standalone skills, Julia, Wolfram, Craft Apps
 
 set -uo pipefail
 
@@ -17,7 +18,7 @@ echo ""
 # 1. GIT PULL (сам репозиторий)
 # ═══════════════════════════════════════
 
-echo ">>> 1/13 Репозиторий..."
+echo ">>> 1/15 Репозиторий..."
 cd "$STACK_DIR"
 git pull --ff-only 2>/dev/null && echo "  Репозиторий обновлён" || echo "  Репозиторий уже актуален или ошибка"
 echo ""
@@ -26,16 +27,43 @@ echo ""
 # 2. HOMEBREW (только стек-пакеты)
 # ═══════════════════════════════════════
 
-echo ">>> 2/13 Homebrew (только стек-пакеты)..."
+echo ">>> 2/15 Homebrew (только стек-пакеты)..."
 brew update
-brew upgrade node python@3.12 gh ffmpeg anomalyco/tap/opencode-v2 2>/dev/null || echo "  brew: часть пакетов обновлена"
+brew upgrade node python@3.12 gh ffmpeg ripgrep anomalyco/tap/opencode-v2 2>/dev/null || echo "  brew: часть пакетов обновлена"
+brew cleanup --prune=all --quiet 2>/dev/null
+echo ""
+echo ">>> 3/15 Apple (Command Line Tools, системные обновления)..."
+# CLT обновляются через softwareupdate (не через brew). Устаревший CLT
+# ломает сборку brew-формул из исходников (см. инцидент с pkgconf).
+CLT_PATH=$(xcode-select -p 2>/dev/null)
+if [ -n "$CLT_PATH" ] && [ "$CLT_PATH" != "xcode-select: error: unable to get active developer directory..." ]; then
+    CLT_VER=$(pkgutil --pkg-info=com.apple.pkg.CLTools_Executables 2>/dev/null | awk '/version:/ {print $2}')
+    echo "  CLT: ${CLT_VER:-версия не определена} ($CLT_PATH)"
+else
+    echo "  ⚠️ CLT не активен — xcode-select --install"
+fi
+SU_LIST=$(softwareupdate --list 2>/dev/null)
+CLT_LABEL=$(printf '%s' "$SU_LIST" | sed -n 's/.*Label: \(.*Command Line Tools[^,]*\).*/\1/p' | head -1)
+if [ -n "$CLT_LABEL" ]; then
+    echo "  Доступно обновление CLT: $CLT_LABEL"
+    if sudo -n true 2>/dev/null; then
+        softwareupdate -i "$CLT_LABEL" --quiet 2>/dev/null && echo "  ✅ CLT обновлён" || echo "  ❌ установка CLT не удалась — обнови вручную"
+    else
+        echo "  ⚠️ нужен sudo — запусти вручную: sudo softwareupdate -i \"$CLT_LABEL\""
+    fi
+else
+    echo "  CLT: обновлений нет"
+fi
+if printf '%s' "$SU_LIST" | grep -q "Label" && [ -z "$CLT_LABEL" ]; then
+    echo "  ⚠️ Есть обновления macOS — установи в System Settings → Software Update"
+fi
 echo ""
 
 # ═══════════════════════════════════════
 # 3. ВНЕШНИЕ MCP РЕПОЗИТОРИИ
 # ═══════════════════════════════════════
 
-echo ">>> 3/13 Внешние MCP репозитории..."
+echo ">>> 4/15 Внешние MCP репозитории..."
 for repo in paraview-mcp manim-mcp julia-mcp tldraw-mcp WolframLanguageForJupyter; do
     if [ -d "$STACK_DIR/$repo" ]; then
         (cd "$STACK_DIR/$repo" && git pull --ff-only 2>/dev/null && echo "  $repo: обновлён" || echo "  $repo: актуален или ошибка")
@@ -49,7 +77,7 @@ echo ""
 # 4. TLDRAW MCP СБОРКА
 # ═══════════════════════════════════════
 
-echo ">>> 4/13 tldraw MCP сборка..."
+echo ">>> 5/15 tldraw MCP сборка..."
 if [ -d "$STACK_DIR/tldraw-mcp" ]; then
     cd "$STACK_DIR/tldraw-mcp"
     npm install --silent || echo "  npm install: ошибка (проверь сеть)"
@@ -64,7 +92,7 @@ echo ""
 # 5. PYTHON VENV (4 шт.)
 # ═══════════════════════════════════════
 
-echo ">>> 5/13 Python venv..."
+echo ">>> 6/15 Python venv..."
 
 update_venv() {
     local name=$1; shift
@@ -107,7 +135,7 @@ echo ""
 # 6. NPM GLOBAL CLI
 # ═══════════════════════════════════════
 
-echo ">>> 6/13 npm global CLI..."
+echo ">>> 7/15 npm global CLI..."
 npm install -g --allow-scripts=puppeteer firecrawl-cli@latest @kitschpatrol/tldraw-cli@latest || echo "  npm: обновление частичное (возможно нужен sudo или проверь сеть)"
 echo "  firecrawl-cli: $(firecrawl --version 2>/dev/null || echo 'не установлен')"
 echo "  tldraw CLI: $(tldraw --version 2>/dev/null || echo 'не установлен')"
@@ -135,10 +163,23 @@ fi
 echo ""
 
 # ═══════════════════════════════════════
+# 8. VS CODE РАСШИРЕНИЯ
+# ═══════════════════════════════════════
+
+echo ">>> 8/15 VS Code расширения..."
+if command -v code >/dev/null 2>&1; then
+    code --update-extensions >/dev/null 2>&1 && echo "  Расширения: обновлены" || echo "  Расширения: обновление пропущено"
+    echo "  VS Code сам обновляется автоматически (self-update)"
+else
+    echo "  code CLI не найден, пропускаю"
+fi
+echo ""
+
+# ═══════════════════════════════════════
 # 7. ARIS SKILLS (список из aris-skills.txt)
 # ═══════════════════════════════════════
 
-echo ">>> 7/13 ARIS skills..."
+echo ">>> 9/15 ARIS skills..."
 if [ -d "$STACK_DIR/aris-research-repo" ]; then
     bash "$STACK_DIR/sync-aris.sh" --update || echo "  ARIS: синхронизация пропущена"
 else
@@ -150,7 +191,7 @@ echo ""
 # 8. STANDALONE SKILLS
 # ═══════════════════════════════════════
 
-echo ">>> 8/13 Skills (консолидация в ~/stack/skills-store)..."
+echo ">>> 10/15 Skills (консолидация в ~/stack/skills-store)..."
 bash "$STACK_DIR/consolidate-skills.sh" || echo "  Консолидация: пропущена"
 echo ""
 
@@ -158,7 +199,7 @@ echo ""
 # 9. JULIA (миграция окружения + IJulia)
 # ═══════════════════════════════════════
 
-echo ">>> 9/13 Julia..."
+echo ">>> 11/15 Julia..."
 
 # Запоминаем текущее окружение
 OLD_ENV=""
@@ -234,7 +275,7 @@ echo ""
 # 10. WOLFRAM
 # ═══════════════════════════════════════
 
-echo ">>> 10/13 Wolfram..."
+echo ">>> 12/15 Wolfram..."
 WOLFRAM_VER=$(wolframscript -code 'p = PacletInstall["Wolfram/AgentTools"]; Print[p["Version"]]' 2>/dev/null | head -1)
 if [ -n "$WOLFRAM_VER" ]; then
     echo "  AgentTools: $WOLFRAM_VER"
@@ -258,7 +299,7 @@ echo ""
 
 # Craft Apps (WordCraft, GridCraft, DeckCraft, PdfCraft, FigCraft): сравниваем
 # установленную версию с последним GitHub-релизом. GUI-обновления идут
-# через install-craft-apps.sh (аналог Launcher без GUI) — здесь только проверка.
+# через craft-install.sh — здесь только проверка + headless-CLI.
 echo "  Craft Apps..."
 for repo in wordcraft gridcraft deckcraft pdfcraft figcraft; do
     case "$repo" in
@@ -324,7 +365,7 @@ echo ""
 # 11. ПРОВЕРКА
 # ═══════════════════════════════════════
 
-echo ">>> 11/13 Проверка стека..."
+echo ">>> 13/15 Проверка стека..."
 bash "$STACK_DIR/check-all.sh"
 
 # ═══════════════════════════════════════
@@ -332,7 +373,7 @@ bash "$STACK_DIR/check-all.sh"
 # ═══════════════════════════════════════
 
 echo ""
-echo ">>> 12/13 Синхронизация AGENTS.md..."
+echo ">>> 14/15 Синхронизация AGENTS.md..."
 bash "$STACK_DIR/sync-agents.sh" --no-hint
 
 # ═══════════════════════════════════════
@@ -340,7 +381,7 @@ bash "$STACK_DIR/sync-agents.sh" --no-hint
 # ═══════════════════════════════════════
 
 echo ""
-echo ">>> 13/13 Финал..."
+echo ">>> 15/15 Финал..."
 echo "============================================"
 echo "  Обновление завершено!"
 echo "============================================"
