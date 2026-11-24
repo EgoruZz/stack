@@ -246,7 +246,7 @@ Assembled automatically (`consolidate-skills.sh`) into `<path>/skills-store/` an
 <h2 align="center">☎️ Attaching to a project</h2>
 
 ```shell
-$ <path>/new-project.sh ~/work/my-project    # create new / register existing
+<path>/new-project.sh ~/work/my-project    # create new / register existing
 ```
 
 <div align="center">
