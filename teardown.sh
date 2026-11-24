@@ -100,6 +100,11 @@ else
 fi
 
 # ── 6. Stack folder: generated artifacts (venvs, repos, builds) ─
+# NOTE: the brew manifest is consumed by step 10 (--deep) — save it and
+# delete it only after that step (store the text, not the file).
+if [ -f "$STACK_DIR/.brew-pre-manifest.txt" ]; then
+    MANIFEST_CONTENT=$(cat "$STACK_DIR/.brew-pre-manifest.txt")
+fi
 for d in manim-env jupyter-env paraview-mcp-env julia-mcp-env \
          paraview-mcp manim-mcp julia-mcp tldraw-mcp aris-research-repo \
          WolframLanguageForJupyter skills-store craft-cli craft-downloads; do
@@ -107,7 +112,6 @@ for d in manim-env jupyter-env paraview-mcp-env julia-mcp-env \
 done
 rmfile "$STACK_DIR/.opencode"
 rmfile "$STACK_DIR/AGENTS.md"
-rmfile "$STACK_DIR/.brew-pre-manifest.txt"
 rmfile "$STACK_DIR/paraview-mcp/typing_extensions.py"
 rmfile "$STACK_DIR/paraview-mcp/pvserver.log"
 rmfile "$STACK_DIR/paraview-mcp-env"
@@ -137,8 +141,8 @@ rmfile "$HOME/.cache/ms-playwright"
 
 # ── 10. Brew packages (--deep; ONLY what is genuinely new) ─────
 if [ "$DEEP" = "1" ]; then
-    MANIFEST="$STACK_DIR/.brew-pre-manifest.txt"
-    if [ ! -f "$MANIFEST" ]; then
+    # Manifest was captured in step 6 (before artifacts were removed)
+    if [ -z "${MANIFEST_CONTENT:-}" ]; then
         echo "⚠️ No pre-install manifest — cannot tell what the stack added."
         echo "   Skipping brew uninstall (use 'brew list' manually if needed)."
     else
@@ -146,7 +150,7 @@ if [ "$DEEP" = "1" ]; then
         CASKS="wolfram-engine paraview mactex tldraw visual-studio-code"
         for f in $FORMULAE; do
             if command -v brew &>/dev/null && brew list --formula "$f" &>/dev/null \
-               && ! grep -qx "$f" "$MANIFEST"; then
+               && ! grep -qx "$f" <(printf "%s\n" "$MANIFEST_CONTENT"); then
                 if confirm "brew uninstall $f (installed by the stack)?"; then
                     run brew uninstall "$f" && echo "✅ brew removed: $f"
                 fi
@@ -154,7 +158,7 @@ if [ "$DEEP" = "1" ]; then
         done
         for c in $CASKS; do
             if command -v brew &>/dev/null && brew list --cask "$c" &>/dev/null \
-               && ! sed -n '/── casks:/,$p' "$MANIFEST" | grep -qx "$c"; then
+               && ! sed -n '/── casks:/,$p' <(printf "%s\n" "$MANIFEST_CONTENT") | grep -qx "$c"; then
                 if confirm "brew uninstall --cask $c (installed by the stack, sudo password may be asked)?"; then
                     run brew uninstall --cask "$c" && echo "✅ brew cask removed: $c"
                 fi
