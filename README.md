@@ -86,8 +86,6 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`)
 
 </div>
 
-</p>
-
 <h2 align="center">🖐 Manual steps</h2>
 
 <div align="center">
