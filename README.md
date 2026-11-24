@@ -47,44 +47,42 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`)
 
 </div>
 
-<div align="center">
-
-<code>~/stack/<br>
-~/stack/<br>
-├── README.md                    # This file<br>
-├── AGENTS.md                    # Agent instructions (with the repo map)<br>
-├── STACK.md                     # Full documentation: keybinds, examples (Russian)<br>
-├── workflow.txt                 # Git workflow rules<br>
-│<br>
-├── setup.sh                     # Install on a clean macOS (12 steps)<br>
-├── update-all.sh                # Update everything (13 steps) + expiry tracking<br>
-├── check-all.sh                 # Health check<br>
-│<br>
-├── new-project.sh               # Attach a project<br>
-├── sync-agents.sh               # AGENTS.md + configs → all projects<br>
-├── gen-opencode-config.sh       # .opencode/opencode.json generator (10 MCP)<br>
-├── sync-aris.sh                 # ARIS skills → skills-store<br>
-├── consolidate-skills.sh        # Assemble skills-store + clean global dirs<br>
-├── craft-install.sh             # Install/update Craft Apps (GUI)<br>
-├── apply-first-start.sh         # First-start form → personal configs<br>
-├── proxy.sh                     # Network: env proxy + CLI (status/expiry/git/test)<br>
-├── chrome-version.sh            # Chrome version pinned by tldraw<br>
-├── check-wolfram-license.sh     # Wolfram license expiry<br>
-│<br>
-├── first-start.template.txt     # First-start form template<br>
-├── projects.template.txt        # Project registry template (projects.txt is personal)<br>
-├── aris-skills.txt              # List of 14 ARIS skills<br>
-├── skills/                      # 8 standalone skills (source)<br>
-├── skills-store/                # Assembled 60 skills (gitignored)<br>
-├── craft-cli/                   # Headless CLIs of the Craft Apps (gitignored)<br>
-├── craft-downloads/             # DMG cache of installers (gitignored)<br>
-├── assets/                      # Banner (painting.png) + editable painting.tldraw<br>
-├── WolframLanguage/             # Custom Wolfram packages<br>
-│<br>
-└── paraview-mcp/ · manim-mcp/ · julia-mcp/ · tldraw-mcp/ ·      # cloned<br>
-    aris-research-repo/ · WolframLanguageForJupyter/             # repos</code>
-
-</div>
+```
+~/stack/
+~/stack/
+├── README.md                    # This file
+├── AGENTS.md                    # Agent instructions (with the repo map)
+├── STACK.md                     # Full documentation: keybinds, examples (Russian)
+├── workflow.txt                 # Git workflow rules
+│
+├── setup.sh                     # Install on a clean macOS (12 steps)
+├── update-all.sh                # Update everything (13 steps) + expiry tracking
+├── check-all.sh                 # Health check
+│
+├── new-project.sh               # Attach a project
+├── sync-agents.sh               # AGENTS.md + configs → all projects
+├── gen-opencode-config.sh       # .opencode/opencode.json generator (10 MCP)
+├── sync-aris.sh                 # ARIS skills → skills-store
+├── consolidate-skills.sh        # Assemble skills-store + clean global dirs
+├── craft-install.sh             # Install/update Craft Apps (GUI)
+├── apply-first-start.sh         # First-start form → personal configs
+├── proxy.sh                     # Network: env proxy + CLI (status/expiry/git/test)
+├── chrome-version.sh            # Chrome version pinned by tldraw
+├── check-wolfram-license.sh     # Wolfram license expiry
+│
+├── first-start.template.txt     # First-start form template
+├── projects.template.txt        # Project registry template (projects.txt is personal)
+├── aris-skills.txt              # List of 14 ARIS skills
+├── skills/                      # 8 standalone skills (source)
+├── skills-store/                # Assembled 60 skills (gitignored)
+├── craft-cli/                   # Headless CLIs of the Craft Apps (gitignored)
+├── craft-downloads/             # DMG cache of installers (gitignored)
+├── assets/                      # Banner (painting.png) + editable painting.tldraw
+├── WolframLanguage/             # Custom Wolfram packages
+│
+└── paraview-mcp/ · manim-mcp/ · julia-mcp/ · tldraw-mcp/ ·      # cloned
+    aris-research-repo/ · WolframLanguageForJupyter/             # repos
+```
 
 <h2 align="center">🖐 Manual steps</h2>
 
