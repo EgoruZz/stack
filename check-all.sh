@@ -166,7 +166,14 @@ if [ -d ~/stack/skills-store ]; then
     N=$(ls ~/stack/skills-store | wc -l | tr -d ' ')
     GLOBAL=$(ls ~/.config/opencode/skills 2>/dev/null | wc -l | tr -d ' ')
     if [ "$N" -ge 50 ] && [ "$GLOBAL" -eq 0 ]; then
-        echo "✅ $N скиллов (глобальные каталоги чисты)"
+        # tldraw-offline ставит само приложение tldraw Desktop при первом запуске:
+        # на чистой машине его нет до первого запуска приложения — это не ошибка,
+        # но пользователь должен знать, что скилл добавится позже.
+        if [ ! -d ~/stack/skills-store/tldraw-offline ]; then
+            echo "✅ $N скиллов (глобальные каталоги чисты; 60-й — tldraw-offline — появится после первого запуска tldraw Desktop, затем bash ~/stack/consolidate-skills.sh)"
+        else
+            echo "✅ $N скиллов (глобальные каталоги чисты)"
+        fi
     elif [ "$N" -lt 50 ]; then
         echo "⚠️ только $N скиллов — запусти: bash ~/stack/consolidate-skills.sh"
     else
