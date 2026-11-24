@@ -2,6 +2,7 @@
 # Проверка что весь стэк работает
 # Запуск: cd $STACK_DIR && bash check-all.sh
 
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export PATH="$HOME/.juliaup/bin:$PATH"
 
 echo "=== Проверка стека ==="
