@@ -107,7 +107,7 @@ Only three things stay manual
 <h2 align="center">🚀 Quick start</h2>
 
 ```shell
-$ git clone https://github.com/EgoruZz/stack.git ~/stack
+$ git clone https://github.com/custom-opencode/stack.git ~/stack
 $ cd ~/stack
 $ bash setup.sh
 ```
