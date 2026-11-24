@@ -110,22 +110,15 @@ All `*.sh` are CLI tools (run: `bash ~/stack/<name>.sh`)
 <h2 align="center">🚀 Quick start</h2>
 
 ```shell
-$ git clone https://github.com/custom-opencode/stack.git ~/stack   # или в любую другую папку
-$ cd ~/stack                                                       # <путь, куда склонировал>
-$ bash setup.sh
-$ opencode                                                         # say "set up the stack"
+git clone https://github.com/custom-opencode/stack.git ~/stack   # or any other folder
+cd ~/stack                                                       # <path of your clone>
+opencode
 ```
 
 > [!NOTE]
 > The clone destination is **your choice** — the stack is path-agnostic: every script finds its own root, and project configs get absolute paths at attach time. In the docs, `~/stack` is shorthand for "wherever you cloned the stack" (`STACK_DIR`); substitute your real path, e.g. `~/git/custom-opencode/stack`.
 
-- The repository is public: `git clone` works over HTTPS, no SSH keys needed
-- It asks for a password only where the system requires one
-- At the end a health check runs — every component must be ✅ — not ❌
-- The first-start form is applied automatically if `first-start.txt` is filled in
-- GitHub CLI is authorized with full scopes automatically (one-time login on the first run)
-
-**Then — `opencode` in the stack folder.** The agent walks you through everything that remains: asks for your proxy and git identity, fills the first-start form, installs the Craft Apps GUI, checks the Wolfram license, attaches your projects — and runs `check-all.sh` so you see every ✅. All you ever do interactively: type the password when macOS asks, confirm browser logins.
+That's the whole start. In the fresh clone the agent is "bare" (no stack MCPs yet) — its first action is running `setup.sh` itself (approving that one command is the only click you make; you may be asked for the macOS password where the system requires it). Then the agent leads the rest of the setup: asks for your proxy and git identity in chat, fills the first-start form, installs the Craft Apps GUI, checks the Wolfram license, attaches your projects — and runs `check-all.sh` so you see every ✅. All you ever do interactively: approve, type the password, confirm browser logins. After the setup — restart OpenCode in each project folder so MCP servers and skills load.
 
 The setup procedure the agent follows lives in `AGENTS.template.md` — nothing to memorize.
 

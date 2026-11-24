@@ -9,6 +9,7 @@ The stack lives in `{{STACK}}/`. Start OpenCode here: `cd {{STACK}} && opencode`
 
 If `~/.stack-secrets.sh` does not exist, the stack is not configured yet. **You lead the setup** — do not dump a manual on the user. Procedure:
 
+0. **Install first (fresh clone)**: if `$STACK/setup.sh` has not run yet (quick check: no `craft-cli/` or no `.opencode/opencode.json` in the stack folder), run `bash $STACK/setup.sh` — it installs everything (12 steps, may ask for the macOS password in the terminal; brew steps take minutes). When it finishes, tell the user to restart OpenCode so the generated config (MCP + skills) loads, then continue.
 1. Read the template `{{STACK}}/first-start.template.txt` to know the fields
 2. Ask the user in chat for: ISP-proxy line (`host:port:login:password`, from proxy.market), subscription expiry, git name/email; optionally Wolfram ID + password (enables non-interactive license activation)
 3. Create `{{STACK}}/first-start.txt` from the template, write in the values the user gave
