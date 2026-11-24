@@ -292,8 +292,52 @@ Pkg.add([
 echo ">>> 11/12 Генерация конфига OpenCode..."
 # Стек поднимается ТОЛЬКО в проектах: конфиг пишется в .opencode/opencode.json
 # папки стека. Проекты получают такой же конфиг через sync-agents.sh
-# и new-project.sh. Глобальный ~/.config/opencode стек не использует.
+# и new-project.sh. Глобальный ~/.config/opencode используется только для
+# клиентских настроек (permission), НЕ для MCP/скиллов.
 bash "$STACK_DIR/gen-opencode-config.sh" "$STACK_DIR"
+
+# ═══════════════════════════════════════
+# 11b. GITHUB CLI + ГЛОБАЛЬНЫЙ КЛИЕНТ-КОНФИГ
+# ═══════════════════════════════════════
+
+echo ">>> 11b/12 GitHub CLI (scopes) и permission-конфиг..."
+# gh-токен нужен с полными scopes — без них агент не сможет делать PR,
+# удалять/переносить репо, работать с организациями. Вход интерактивный,
+# делается ОДИН раз на машину (токен живёт в keyring и переживает перезапуски).
+if ! command -v gh >/dev/null 2>&1; then
+    echo "  gh не найден, пропускаю"
+elif ! gh auth status >/dev/null 2>&1; then
+    echo "  gh не авторизован — запускаю вход (один раз на машину)..."
+    gh auth login -h github.com -p ssh -s repo -s admin:org -s workflow -s admin:public_key -s delete_repo -s gist || \
+        echo "  ⚠️ вход не завершён — запусти позже: gh auth login -s repo,admin:org,workflow,admin:public_key,delete_repo,gist"
+elif ! gh auth status 2>&1 | grep -q "admin:org"; then
+    echo "  токен есть, но scopes неполные — расширяю (device-flow)..."
+    gh auth refresh -h github.com -s admin:org -s workflow || \
+        echo "  ⚠️ не удалось — запусти позже: gh auth refresh -s admin:org -s workflow"
+else
+    echo "  gh: авторизован, scopes полные"
+fi
+# Глобальный клиент-конфиг OpenCode: permission allow — агент не кликает
+# "allow" на каждое действие (это настройки клиента, не MCP/скиллы).
+OC_DIR="$HOME/.config/opencode"; mkdir -p "$OC_DIR"
+OC_CONF="$OC_DIR/opencode.jsonc"
+if [ ! -f "$OC_CONF" ]; then
+    cat > "$OC_CONF" << 'EOF'
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "edit": "allow",
+    "webfetch": "allow",
+    "bash": {
+      "*": "allow"
+    }
+  }
+}
+EOF
+    echo "  $OC_CONF: создан (permission: allow)"
+else
+    echo "  $OC_CONF: уже существует, не трогаю"
+fi
 
 # ═══════════════════════════════════════
 # 12. ПРОВЕРКА

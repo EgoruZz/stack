@@ -28,7 +28,7 @@ PROXY_EXPIRES_DEFAULT=""
 # Персональные значения задаются в ~/.stack-secrets.sh (файл в $HOME,
 # в репозиторий не попадает):
 #   PROXY_HOST="..."  PROXY_USER="..."  PROXY_PASS="..."
-#   PROXY_EXPIRES="2026-12-22 13:30 +0300"
+#   PROXY_EXPIRES="YYYY-MM-DD HH:MM +ZZZZ"
 # Файл создаётся apply-first-start.sh из формы; шаблон — first-start.template.txt.
 
 # Личный конфиг поверх дефолтов (секреты, не для репозитория):
