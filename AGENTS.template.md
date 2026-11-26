@@ -63,6 +63,8 @@ Interactive-by-design (only the user can do them): sudo password prompts, browse
 | `setup.sh` | Clean-macOS install (12 steps, idempotent) |
 | `update-all.sh` | Full update (15 steps) + expiry tracking |
 | `check-all.sh` | Health check (✅/❌ per component, incl. MCP modules) |
+| `check-docs.sh` | Doc-consistency check (counters, cross-references, assets) — run instead of hand-verifying docs |
+| `gh.sh` | gh CLI wrapper: proxy env + retries (use for PRs, releases; merge may still need the GitHub API via curl) |
 | `teardown.sh` | Uninstall everything the stack installed; keeps OpenCode itself |
 | `new-project.sh` | Attach the stack to any folder (AGENTS.md + `.opencode/opencode.json`) |
 | `detach-project.sh` | Detach (works even if the folder is already gone) |
