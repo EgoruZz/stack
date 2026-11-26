@@ -1,10 +1,10 @@
 #!/bin/bash
 # Create a new project or register an existing one to use the stack
-# Usage: $STACK_DIR/new-project.sh <path>
+# Usage: $STACK_DIR/scripts/new-project.sh <path>
 # Examples:
-#   $STACK_DIR/new-project.sh ~/projects/my-calculation   # create new
-#   $STACK_DIR/new-project.sh ~/learn                      # register existing
-#   $STACK_DIR/new-project.sh ~/work/analysis              # create anywhere
+#   $STACK_DIR/scripts/new-project.sh ~/projects/my-calculation   # create new
+#   $STACK_DIR/scripts/new-project.sh ~/learn                      # register existing
+#   $STACK_DIR/scripts/new-project.sh ~/work/analysis              # create anywhere
 
 set -euo pipefail
 

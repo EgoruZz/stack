@@ -47,10 +47,10 @@ fi
 if [ ! -f "$REGISTRY" ]; then
     if [ -f "$STACK_DIR/projects.template.txt" ]; then
         cp "$STACK_DIR/projects.template.txt" "$REGISTRY"
-        echo "  projects.txt created from the template (empty — add projects: $STACK_DIR/new-project.sh <path>)"
+        echo "  projects.txt created from the template (empty — add projects: $STACK_DIR/scripts/new-project.sh <path>)"
     else
         echo "ERROR: registry $REGISTRY not found and no template present"
-        echo "  Create it: $STACK_DIR/new-project.sh <path>"
+        echo "  Create it: $STACK_DIR/scripts/new-project.sh <path>"
         exit 1
     fi
 fi

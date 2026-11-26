@@ -18,22 +18,26 @@ If `~/.stack-secrets.sh` does not exist, the stack is not configured yet. **You 
 
 ### Procedure
 
-0. **Install (fresh clone)**: if `scripts/setup.sh` has not run yet (quick check: no `craft-cli/` or no `.opencode/opencode.json` in the stack folder), run `bash {{STACK}}/scripts/setup.sh` — it installs everything (12 steps; brew steps take minutes; macOS may ask for the password in the terminal). When it finishes, tell the user to restart OpenCode so the generated config (MCP + skills) loads, then continue.
-1. Read the template `{{STACK}}/first-start.template.txt` to know the fields.
-2. Ask the user in chat, one block of questions at a time:
-   - ISP-proxy line (`host:port:login:password`, from proxy.market) + subscription expiry — if declined: web access and git-via-proxy will not be routed through the proxy (direct connection is used; may fail where GitHub is blocked)
+0. **Form first, install second** — this order matters: the setup downloads
+   through the proxy, so the personal data must be in place before
+   `setup.sh` runs. Read the template `{{STACK}}/first-start.template.txt`
+   to know the fields.
+1. Ask the user in chat, one block of questions at a time:
+   - Proxy line in whatever format the user has (`host:port:login:password`, a URL like `http://login:pass@host:port`, or any string that contains the parts — split it into PROXY_HOST/PROXY_USER/PROXY_PASS yourself) + subscription expiry (optional, ask for it if the user knows it) — if declined: web access and git-via-proxy will not be routed through the proxy (direct connection is used; may fail where GitHub is blocked)
    - git name/email — if declined: commits and PRs from the agent will not be possible
    - Wolfram ID + password (optional) — if declined: license activation is interactive, the user signs in inside `wolframscript`
    - Firecrawl (optional) — if declined: web-scraping skills will not authenticate
-3. Create `{{STACK}}/first-start.txt` from the template, write in the values the user gave (leave declined fields empty).
-4. Run `bash {{STACK}}/scripts/apply-first-start.sh` — it validates and writes `~/.stack-secrets.sh`.
-5. Verify: `bash {{STACK}}/scripts/proxy.sh test` — must report a live proxy and a working GitHub API.
-6. Craft Apps GUI: `bash {{STACK}}/scripts/craft-install.sh` (DMG installs; if macOS asks for the password, the user enters it in their terminal — you run the script and report).
-7. tldraw Desktop (GUI canvas, https://office.tldraw.com): check whether `/Applications/tldraw.app` exists; if not, tell the user to download and install it from the site (browser step), then the `tldraw` MCP and the `tldraw-offline` skill work with it.
-8. Wolfram license: check `bash {{STACK}}/scripts/check-wolfram-license.sh`; if expired, try `wolframscript -activate` non-interactively with the WOLFRAM_ID/PASS from the form; if those are absent — the user signs in interactively in `wolframscript`.
-9. Firecrawl (optional): ask the user for the API key (firecrawl.dev → dashboard) and run it yourself: `firecrawl login -k <key>`; if the user prefers not to paste the key, run `firecrawl login --browser` — the command runs in your terminal, the user only confirms in the browser. Verify with `firecrawl --status`.
-10. Projects: ask which folders should use the stack, then `bash {{STACK}}/scripts/new-project.sh <path>` for each (any folder, git not required).
-11. Finish: `bash {{STACK}}/scripts/check-all.sh` — every row must be ✅ — and tell the user to restart OpenCode in each project folder.
+2. Create `{{STACK}}/first-start.txt` from the template, write in the values the user gave (leave declined fields empty).
+3. Run `bash {{STACK}}/scripts/apply-first-start.sh` — it validates and writes `~/.stack-secrets.sh`.
+4. Verify: `bash {{STACK}}/scripts/proxy.sh test` — must report a live proxy and a working GitHub API.
+5. **Install**: if `scripts/setup.sh` has not run yet (quick check: no `craft-cli/` or no `.opencode/opencode.json` in the stack folder), run `bash {{STACK}}/scripts/setup.sh` — it installs everything (12 steps; brew steps take minutes; macOS may ask for the password in the terminal). If the proxy was configured, export its env for the run: `source {{STACK}}/scripts/proxy.sh; export http_proxy HTTP_PROXY https_proxy HTTPS_PROXY all_proxy no_proxy` (a fresh terminal or a restart of OpenCode picks this up automatically from `.zshrc`).
+6. **After setup — restart**: tell the user to restart OpenCode (and, if a long-lived terminal was used, to open a new one) so the generated config (MCP + skills) and the proxy env load. The agent may keep working in the current session and re-check MCP availability later.
+7. Craft Apps GUI: `bash {{STACK}}/scripts/craft-install.sh` (DMG installs; if macOS asks for the password, the user enters it in their terminal — you run the script and report).
+8. tldraw Desktop (GUI canvas, https://office.tldraw.com): check whether `/Applications/tldraw.app` exists; if not, tell the user to download and install it from the site (browser step), then the `tldraw` MCP and the `tldraw-offline` skill work with it.
+9. Wolfram license: check `bash {{STACK}}/scripts/check-wolfram-license.sh`; if expired, try `wolframscript -activate` non-interactively with the WOLFRAM_ID/PASS from the form; if those are absent — the user signs in interactively in `wolframscript`.
+10. Firecrawl (optional): ask the user for the API key (firecrawl.dev → dashboard) and run it yourself: `firecrawl login -k <key>`; if the user prefers not to paste the key, run `firecrawl login --browser` — the command runs in your terminal, the user only confirms in the browser. Verify with `firecrawl --status`.
+11. Projects: ask which folders should use the stack, then `bash {{STACK}}/scripts/new-project.sh <path>` for each (any folder, git not required).
+12. Finish: `bash {{STACK}}/scripts/check-all.sh` — every row must be ✅ — and remind the user once more to restart OpenCode in each project folder (the config was generated mid-session).
 
 Interactive-by-design (only the user can do them): sudo password prompts, browser confirmations (gh device login, Firecrawl login, Wolfram sign-in). Everything else — you run and verify yourself.
 
@@ -74,7 +78,7 @@ Interactive-by-design (only the user can do them): sudo password prompts, browse
 | `sync-aris.sh` | ARIS skills → skills-store (list: aris-skills.txt) |
 | `consolidate-skills.sh` | Assemble skills-store + clean global skill dirs |
 | `craft-install.sh` | Install/update Craft Apps GUI |
-| `proxy.sh` | ISP-proxy routing (status / test / expiry / git on-off) |
+| `proxy.sh` | Proxy routing (status / test / expiry / git on-off) |
 | `chrome-version.sh` | Chrome version pinned by tldraw-cli |
 | `check-wolfram-license.sh` | Wolfram license expiry |
 | `apply-first-start.sh` | Validate the form → write `~/.stack-secrets.sh` |

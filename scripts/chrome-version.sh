@@ -2,8 +2,8 @@
 # Detect the Chrome version pinned by the installed tldraw-cli
 # (via its bundled puppeteer). Prints the version or nothing.
 # Usage:
-#   VER=$(bash $STACK_DIR/chrome-version.sh)     # get version
-#   bash $STACK_DIR/chrome-version.sh            # print
+#   VER=$(bash $STACK_DIR/scripts/chrome-version.sh)     # get version
+#   bash $STACK_DIR/scripts/chrome-version.sh            # print
 
 set -uo pipefail
 

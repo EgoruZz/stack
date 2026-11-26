@@ -233,7 +233,7 @@ echo ">>> 6/12 Browser for render-visual and tldraw export..."
 echo "  Installing Playwright Chromium..."
 npx -y playwright install chromium 2>/dev/null || echo "  Playwright: install manually (npx playwright install chromium)"
 echo "  Installing Puppeteer Chrome..."
-CHROME_VER=$(bash "$STACK_DIR/chrome-version.sh" 2>/dev/null)
+CHROME_VER=$(bash "$STACK_DIR/scripts/chrome-version.sh" 2>/dev/null)
 if [ -n "$CHROME_VER" ]; then
     npx -y puppeteer browsers install "chrome@$CHROME_VER" 2>/dev/null || echo "  Puppeteer: install manually (npx puppeteer browsers install chrome@$CHROME_VER)"
 else
@@ -307,11 +307,11 @@ echo ">>> 9/12 Skills (assemble into $STACK_DIR/skills-store)..."
 # into the store. Global skill directories are emptied: skills are visible
 # only in projects (attached via skills.paths in the config).
 if [ -d "$STACK_DIR/aris-research-repo" ]; then
-    bash "$STACK_DIR/sync-aris.sh" || echo "  ARIS: sync skipped"
+    bash "$STACK_DIR/scripts/sync-aris.sh" || echo "  ARIS: sync skipped"
 else
     echo "  ARIS: clone not found, skipping"
 fi
-bash "$STACK_DIR/consolidate-skills.sh"
+bash "$STACK_DIR/scripts/consolidate-skills.sh"
 
 # ═══════════════════════════════════════
 # 9. JULIA PACKAGES

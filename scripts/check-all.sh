@@ -171,14 +171,14 @@ if [ -d $STACK_DIR/skills-store ]; then
         # launch: on a fresh machine it is absent until then — not an error,
         # but the user should know the 60th skill will appear later.
         if [ ! -d $STACK_DIR/skills-store/tldraw-offline ]; then
-            echo "✅ $N skills (global dirs clean; the 60th — tldraw-offline — will appear after the first tldraw Desktop launch, then bash $STACK_DIR/consolidate-skills.sh)"
+            echo "✅ $N skills (global dirs clean; the 60th — tldraw-offline — will appear after the first tldraw Desktop launch, then bash $STACK_DIR/scripts/consolidate-skills.sh)"
         else
             echo "✅ $N skills (global dirs clean)"
         fi
     elif [ "$N" -lt 50 ]; then
-        echo "⚠️ only $N skills — run: bash $STACK_DIR/consolidate-skills.sh"
+        echo "⚠️ only $N skills — run: bash $STACK_DIR/scripts/consolidate-skills.sh"
     else
-        echo "⚠️ $GLOBAL skills in ~/.config/opencode/skills — run: bash $STACK_DIR/consolidate-skills.sh"
+        echo "⚠️ $GLOBAL skills in ~/.config/opencode/skills — run: bash $STACK_DIR/scripts/consolidate-skills.sh"
     fi
 else
     echo "❌ $STACK_DIR/skills-store not found"

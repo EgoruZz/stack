@@ -5,11 +5,13 @@
 # The script validates the entries and distributes the data into personal files
 # (~/.stack-secrets.sh etc.). The form file itself can be deleted afterwards.
 #
-# ── ISP proxy (proxy.market): host:port:login:password, subscription expiry ──
+# ── Proxy (optional): any format the user gives — host:port:login:password, # ──
+# ── a URL (http://login:pass@host:port), or a full line with expiry.       ──
+# ── Subscription expiry (optional), format YYYY-MM-DD HH:MM ±HHMM.        ──
 PROXY_HOST=
 PROXY_USER=
 PROXY_PASS=
-PROXY_EXPIRES=YYYY-MM-DD HH:MM +ZZZZ             # format YYYY-MM-DD HH:MM ±HHMM; quotes optional
+PROXY_EXPIRES=                                    # quotes optional
 #
 # ── Wolfram ID (for non-interactive license activation; optional) ──
 WOLFRAM_ID=

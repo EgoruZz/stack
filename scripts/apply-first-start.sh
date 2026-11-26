@@ -29,9 +29,42 @@ while IFS= read -r line || [ -n "$line" ]; do
 done < "$FORM"
 
 # Fields not set in the form -> empty (set -u safe)
-for v in PROXY_HOST PROXY_USER PROXY_PASS PROXY_EXPIRES GIT_NAME GIT_EMAIL WOLFRAM_ID WOLFRAM_PASS AGENT_SUDO; do
+for v in PROXY_HOST PROXY_USER PROXY_PASS PROXY_EXPIRES PROXY_HTTP_PORT PROXY_SOCKS_PORT GIT_NAME GIT_EMAIL WOLFRAM_ID WOLFRAM_PASS AGENT_SUDO; do
     eval "test -n \"\${$v+x}\" || $v=''"
 done
+
+# ── Proxy normalization: accept any common format the user typed ──
+# Supported:
+#   "host:port:login:password"          (full line in one field)
+#   "http(s)://login:password@host:port" (URL)
+#   "host:port" in PROXY_HOST (ports are resolved by proxy.sh)
+# After normalization: PROXY_HOST = host[:port], PROXY_USER, PROXY_PASS.
+if [ -n "$PROXY_HOST" ]; then
+    # URL form: scheme://user:pass@host(:port)
+    if [[ "$PROXY_HOST" == *"://"*"@"* ]]; then
+        _pauth="${PROXY_HOST#*://}"; _pauth="${_pauth%%@*}"
+        PROXY_HOST="${PROXY_HOST#*@}"
+        PROXY_USER="${PROXY_USER:-${_pauth%%:*}}"
+        PROXY_PASS="${PROXY_PASS:-${_pauth#*:}}"
+        unset _pauth
+    fi
+    # Full-line form: host:port:login:password (3+ ':'-separated parts)
+    case "$PROXY_HOST" in
+        *:*:*:*)
+            _ph="${PROXY_HOST%%:*}"; _prest="${PROXY_HOST#*:}"
+            _pport="${_prest%%:*}"; _prest="${_prest#*:}"
+            _puser="${_prest%%:*}"; _ppass="${_prest#*:}"
+            PROXY_HOST="$_ph:$_pport"
+            PROXY_USER="${PROXY_USER:-$_puser}"
+            PROXY_PASS="${PROXY_PASS:-$_ppass}"
+            unset _ph _prest _pport _puser _ppass
+            ;;
+    esac
+    # Strip a scheme if the user left one: "http://host:port"
+    PROXY_HOST="${PROXY_HOST##*://}"
+    PROXY_HOST="${PROXY_HOST%%/*}"
+    PROXY_HOST="${PROXY_HOST%@*}"
+fi
 # The proxy is OPTIONAL: either all fields of the block are filled, or none
 P_EMPTY=0; P_FULL=0
 for v in PROXY_HOST PROXY_USER PROXY_PASS; do
@@ -54,6 +87,8 @@ PROXY_HOST="$PROXY_HOST"
 PROXY_USER="$PROXY_USER"
 PROXY_PASS="$PROXY_PASS"
 PROXY_EXPIRES="$PROXY_EXPIRES"
+PROXY_HTTP_PORT="$PROXY_HTTP_PORT"
+PROXY_SOCKS_PORT="$PROXY_SOCKS_PORT"
 EOF
 chmod 600 "$SECRETS"
 echo "✅ $SECRETS written (600)"

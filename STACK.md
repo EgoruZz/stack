@@ -99,7 +99,7 @@ The apps are pre-release: complex MS Office files open best-effort — keep back
 
 ## Network (proxy.sh)
 
-ISP proxy (proxy.market) is set in `.zshrc` (STACK_PROXY_*); local stack traffic (all MCP, localhost) goes direct (no_proxy).
+Proxy (configured by the user in the first-start form, secrets in `~/.stack-secrets.sh`) is sourced in `.zshrc` (STACK_PROXY_*); local stack traffic (all MCP, localhost) goes direct (no_proxy).
 
 ```bash
 bash $STACK/proxy.sh status    # routes state

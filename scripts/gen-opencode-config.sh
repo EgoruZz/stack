@@ -84,7 +84,7 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
         "WOLFRAM_LOCALBASE": "{env:HOME}/Library/Wolfram/Objects",
         "WOLFRAM_USERBASE": "{env:HOME}/Library/WolframEngine"
       },
-      "timeout": 120000
+      "timeout": 240000
     },
     "julia": {
       "type": "local",

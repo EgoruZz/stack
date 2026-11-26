@@ -155,7 +155,7 @@ firecrawl setup build >/dev/null 2>&1 || true
 firecrawl setup workflows >/dev/null 2>&1 || true
 
 # Chrome for tldraw export — version comes from the pin of the installed tldraw-cli
-CHROME_VER=$(bash "$STACK_DIR/chrome-version.sh" 2>/dev/null)
+CHROME_VER=$(bash "$STACK_DIR/scripts/chrome-version.sh" 2>/dev/null)
 if [ -n "$CHROME_VER" ]; then
     if ls ~/.cache/puppeteer/chrome/ 2>/dev/null | grep -q "$CHROME_VER"; then
         echo "  Chrome $CHROME_VER: already installed"
@@ -187,7 +187,7 @@ echo ""
 
 echo ">>> 9/15 ARIS skills..."
 if [ -d "$STACK_DIR/aris-research-repo" ]; then
-    bash "$STACK_DIR/sync-aris.sh" --update || echo "  ARIS: sync skipped"
+    bash "$STACK_DIR/scripts/sync-aris.sh" --update || echo "  ARIS: sync skipped"
 else
     echo "  ARIS: clone not found, skipping"
 fi
@@ -198,7 +198,7 @@ echo ""
 # ═══════════════════════════════════════
 
 echo ">>> 10/15 Skills (assemble into $STACK_DIR/skills-store)..."
-bash "$STACK_DIR/consolidate-skills.sh" || echo "  Consolidation: skipped"
+bash "$STACK_DIR/scripts/consolidate-skills.sh" || echo "  Consolidation: skipped"
 echo ""
 
 # ═══════════════════════════════════════
@@ -363,7 +363,7 @@ else
     echo "  Firecrawl credits: could not get (not logged in?)"
 fi
 
-# ── ISP proxy subscription expiry ──
+# ── proxy subscription expiry ──
 echo "  Proxy..."
 bash "$STACK_DIR/scripts/proxy.sh" expiry 2>/dev/null || echo "  ⚠️ proxy check failed"
 echo ""

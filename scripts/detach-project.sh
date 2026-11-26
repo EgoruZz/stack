@@ -79,4 +79,4 @@ fi
 
 echo ""
 echo "✅ Done: the stack is detached from $PROJECT_DIR"
-echo "   Re-attach: bash $STACK_DIR/new-project.sh $PROJECT_DIR"
+echo "   Re-attach: bash $STACK_DIR/scripts/new-project.sh $PROJECT_DIR"

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════
-#  Stack networking: ISP proxy (proxy.market, Singapore)
+#  Stack networking: proxy (set by the user in the first-start form)
 # ═══════════════════════════════════════════════════════════════
 # Dual mode:
 #   • `source $STACK_DIR/scripts/proxy.sh` — from .zshrc: exports proxy env vars
@@ -18,32 +18,42 @@
 # ═══════════════════════════════════════════════════════════════
 
 STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PROXY_HOST_DEFAULT="212.68.182.64"
-PROXY_USER_DEFAULT="cl0pmb4J"
-PROXY_PASS_DEFAULT="7sU0M2hqyl"
-PROXY_HTTP_PORT="50100"
-PROXY_SOCKS_PORT="50101"
-# Subscription expiry; check: bash proxy.sh expiry
-PROXY_EXPIRES_DEFAULT="22.12.2026 13:30"
+
 # ═══ Secrets — NOT in this file! ═══
 # Personal values are set in ~/.stack-secrets.sh (file in $HOME,
 # never committed to the repo):
 #   PROXY_HOST="..."  PROXY_USER="..."  PROXY_PASS="..."
-#   PROXY_EXPIRES="YYYY-MM-DD HH:MM +ZZZZ"
+#   PROXY_EXPIRES="YYYY-MM-DD HH:MM ±HHMM"
+#   PROXY_HTTP_PORT="..."  PROXY_SOCKS_PORT="..."   (optional)
 # The file is created by apply-first-start.sh from the form; template: first-start.template.txt.
 
-# Personal config on top of defaults (secrets, not for the repo):
-# ~/.stack-secrets.sh may override PROXY_HOST/USER/PASS/EXPIRES.
+# Personal config (secrets, not for the repo):
 [ -f "$HOME/.stack-secrets.sh" ] && source "$HOME/.stack-secrets.sh"
 
-PROXY_HOST="${PROXY_HOST:-$PROXY_HOST_DEFAULT}"
-PROXY_USER="${PROXY_USER:-$PROXY_USER_DEFAULT}"
-PROXY_PASS="${PROXY_PASS:-$PROXY_PASS_DEFAULT}"
-PROXY_EXPIRES="${PROXY_EXPIRES:-$PROXY_EXPIRES_DEFAULT}"
+PROXY_HOST="${PROXY_HOST:-}"
+PROXY_USER="${PROXY_USER:-}"
+PROXY_PASS="${PROXY_PASS:-}"
+PROXY_EXPIRES="${PROXY_EXPIRES:-}"
 
 # The form's PROXY_HOST may include the port ("host:port") — strip it:
 # the ports are added below from PROXY_HTTP_PORT / PROXY_SOCKS_PORT.
-PROXY_HOST="${PROXY_HOST%%:*}"
+if [ -n "${PROXY_HOST##*:*}" ]; then
+    : # no port in PROXY_HOST
+else
+    _stack_host_port="${PROXY_HOST#*:}"
+    PROXY_HOST="${PROXY_HOST%%:*}"
+    case "$_stack_host_port" in
+        ''|*[!0-9]*) ;;                      # not a bare port — ignore
+        *) PROXY_HTTP_PORT="${PROXY_HTTP_PORT:-$_stack_host_port}"
+           PROXY_SOCKS_PORT="${PROXY_SOCKS_PORT:-$((_stack_host_port + 1))}" ;;
+    esac
+    unset _stack_host_port
+fi
+# Default ports if the user's proxy line did not specify them and the
+# form did not set them (both overridable via ~/.stack-secrets.sh):
+PROXY_HTTP_PORT="${PROXY_HTTP_PORT:-50100}"
+PROXY_SOCKS_PORT="${PROXY_SOCKS_PORT:-50101}"
+
 STACK_PROXY_HOST="$PROXY_HOST"
 STACK_PROXY_HTTP="http://$PROXY_USER:$PROXY_PASS@$PROXY_HOST:$PROXY_HTTP_PORT"
 STACK_PROXY_SOCKS="socks5://$PROXY_USER:$PROXY_PASS@$PROXY_HOST:$PROXY_SOCKS_PORT"
@@ -64,10 +74,10 @@ _stack_proxy_expiry() {
         echo "❌ STACK_PROXY_EXPIRES not recognized: '$STACK_PROXY_EXPIRES'"; return 1; }
     now=$(date +%s); diff=$(( (epoch - now) / 86400 ))
     if [ "$diff" -lt 0 ]; then
-        echo "❌ Proxy expired! Renew the subscription: https://proxy.market (then update PROXY_* in proxy.sh or ~/.stack-secrets.sh)"
+        echo "❌ Proxy expired! Renew the subscription (then update PROXY_* in ~/.stack-secrets.sh via first-start.txt or scripts/apply-first-start.sh)"
         return 1
     elif [ "$diff" -lt 7 ]; then
-        echo "⚠️  Proxy expires in $diff days — renew: https://proxy.market"
+        echo "⚠️  Proxy expires in $diff days — renew the subscription"
     else
         echo "✅ Proxy valid ($diff days left), expires $STACK_PROXY_EXPIRES"
     fi
