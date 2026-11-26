@@ -29,7 +29,16 @@ echo ""
 
 echo ">>> 2/15 Homebrew (stack packages only)..."
 brew update
-brew upgrade node python@3.12 gh ffmpeg ripgrep anomalyco/tap/opencode-v2 2>/dev/null || echo "  brew: some packages updated"
+# OpenCode: update via brew only if it was installed via brew;
+# a curl/script install is updated by its own `opencode upgrade`.
+if brew list --formula anomalyco/tap/opencode-v2 &>/dev/null; then
+    BREW_UPGRADE_PKGS="node python@3.12 gh ffmpeg ripgrep anomalyco/tap/opencode-v2"
+else
+    echo "  opencode: not a brew install — updating via 'opencode upgrade'"
+    opencode upgrade >/dev/null 2>&1 || echo "  opencode upgrade: skipped/failed (update manually)"
+    BREW_UPGRADE_PKGS="node python@3.12 gh ffmpeg ripgrep"
+fi
+brew upgrade $BREW_UPGRADE_PKGS 2>/dev/null || echo "  brew: some packages updated"
 brew cleanup --prune=all --quiet 2>/dev/null
 echo ""
 echo ">>> 3/15 Apple (Command Line Tools, system updates)..."

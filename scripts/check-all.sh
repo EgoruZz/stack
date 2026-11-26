@@ -90,10 +90,12 @@ else
     echo "❌ venv not found"
 fi
 
-# VS Code
+# VS Code: prefer the `code` CLI (works for any install method),
+# fall back to the default app location
 echo -n "VS Code: "
-if [ -d "/Applications/Visual Studio Code.app" ]; then
-    VS_VER=$("/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code" --version 2>/dev/null | head -1)
+VSCODE_BIN="$(command -v code 2>/dev/null || echo "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code")"
+if [ -x "$VSCODE_BIN" ]; then
+    VS_VER=$("$VSCODE_BIN" --version 2>/dev/null | head -1)
     if [ -n "$VS_VER" ]; then
         echo "✅ $VS_VER"
     else

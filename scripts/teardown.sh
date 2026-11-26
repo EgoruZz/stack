@@ -80,13 +80,17 @@ if [ -f /etc/sudoers.d/stack-agent ]; then
 fi
 
 # ── 4. Firecrawl state (CLI account + skills it installed globally) ──
-rmfile "$HOME/.firecrawl"
+if [ -e "$HOME/.firecrawl" ]; then
+    if confirm "Remove Firecrawl state (~/.firecrawl: account, skills cache)?"; then
+        rmfile "$HOME/.firecrawl"
+    fi
+fi
 for d in "$HOME/.claude/skills" "$HOME/.config/opencode/skills" \
          "$HOME/.claude/commands" "$HOME/.codex/skills"; do
     if [ -d "$d" ] && ls "$d" 2>/dev/null | grep -q 'firecrawl'; then
         if [ "$DRY" = "1" ]; then
             echo "[dry] would remove firecrawl skills from: $d"
-        else
+        elif confirm "Remove firecrawl skills from $d?"; then
             find "$d" -maxdepth 1 -iname '*firecrawl*' -exec rm -rf {} + 2>/dev/null
             echo "✅ firecrawl skills removed from: $d"
         fi
@@ -134,7 +138,8 @@ rmfile "$STACK_DIR/paraview-mcp-env"
 for pkg in "@kitschpatrol/tldraw-cli" "firecrawl-cli"; do
     if npm ls -g "$pkg" >/dev/null 2>&1; then
         if [ "$DRY" = "1" ]; then echo "[dry] would npm uninstall -g $pkg"
-        else npm uninstall -g "$pkg" >/dev/null 2>&1 && echo "✅ npm uninstalled: $pkg"; fi
+        elif confirm "npm uninstall -g $pkg (installed by the stack)?"; then
+            npm uninstall -g "$pkg" >/dev/null 2>&1 && echo "✅ npm uninstalled: $pkg"; fi
     fi
 done
 
@@ -155,14 +160,19 @@ if command -v code &>/dev/null; then
                julialang.language-julia wolframresearch.wolfram james-yu.latex-workshop; do
         if code --list-extensions 2>/dev/null | grep -q "^$ext$"; then
             if [ "$DRY" = "1" ]; then echo "[dry] would remove VS Code ext: $ext"
-            else code --uninstall-extension "$ext" >/dev/null 2>&1 && echo "✅ VS Code ext removed: $ext"; fi
+            elif confirm "Uninstall VS Code extension: $ext?"; then
+                code --uninstall-extension "$ext" >/dev/null 2>&1 && echo "✅ VS Code ext removed: $ext"; fi
         fi
     done
 fi
 
 # ── 9. Browser caches for headless renders ─────────────────────
-rmfile "$HOME/.cache/puppeteer"
-rmfile "$HOME/.cache/ms-playwright"
+if [ -e "$HOME/.cache/puppeteer" ] || [ -e "$HOME/.cache/ms-playwright" ]; then
+    if confirm "Remove headless-render browser caches (~/.cache/puppeteer, ~/.cache/ms-playwright, ~400 MB)?"; then
+        rmfile "$HOME/.cache/puppeteer"
+        rmfile "$HOME/.cache/ms-playwright"
+    fi
+fi
 
 # ── 10. Brew packages (--deep; ONLY what is genuinely new) ─────
 if [ "$DEEP" = "1" ]; then
@@ -211,7 +221,7 @@ fi
 if command -v wolframscript &>/dev/null; then
     if [ "$DRY" = "1" ]; then
         echo "[dry] would uninstall the Wolfram AgentTools paclet"
-    else
+    elif confirm "Uninstall the Wolfram AgentTools paclet?"; then
         wolframscript -code 'PacletUninstall["Wolfram/AgentTools"]' >/dev/null 2>&1 \
             && echo "✅ Wolfram AgentTools paclet uninstalled" || echo "ℹ️ AgentTools not removed (not installed)"
     fi

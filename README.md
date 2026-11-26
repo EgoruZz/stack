@@ -17,9 +17,19 @@ Four steps. The rest the agent does with you, in chat.
 
 **1. Install OpenCode**
 
+If Homebrew is installed (recommended — updates come with `brew upgrade`):
+
 ```bash
 brew install anomalyco/tap/opencode-v2
 ```
+
+If you don't have Homebrew yet, install OpenCode without it (official installer, ~30 seconds):
+
+```bash
+curl -fsSL https://opencode.ai/install | bash
+```
+
+Both installs are equally supported by the stack — every script just calls `opencode`. Pick **one** install method and stay with it: a brew install is updated by `brew upgrade` (and by `update-all.sh`), a script install is updated by `opencode upgrade` (and by `update-all.sh`). They don't fight each other — `update-all.sh` detects which one you have.
 
 **2. Clone the stack anywhere**
 
@@ -55,7 +65,8 @@ Removes everything the stack installed or changed:
 - detaches the stack from all projects (project-scoped MCP configs and skills go with them — none of it is global)
 - cleans files it wrote: `.zshrc` proxy block, `~/.stack-secrets.sh`, `~/.stack-wolfram.conf`, Firecrawl state
 - removes generated artifacts: venvs, cloned MCP repos, `craft-cli`, skills-store
-- with `--deep`: brew packages the stack added (identified against `.brew-pre-manifest.txt` — a snapshot of what existed before installation), npm CLIs, VS Code extensions, Craft Apps GUI
+- with `--deep`: brew packages the stack added (identified against `.brew-pre-manifest.txt` — a snapshot of what existed before installation)
+- every removal asks `y/N`: Craft Apps, VS Code extensions, npm CLIs, browser caches, brew packages, Julia depot, Firecrawl state, the Wolfram AgentTools paclet (or use `--yes` to answer `y` to everything)
 
 **Never touched:** OpenCode itself, the stack git repo, Wolfram license data, and anything the user had before installation.
 
