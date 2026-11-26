@@ -242,5 +242,12 @@ else
     echo "❌ $PROJ_OK/$PROJ_TOTAL point to this stack — fix the ⚠️ rows above"
 fi
 
+echo -n "Docs consistency: "
+if bash "$STACK_DIR/scripts/check-docs.sh" >/dev/null 2>&1; then
+    echo "✅ (details: bash $STACK_DIR/scripts/check-docs.sh)"
+else
+    echo "❌ — run: bash $STACK_DIR/scripts/check-docs.sh"
+fi
+
 echo ""
 echo "=== Done ==="

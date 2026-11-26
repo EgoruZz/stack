@@ -26,7 +26,7 @@ These are what we check for any change — you can do it yourself or let us hand
 2. **No secrets in the repo** — templates only; personal values live in `~/.stack-secrets.sh` / `.zshrc`
 3. **Path-agnostic** — every script locates its own root (`STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"`); no hardcoded `$HOME/stack` in code. Project configs (`gen-opencode-config.sh`) bake absolute paths at generation time; `sync-agents.sh` rewrites them if the stack moves
 4. **AGENTS.md is generated** — the committed source is `AGENTS.template.md` (with a `{{STACK}}` placeholder); `AGENTS.md` is a committed thin bootstrap for fresh clones, replaced by a local render on the first setup run (git hides the render via `skip-worktree`). Edit the template, never the render
-5. **Consistent docs** — counters (CLI/MCP/skills/steps) and commands match across README, `AGENTS.template.md`, STACK.md
+5. **Consistent docs** — counters (CLI/MCP/skills/steps) and commands match across README, `AGENTS.template.md`, STACK.md. Don't verify by hand: `bash scripts/check-docs.sh` does it (also wired into `check-all.sh` and CI)
 6. **Project-scoped** — no changes that make the stack global
 
 ## Code of Conduct
