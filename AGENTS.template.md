@@ -41,7 +41,7 @@ Interactive-by-design (only the user can do them): sudo password prompts, browse
 
 | File / folder | Purpose |
 |:---:|:---:|
-| `AGENTS.template.md` | Agent instructions source (a path placeholder is substituted on render); `AGENTS.md` is a local render, gitignored — edit the template only |
+| `AGENTS.template.md` | Agent instructions source (a path placeholder is substituted on render); `AGENTS.md` is a committed bootstrap for fresh clones, overwritten by a local render — edit the template only |
 | `README.md` | Human documentation |
 | `STACK.md` | Full tool reference (keybinds, examples) |
 | `workflow.txt` | The owner's personal git flow |

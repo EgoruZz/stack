@@ -9,6 +9,24 @@ echo "============================================"
 echo ""
 
 # ═══════════════════════════════════════
+# 0. AGENTS.md RENDER
+# ═══════════════════════════════════════
+
+# The committed AGENTS.md is a thin bootstrap for the agent on a fresh clone.
+# Render the real instructions immediately, so they exist from minute one —
+# the full sync into projects happens later (step 14/15 of update-all.sh,
+# or scripts/sync-agents.sh).
+echo ">>> 0/12 AGENTS.md render..."
+if [ -f "$STACK_DIR/AGENTS.template.md" ]; then
+    sed "s|{{STACK}}|$STACK_DIR|g" "$STACK_DIR/AGENTS.template.md" > "$STACK_DIR/AGENTS.md"
+    # Local render of a tracked file — hide it from git status
+    git -C "$STACK_DIR" update-index --skip-worktree AGENTS.md 2>/dev/null || true
+    echo "  AGENTS.md rendered from AGENTS.template.md"
+else
+    echo "  ⚠️ AGENTS.template.md not found — keeping the bootstrap AGENTS.md"
+fi
+
+# ═══════════════════════════════════════
 # 1. SYSTEM DEPENDENCIES
 # ═══════════════════════════════════════
 

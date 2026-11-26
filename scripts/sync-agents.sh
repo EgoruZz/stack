@@ -33,8 +33,11 @@ STACK_AGENTS="$(mktemp)"
 trap 'rm -f "$STACK_AGENTS"' EXIT
 sed "s|{{STACK}}|$STACK_DIR|g" "$STACK_TEMPLATE" > "$STACK_AGENTS"
 
-# Render AGENTS.md for sessions inside the stack itself (gitignored, local)
+# Render AGENTS.md for sessions inside the stack itself (local render; the
+# committed file is a thin bootstrap for fresh clones — see AGENTS.md)
 sed "s|{{STACK}}|$STACK_DIR|g" "$STACK_TEMPLATE" > "$STACK_DIR/AGENTS.md"
+# The render of a tracked file is per-machine — hide it from git status
+git -C "$STACK_DIR" update-index --skip-worktree AGENTS.md 2>/dev/null || true
 
 if ! grep -q "STACK:START" "$STACK_AGENTS"; then
     echo "ERROR: STACK:START/END markers not found in $STACK_AGENTS"

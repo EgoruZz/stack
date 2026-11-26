@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.png" alt="Stack" width="100%">
+  <img src="assets/painting.png" alt="Stack" width="100%">
 </p>
 
 <h1 align="center">Stack</h1>
@@ -27,7 +27,7 @@ Everything is idempotent: run the same script on a fresh or an already-configure
 
 | Path | What it is |
 |:---|:---|
-| `AGENTS.template.md` | Agent instructions source; rendered into `AGENTS.md` (gitignored) with the real stack path |
+| `AGENTS.template.md` | Agent instructions source; `AGENTS.md` is a committed bootstrap for fresh clones, replaced by a local render on first setup |
 | `STACK.md` | Full tool reference for the user (keybinds, examples) |
 | `scripts/` | All stack scripts — setup, update, check, teardown, proxy, project management |
 | `skills/` | 8 standalone agent skills (source) |
@@ -38,7 +38,7 @@ Everything is idempotent: run the same script on a fresh or an already-configure
 
 Everything else (`skills-store/`, `craft-cli/`, cloned MCP repos, venvs) is generated and gitignored.
 
-## Quick start
+## Constructor
 
 Four steps. The rest the agent does with you, in chat.
 
@@ -67,9 +67,22 @@ opencode
 Set up the stack
 ```
 
-That's it. The agent reads `AGENTS.md`, runs the installation, asks you for the personal data (proxy, git identity, Wolfram ID — each optional, and it warns what stops working if you decline), fills the form, verifies every component and attaches your project folders. When it finishes, every row of its health check is ✅ — restart OpenCode in your project folder and work.
+That's it. Even on a fresh clone the committed `AGENTS.md` is a bootstrap that tells the agent exactly what to do: read `AGENTS.template.md`, run the installation, ask you for the personal data (proxy, git identity, Wolfram ID — each optional, and it warns what stops working if you decline), fill the form, verify every component and attach your project folders. When it finishes, every row of its health check is ✅ — restart OpenCode in your project folder and work.
 
 You only ever do what only a human can do: type answers, click links, confirm in the browser.
+
+## Attaching projects
+
+The stack activates per-project, nothing global:
+
+```bash
+bash scripts/new-project.sh ~/work/my-project   # existing folder
+bash scripts/new-project.sh ~/projects/new-one  # creates it if missing
+```
+
+Each project gets an `AGENTS.md` with the stack section and a `.opencode/opencode.json` with the stack's MCP servers and skills (absolute paths). Open `opencode` in the project and the whole stack is there.
+
+**Moving the stack?** Re-run `bash scripts/sync-agents.sh` in its new location — it re-renders `AGENTS.md` and rewrites all project configs. `bash scripts/check-all.sh` reports any project whose config still points elsewhere or whose folder has vanished.
 
 ## Destructor
 

@@ -206,5 +206,41 @@ else
     echo "❌ FastMCP $MCP_OK/$MCP_TOTAL venvs; ParaView patches: $PV_PATCHED/1 — re-run: bash $STACK_DIR/scripts/setup.sh"
 fi
 
+# Attached projects: every registered project must exist, and its generated
+# OpenCode config must point to THIS stack (otherwise — stack moved/re-cloned,
+# or the project was detached and the registry entry is stale).
+echo -n "Attached projects: "
+PROJ_OK=0; PROJ_TOTAL=0; PROJ_STALE=0
+if [ -f "$STACK_DIR/projects.txt" ]; then
+    while IFS= read -r line; do
+        [[ "$line" =~ ^[[:space:]]*# ]] && continue
+        [[ -z "${line// }" ]] && continue
+        case "$line" in
+            "~") P="$HOME" ;;
+            "~/"*) P="$HOME/${line#\~/}" ;;
+            *) P="$line" ;;
+        esac
+        PROJ_TOTAL=$((PROJ_TOTAL+1))
+        if [ ! -d "$P" ]; then
+            echo ""
+            echo "  ⚠️ $line: folder gone — clean the registry: bash $STACK_DIR/scripts/sync-agents.sh --prune"
+            PROJ_STALE=$((PROJ_STALE+1))
+        elif [ -f "$P/.opencode/opencode.json" ] && grep -qF "$STACK_DIR" "$P/.opencode/opencode.json"; then
+            PROJ_OK=$((PROJ_OK+1))
+        else
+            echo ""
+            echo "  ⚠️ $P: config missing or points to another stack location — re-attach: bash $STACK_DIR/scripts/new-project.sh $P"
+            PROJ_STALE=$((PROJ_STALE+1))
+        fi
+    done < "$STACK_DIR/projects.txt"
+fi
+if [ "$PROJ_TOTAL" -eq 0 ]; then
+    echo "none registered — attach one: bash $STACK_DIR/scripts/new-project.sh <path>"
+elif [ "$PROJ_STALE" -eq 0 ]; then
+    echo "✅ $PROJ_OK/$PROJ_TOTAL point to this stack"
+else
+    echo "❌ $PROJ_OK/$PROJ_TOTAL point to this stack — fix the ⚠️ rows above"
+fi
+
 echo ""
 echo "=== Done ==="
