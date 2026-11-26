@@ -127,6 +127,17 @@ for pkg in "@kitschpatrol/tldraw-cli" "firecrawl-cli"; do
     fi
 done
 
+# ── 7b. Craft Apps GUI (installed by the stack via DMG — never pre-existing) ──
+for app in WordCraft GridCraft DeckCraft PdfCraft FigCraft; do
+    app="/Applications/${app}.app"
+    [ -d "$app" ] || continue
+    if [ "$DRY" = "1" ]; then
+        echo "[dry] would remove: $app"
+    elif confirm "Remove $app (installed by the stack)?"; then
+        rm -rf "$app" && echo "✅ removed: $app"
+    fi
+done
+
 # ── 8. VS Code extensions (only the 6 stack ones) ──────────────
 if command -v code &>/dev/null; then
     for ext in tldraw-org.tldraw-vscode ms-python.python ms-toolsai.jupyter \

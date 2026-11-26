@@ -82,7 +82,7 @@ Removes everything the stack installed or changed:
 - detaches the stack from all projects (project-scoped MCP configs and skills go with them — none of it is global)
 - cleans files it wrote: `.zshrc` proxy block, `~/.stack-secrets.sh`, `~/.stack-wolfram.conf`, Firecrawl state
 - removes generated artifacts: venvs, cloned MCP repos, `craft-cli`, skills-store
-- with `--deep`: brew packages the stack added (identified against `.brew-pre-manifest.txt` — a snapshot of what existed before installation), npm CLIs, VS Code extensions
+- with `--deep`: brew packages the stack added (identified against `.brew-pre-manifest.txt` — a snapshot of what existed before installation), npm CLIs, VS Code extensions, Craft Apps GUI
 
 **Never touched:** OpenCode itself, the stack git repo, Wolfram license data, and anything the user had before installation.
 
