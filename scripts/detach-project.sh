@@ -10,7 +10,7 @@
 
 set -euo pipefail
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REGISTRY="$STACK_DIR/projects.txt"
 
 if [ $# -eq 0 ]; then

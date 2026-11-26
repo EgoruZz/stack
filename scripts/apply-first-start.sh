@@ -1,11 +1,11 @@
 #!/bin/bash
 # Applies the filled-in first-start form (first-start.txt).
-# Run:  bash $STACK_DIR/apply-first-start.sh [path-to-form]
+# Run:  bash $STACK_DIR/scripts/apply-first-start.sh [path-to-form]
 # By default looks for $STACK_DIR/first-start.txt (a copy of the template with data).
 
 set -uo pipefail
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FORM="${1:-$STACK_DIR/first-start.txt}"
 SECRETS="$HOME/.stack-secrets.sh"
 
@@ -81,7 +81,7 @@ else
 fi
 
 echo ""
-echo "Done. Check: bash $STACK_DIR/proxy.sh test && bash $STACK_DIR/check-all.sh"
+echo "Done. Check: bash $STACK_DIR/scripts/proxy.sh test && bash $STACK_DIR/scripts/check-all.sh"
 
 # Passwordless sudo for the agent (optional)
 SUDOERS="/etc/sudoers.d/stack-agent"

@@ -16,7 +16,7 @@
 set -euo pipefail
 
 # Stack root = the folder containing this script
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 TARGET="${1:-}"
 if [ -z "$TARGET" ]; then
@@ -101,7 +101,7 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
     },
     "ParaView": {
       "type": "local",
-      "command": ["bash", "__STACK__/paraview-run.sh"],
+      "command": ["bash", "__STACK__/scripts/paraview-run.sh"],
       "enabled": true,
       "timeout": 60000
     },

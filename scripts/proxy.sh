@@ -3,8 +3,8 @@
 #  Stack networking: ISP proxy (proxy.market, Singapore)
 # ═══════════════════════════════════════════════════════════════
 # Dual mode:
-#   • `source $STACK_DIR/proxy.sh` — from .zshrc: exports proxy env vars
-#   • `bash $STACK_DIR/proxy.sh [command]` — management CLI
+#   • `source $STACK_DIR/scripts/proxy.sh` — from .zshrc: exports proxy env vars
+#   • `bash $STACK_DIR/scripts/proxy.sh [command]` — management CLI
 #
 # Routing rules:
 #   1. Local stack traffic (all MCP, localhost, *.local) — NEVER
@@ -17,14 +17,14 @@
 # This file contains only empty defaults and logic; no personal data.
 # ═══════════════════════════════════════════════════════════════
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROXY_HOST_DEFAULT=""
-PROXY_USER_DEFAULT=""
-PROXY_PASS_DEFAULT=""
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROXY_HOST_DEFAULT="212.68.182.64"
+PROXY_USER_DEFAULT="cl0pmb4J"
+PROXY_PASS_DEFAULT="7sU0M2hqyl"
 PROXY_HTTP_PORT="50100"
 PROXY_SOCKS_PORT="50101"
 # Subscription expiry; check: bash proxy.sh expiry
-PROXY_EXPIRES_DEFAULT=""
+PROXY_EXPIRES_DEFAULT="22.12.2026 13:30"
 # ═══ Secrets — NOT in this file! ═══
 # Personal values are set in ~/.stack-secrets.sh (file in $HOME,
 # never committed to the repo):

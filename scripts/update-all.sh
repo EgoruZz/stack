@@ -7,7 +7,7 @@
 
 set -uo pipefail
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "============================================"
 echo "  Stack update"
@@ -322,9 +322,9 @@ for repo in wordcraft gridcraft deckcraft pdfcraft figcraft; do
     LATEST=$(curl -s --max-time 20 "https://api.github.com/repos/storytold/$repo/releases/latest" \
         | grep -o '"tag_name": "[^"]*"' | cut -d'"' -f4 | sed 's/^v//')
     if [ -z "$INSTALLED" ]; then
-        echo "  $APP_NAME: not installed (install: bash $STACK_DIR/craft-install.sh)"
+        echo "  $APP_NAME: not installed (install: bash $STACK_DIR/scripts/craft-install.sh)"
     elif [ -n "$LATEST" ] && [ "$INSTALLED" != "$LATEST" ]; then
-        echo "  $APP_NAME: $INSTALLED → $LATEST available — update: bash $STACK_DIR/craft-install.sh"
+        echo "  $APP_NAME: $INSTALLED → $LATEST available — update: bash $STACK_DIR/scripts/craft-install.sh"
     else
         echo "  $APP_NAME: $INSTALLED up to date"
     fi
@@ -365,7 +365,7 @@ fi
 
 # ── ISP proxy subscription expiry ──
 echo "  Proxy..."
-bash "$STACK_DIR/proxy.sh" expiry 2>/dev/null || echo "  ⚠️ proxy check failed"
+bash "$STACK_DIR/scripts/proxy.sh" expiry 2>/dev/null || echo "  ⚠️ proxy check failed"
 echo ""
 
 # ═══════════════════════════════════════
@@ -373,7 +373,7 @@ echo ""
 # ═══════════════════════════════════════
 
 echo ">>> 13/15 Stack check..."
-bash "$STACK_DIR/check-all.sh"
+bash "$STACK_DIR/scripts/check-all.sh"
 
 # ═══════════════════════════════════════
 # 12. AGENTS.md SYNC
@@ -381,7 +381,7 @@ bash "$STACK_DIR/check-all.sh"
 
 echo ""
 echo ">>> 14/15 AGENTS.md sync..."
-bash "$STACK_DIR/sync-agents.sh" --no-hint
+bash "$STACK_DIR/scripts/sync-agents.sh" --no-hint
 
 # ═══════════════════════════════════════
 # 13. FINAL

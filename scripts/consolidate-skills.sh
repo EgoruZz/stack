@@ -12,7 +12,7 @@
 
 set -uo pipefail
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 STORE="$STACK_DIR/skills-store"
 ARIS_REPO="$STACK_DIR/aris-research-repo"
 ARIS_LIST="$STACK_DIR/aris-skills.txt"

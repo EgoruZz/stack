@@ -1,40 +1,40 @@
-0. Убедись что ты в актуальном main
+0. Make sure you are on up-to-date main
 git checkout main
 git pull origin main
 
-1. Создаешь рабочую ветку
+1. Create a working branch
 git checkout -b working
 
-2. Работаешь с файлами
-(пишешь конспекты, код, схемы)
+2. Work with files
+(writing notes, code, diagrams)
 
-3. проверяешь изменения (очень важно)
+3. Review the changes (very important)
 git status
 git diff
 
-4. Добавляешь файлы (осознанно)
-Вариант А: git add path/to/file1 path/to/file2
-Вариант Б: git add -p (интерактивно — лучше для роста)
+4. Add files (deliberately)
+Option A: git add path/to/file1 path/to/file2
+Option B: git add -p (interactive — better for growth)
 
-5. Создаешь commit
+5. Create a commit
 git commit -m "type(scope): short description"
-правило:1 commit = 1 смысловой блок изменений
+rule: 1 commit = 1 meaningful block of changes
 
-6. Проверка истории (обязательно)
+6. Check the history (mandatory)
 git log --oneline -n 5
 
-7. Синхронизация с main (ПЕРЕД PUSH)
+7. Sync with main (BEFORE PUSH)
 git fetch origin
 git rebase origin/main
 
-8. Отправляешь ветку в GitHub
+8. Push the branch to GitHub
 git push origin working
 
-9. Создаешь Pull Request (gh есть)
+9. Create a Pull Request (gh is available)
 * base: main
 * compare: working
 
-10. Описание PR (обязательно)
+10. PR description (mandatory)
 ## What was added
 - ...
 
@@ -44,30 +44,30 @@ git push origin working
 ## Notes
 - ...
 
-11. Review (обязательно)
-Перед merge проверь:
-* нет ли мусора
-* логично ли разбиты изменения
-* нет ли лишних файлов
+11. Review (mandatory)
+Before merge, check:
+* no junk
+* changes split logically
+* no extra files
 
-12. Merge через GitHub (gh есть)
-Нажимаешь: “Merge pull request”
-Выбирай: “Create merge commit”
+12. Merge via GitHub (gh is available)
+Click: "Merge pull request"
+Choose: "Create a merge commit"
 
-13. Уходишь в другую ветку
+13. Switch to another branch
 git checkout main
 git pull origin main
 
-14. Удаляешь ветку (опционально)
+14. Delete the branch (optional)
 git branch -d working
 git push origin --delete working
 
-15. Release (ОПЦИОНАЛЬНО — не на каждый commit/PR, а когда решаешь сам)
-Release = тег + заметки на странице Releases репозитория (GitHub).
-Пользователи стека видят: что нового и нужен ли повторный setup.sh.
-Команда:
+15. Release (OPTIONAL — not on every commit/PR, but when you decide yourself)
+Release = a tag + notes on the repository's Releases page (GitHub).
+Stack users see: what's new and whether a re-run of setup.sh is needed.
+Command:
 git tag vX.Y.Z && git push origin vX.Y.Z
-gh release create vX.Y.Z --title "vX.Y.Z" --notes "- изменения...
-Повторный setup.sh: да/нет (bash ~/stack/setup.sh — идемпотентен)"
-Правило: патч (X.Y.+1) — обычный update-all.sh; минор/мажор (X.+1.Y,
-+1.0.0) — после update-all.sh выполнить setup.sh, затем перезапустить OpenCode.
+gh release create vX.Y.Z --title "vX.Y.Z" --notes "- changes...
+Re-run setup.sh: yes/no (bash ~/stack/setup.sh — idempotent)"
+Rule: patch (X.Y.+1) — a regular update-all.sh; minor/major (X.+1.Y,
++1.0.0) — after update-all.sh run setup.sh, then restart OpenCode.

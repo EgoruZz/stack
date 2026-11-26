@@ -13,7 +13,7 @@
 
 set -uo pipefail
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 STACK_TEMPLATE="$STACK_DIR/AGENTS.template.md"
 REGISTRY="$STACK_DIR/projects.txt"
 
@@ -110,7 +110,7 @@ MISSING=0
 SEEN=$(mktemp)
 
 # The stack own config (for sessions in $STACK_DIR) — regenerate from the template
-bash "$STACK_DIR/gen-opencode-config.sh" "$STACK_DIR" >/dev/null 2>&1 \
+bash "$STACK_DIR/scripts/gen-opencode-config.sh" "$STACK_DIR" >/dev/null 2>&1 \
     && echo "  $STACK_DIR/.opencode/opencode.json: regenerated" \
     || echo "  ⚠️ config for $STACK_DIR not generated"
 
@@ -139,7 +139,7 @@ while IFS= read -r project || [ -n "$project" ]; do
 
     # OpenCode config (.opencode/opencode.json) — the project gets the stack MCP/skills.
     # The stack activates only where this file is generated.
-    if bash "$STACK_DIR/gen-opencode-config.sh" "$project" >/dev/null 2>&1; then
+    if bash "$STACK_DIR/scripts/gen-opencode-config.sh" "$project" >/dev/null 2>&1; then
         CONFIGURED=$((CONFIGURED + 1))
     else
         echo "  $project: ⚠️ OpenCode config not generated"

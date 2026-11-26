@@ -1,29 +1,41 @@
-# AGENTS.md
+# AGENTS.md — Stack agent instructions
 
 <!-- STACK:START -->
 ## Installed stack
 
-The stack lives in `{{STACK}}/`. Start OpenCode here: `cd {{STACK}} && opencode`.
+The stack lives in `{{STACK}}`. Start OpenCode there (or in any project attached to it). All scripts are in `{{STACK}}/scripts/`.
 
 ## ⭐ FIRST START — agent-driven (do this when `~/.stack-secrets.sh` is missing)
 
-If `~/.stack-secrets.sh` does not exist, the stack is not configured yet. **You lead the setup** — do not dump a manual on the user. Procedure:
+If `~/.stack-secrets.sh` does not exist, the stack is not configured yet. **You lead the setup.** The user only does what only a human can do: type answers, confirm in the browser, enter passwords in prompts. Everything else you run and verify yourself.
 
-> ⚠️ **An existing filled form matters.** If `first-start.txt` exists AND is filled, or if `~/.stack-secrets.sh` exists — the personal data is already known: do NOT delete or overwrite it, go straight to the missing steps. A filled form + `apply-first-start.sh` is idempotent and safe to re-run; an EMPTY form is not (it wipes `~/.stack-secrets.sh`).
+### Golden rules
 
-0. **Install first (fresh clone)**: if `$STACK/setup.sh` has not run yet (quick check: no `craft-cli/` or no `.opencode/opencode.json` in the stack folder), run `bash $STACK/setup.sh` — it installs everything (12 steps, may ask for the macOS password in the terminal; brew steps take minutes). When it finishes, tell the user to restart OpenCode so the generated config (MCP + skills) loads, then continue. **Never run `teardown.sh` while debugging — it is for full removal only, and never pipe canned answers into it.**
-1. Read the template `{{STACK}}/first-start.template.txt` to know the fields
-2. Ask the user in chat for: ISP-proxy line (`host:port:login:password`, from proxy.market), subscription expiry, git name/email; optionally Wolfram ID + password (enables non-interactive license activation)
-3. Create `{{STACK}}/first-start.txt` from the template, write in the values the user gave
-4. Run `bash {{STACK}}/apply-first-start.sh` — it validates and writes `~/.stack-secrets.sh`
-5. Verify: `bash {{STACK}}/proxy.sh test` — must report a live proxy and a working GitHub API
-6. Craft Apps GUI: `bash {{STACK}}/craft-install.sh` (DMG installs; if macOS asks for the password, the user enters it in their terminal — you run the script and report)
-7. Wolfram license: check `bash {{STACK}}/check-wolfram-license.sh`; if expired, guide renewal at https://www.wolfram.com/engine/, then try `wolframscript -activate` non-interactively with the WOLFRAM_ID/PASS from the form; if those are absent — the user signs in interactively in `wolframscript`
-8. Firecrawl (optional): suggest `firecrawl login --browser` (user action, browser needed)
-9. Projects: ask which folders should use the stack, then `bash {{STACK}}/new-project.sh <path>` for each (any folder, git not required)
-10. Finish: `bash {{STACK}}/check-all.sh` — every row must be ✅ — and tell the user to restart OpenCode in each project folder
+- Ask before you install nothing — setup.sh handles installation; you handle configuration.
+- Every optional feature (proxy, git identity, Wolfram, Firecrawl, sudo) is a question with a consequence: if the user declines, tell them plainly what will not work. Declined = skipped, never half-configured.
+- Never run `scripts/teardown.sh` while debugging — it is for full removal only. Never pipe canned answers into it.
+- An existing filled `first-start.txt` or an existing `~/.stack-secrets.sh` means personal data is already known: do NOT delete or overwrite it. `scripts/apply-first-start.sh` is idempotent and safe to re-run; an EMPTY form is not.
 
-Interactive-by-design (only the user can do them): sudo password prompts, browser confirmations (gh device login, Firecrawl login, Wolfram sign-in). Everything else — you run and verify yourself. If the form already exists and is filled, skip the questions and go straight to `apply-first-start.sh`.
+### Procedure
+
+0. **Install (fresh clone)**: if `scripts/setup.sh` has not run yet (quick check: no `craft-cli/` or no `.opencode/opencode.json` in the stack folder), run `bash {{STACK}}/scripts/setup.sh` — it installs everything (12 steps; brew steps take minutes; macOS may ask for the password in the terminal). When it finishes, tell the user to restart OpenCode so the generated config (MCP + skills) loads, then continue.
+1. Read the template `{{STACK}}/first-start.template.txt` to know the fields.
+2. Ask the user in chat, one block of questions at a time:
+   - ISP-proxy line (`host:port:login:password`, from proxy.market) + subscription expiry — if declined: web access and git-via-proxy will not be routed through the proxy (direct connection is used; may fail where GitHub is blocked)
+   - git name/email — if declined: commits and PRs from the agent will not be possible
+   - Wolfram ID + password (optional) — if declined: license activation is interactive, the user signs in inside `wolframscript`
+   - Firecrawl (optional) — if declined: web-scraping skills will not authenticate
+3. Create `{{STACK}}/first-start.txt` from the template, write in the values the user gave (leave declined fields empty).
+4. Run `bash {{STACK}}/scripts/apply-first-start.sh` — it validates and writes `~/.stack-secrets.sh`.
+5. Verify: `bash {{STACK}}/scripts/proxy.sh test` — must report a live proxy and a working GitHub API.
+6. Craft Apps GUI: `bash {{STACK}}/scripts/craft-install.sh` (DMG installs; if macOS asks for the password, the user enters it in their terminal — you run the script and report).
+7. tldraw Desktop (GUI canvas, https://office.tldraw.com): check whether `/Applications/tldraw.app` exists; if not, tell the user to download and install it from the site (browser step), then the `tldraw` MCP and the `tldraw-offline` skill work with it.
+8. Wolfram license: check `bash {{STACK}}/scripts/check-wolfram-license.sh`; if expired, try `wolframscript -activate` non-interactively with the WOLFRAM_ID/PASS from the form; if those are absent — the user signs in interactively in `wolframscript`.
+9. Firecrawl (optional): suggest `firecrawl login --browser` (user action, browser needed).
+10. Projects: ask which folders should use the stack, then `bash {{STACK}}/scripts/new-project.sh <path>` for each (any folder, git not required).
+11. Finish: `bash {{STACK}}/scripts/check-all.sh` — every row must be ✅ — and tell the user to restart OpenCode in each project folder.
+
+Interactive-by-design (only the user can do them): sudo password prompts, browser confirmations (gh device login, Firecrawl login, Wolfram sign-in). Everything else — you run and verify yourself.
 
 ## Repository map ({{STACK}})
 
@@ -33,10 +45,25 @@ Interactive-by-design (only the user can do them): sudo password prompts, browse
 | `README.md` | Human documentation |
 | `STACK.md` | Full tool reference (keybinds, examples) |
 | `workflow.txt` | The owner's personal git flow |
+| `scripts/` | All stack scripts (setup, update, check, teardown, projects, proxy, …) |
+| `.brew-pre-manifest.txt` | Pre-install snapshot of brew packages — teardown `--deep` uses it to know what the user had before; never delete it |
+| `first-start.template.txt` | First-start form template |
+| `projects.txt` | Project registry (personal, gitignored) |
+| `aris-skills.txt` | 14 ARIS skills |
+| `skills/` | 8 standalone skills (source) |
+| `skills-store/` | Runtime store of 60 skills (gitignored, generated) |
+| `craft-cli/`, `craft-downloads/` | Craft headless CLIs + DMG cache (gitignored) |
+| `WolframLanguage/` | Custom Wolfram packages |
+| `paraview-mcp/ · manim-mcp/ · julia-mcp/ · tldraw-mcp/ · aris-research-repo/ · WolframLanguageForJupyter/` | Cloned external repos (gitignored) |
+
+## Scripts (in `scripts/`)
+
+| Script | Purpose |
+|:---:|:---:|
 | `setup.sh` | Clean-macOS install (12 steps, idempotent) |
 | `update-all.sh` | Full update (15 steps) + expiry tracking |
 | `check-all.sh` | Health check (✅/❌ per component, incl. MCP modules) |
-| `teardown.sh` | Uninstall everything the stack installed: detach projects, remove .zshrc block, secrets, venvs, repos, npm CLIs, VS Code extensions; `--deep` also brew packages absent from `.brew-pre-manifest.txt` (pre-install snapshot — never delete it) |
+| `teardown.sh` | Uninstall everything the stack installed; keeps OpenCode itself |
 | `new-project.sh` | Attach the stack to any folder (AGENTS.md + `.opencode/opencode.json`) |
 | `detach-project.sh` | Detach (works even if the folder is already gone) |
 | `export-personal.sh` | Collect personal files (registry, form, secrets) for backup/migration |
@@ -48,21 +75,14 @@ Interactive-by-design (only the user can do them): sudo password prompts, browse
 | `proxy.sh` | ISP-proxy routing (status / test / expiry / git on-off) |
 | `chrome-version.sh` | Chrome version pinned by tldraw-cli |
 | `check-wolfram-license.sh` | Wolfram license expiry |
-| `projects.txt` | Project registry (personal, gitignored) |
-| `first-start.template.txt` | First-start form template |
-| `aris-skills.txt` | 14 ARIS skills |
-| `skills/` | 8 standalone skills (source) |
-| `skills-store/` | Runtime store of 60 skills (gitignored, generated) |
-| `craft-cli/`, `craft-downloads/` | Craft headless CLIs + DMG cache (gitignored) |
-| `WolframLanguage/` | Custom Wolfram packages |
-| `paraview-mcp/ · manim-mcp/ · julia-mcp/ · tldraw-mcp/ · aris-research-repo/ · WolframLanguageForJupyter/` | Cloned external repos (gitignored) |
+| `apply-first-start.sh` | Validate the form → write `~/.stack-secrets.sh` |
 
 ## Tools
 
 ### Wolfram Language
 - Free developer license; CLI: `wolframscript`; MCP server: `Wolfram`; Jupyter kernel: `wolframlanguage15`
 - License renews every ~40 days at https://www.wolfram.com/engine/; license data lives in `~/Library/Wolfram*` and SURVIVES session resets and git pulls
-- Activation creds: `~/.stack-wolfram.conf` (written by apply-first-start.sh); if absent — ask the user
+- Activation creds: `~/.stack-wolfram.conf` (written by scripts/apply-first-start.sh); if absent — ask the user
 - Expired: renew on the site → try `wolframscript -activate` (interactive unless WOLFRAM_ID/PASS exist in the form)
 - Check: `wolframscript -code 'Print[$LicenseExpirationDate]'`
 - Custom packages: `{{STACK}}/WolframLanguage/`; Jupyter integration: `{{STACK}}/WolframLanguageForJupyter/`
@@ -75,10 +95,9 @@ Interactive-by-design (only the user can do them): sudo password prompts, browse
 ### ParaView
 - Auto-detected: `PVAPP=$(ls -d /Applications/ParaView-*.app | head -1)`; pvpython: `$PVAPP/Contents/bin/pvpython`; API: `paraview.simple`
 - MCP server: `ParaView`; env: `{{STACK}}/paraview-mcp-env`
-- **The MCP config launches `bash {{STACK}}/paraview-run.sh`** — the wrapper sets PYTHONPATH/DYLD_LIBRARY_PATH (incompatibilities between the app python and a venv) and auto-starts a headless pvserver on :11111 if none is running. So the MCP works out of the box, no GUI needed.
+- **The MCP config launches `bash {{STACK}}/scripts/paraview-run.sh`** — the wrapper sets PYTHONPATH/DYLD_LIBRARY_PATH (incompatibilities between the app python and a venv) and auto-starts a headless pvserver on :11111 if none is running. So the MCP works out of the box, no GUI needed.
 - Screenshots with the GUI visible: open the GUI, File → Connect → localhost:11111, press P — then read `{{STACK}}/paraview-mcp/screenshots/`
 - **Shutdown:** close the GUI; `kill $(pgrep -f pvserver)`
-- MCP tools: load_data, create_source, create_isosurface, create_slice, toggle_volume_rendering, color_by, rotate_camera, reset_camera, plot_over_line, warp_by_vector, create_streamline, get_pipeline, …
 
 ### LaTeX
 - MacTeX: `pdflatex document.tex`; VS Code: LaTeX Workshop
@@ -99,7 +118,7 @@ Interactive-by-design (only the user can do them): sudo password prompts, browse
 - **Final office deliverables (.docx/.xlsx/.pptx/.pdf) go through Craft Apps**, not python scripts
 - `.tex` compilation is still pdflatex; WordCraft only imports/exports .tex
 - Live mode (edits in an open window): `/Applications/<App>.app/Contents/MacOS/<app> --control 798X`; ports: wordcraft 7981, gridcraft 7982, deckcraft 7983, pdfcraft 7984, figcraft 7985
-- GUI install/update: `bash {{STACK}}/craft-install.sh`; the skill `craft-office` holds the detailed workflow
+- GUI install/update: `bash {{STACK}}/scripts/craft-install.sh`; the skill `craft-office` holds the detailed workflow
 
 ### Jupyter
 - Env: `{{STACK}}/jupyter-env`; run: `source {{STACK}}/jupyter-env/bin/activate && jupyter-lab`
@@ -109,13 +128,13 @@ Interactive-by-design (only the user can do them): sudo password prompts, browse
 - Extensions: Jupyter, Python, Julia, LaTeX Workshop, Wolfram Language; config: `~/Library/Application Support/Code/User/settings.json`
 
 ## OpenCode specifics
-- Project-scoped: MCP config lives in the project's `.opencode/opencode.json` (generated by gen-opencode-config.sh); outside attached projects the agent sees none of the stack
+- Project-scoped: MCP config lives in the project's `.opencode/opencode.json` (generated by scripts/gen-opencode-config.sh); outside attached projects the agent sees none of the stack — this is deliberate: nothing global leaks into other sessions
 - **Version:** OpenCode **v2** (brew `anomalyco/tap/opencode-v2`, v1 removed). v2 casualties: no LSP servers (the `lsp` field is ignored), no `OPENCODE_DISABLE_*_SKILLS` variables; v1-form MCP configs are normalized automatically
 - **Known MCP fixes (built into setup.sh / update-all.sh — do not "clean up"):**
   - `mcp[cli]<2` pinned in julia-mcp-env, manim-env, paraview-mcp-env — mcp 2.x (2025-11) renamed FastMCP and breaks the servers
   - ParaView server: run via venv python with `PYTHONPATH` (ParaView app's `Contents/Python` + `Libraries/lib/python3.12` + venv site-packages) and `DYLD_LIBRARY_PATH` (`Contents/Libraries` + `Contents/Frameworks`) — pvpython's bundled python has no `_ssl`; the server code is patched (`instructions=` instead of `system_prompt=`) and needs the fresh `typing_extensions.py` copied next to it
   - manim server needs `PATH` with `manim-env/bin` (set in the generated config)
-  - ParaView MCP only fully works with `pvserver --multi-clients --server-port=11111` running (see the workflow below) — without it the server starts but tools fail to connect; that is expected, not a bug
+  - ParaView MCP only fully works with `pvserver --multi-clients --server-port=11111` running (see the workflow above) — without it the server starts but tools fail to connect; that is expected, not a bug
 - **Code diagnostics:** run linters/compilers/tests directly — `bash -n` (.sh), `python` (.py), `npm run build` (.ts), `julia` (.jl), `pdflatex` (.tex). Verify edits with a compiler before claiming success
 - Skills: 60 in `{{STACK}}/skills-store` (Firecrawl 37, ARIS 14, standalone 8, tldraw-offline 1 — the last one appears after the first tldraw Desktop launch, then `consolidate-skills.sh`)
 - ARIS runs local-only: external Codex/Oracle/manual-review MCPs are NOT available
@@ -149,7 +168,7 @@ julia -e 'using Pkg; Pkg.add("PackageName")'    # Pkg.update() to update all
 # Wolfram
 wolframscript -code 'PacletInstall["PackageName"]'
 # Full check / update
-cd {{STACK}} && bash check-all.sh     # everything must be ✅
-cd {{STACK}} && bash update-all.sh
+bash {{STACK}}/scripts/check-all.sh     # everything must be ✅
+bash {{STACK}}/scripts/update-all.sh
 ```
 <!-- STACK:END -->

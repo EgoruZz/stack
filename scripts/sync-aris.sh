@@ -7,7 +7,7 @@
 
 set -uo pipefail
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS_DIR="$STACK_DIR/skills-store"
 ARIS_REPO="$STACK_DIR/aris-research-repo"
 ARIS_LIST="$STACK_DIR/aris-skills.txt"
@@ -19,7 +19,7 @@ fi
 
 if [ ! -d "$ARIS_REPO/skills" ]; then
     echo "ERROR: $ARIS_REPO/skills not found (clone not installed)"
-    echo "  Run: bash $STACK_DIR/setup.sh"
+    echo "  Run: bash $STACK_DIR/scripts/setup.sh"
     exit 1
 fi
 

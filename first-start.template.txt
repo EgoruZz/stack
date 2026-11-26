@@ -1,26 +1,26 @@
 # ═══════════════════════════════════════════════════════════════
-#  Форма первого старта стека
+#  Stack first-start form
 # ═══════════════════════════════════════════════════════════════
-# Заполни поля ниже и запусти:  bash ~/stack/apply-first-start.sh
-# Скрипт проверит заполнение и разложит данные по личным файлам
-# (~/.stack-secrets.sh и др.). Сам файл формы можно удалить после.
+# Fill in the fields below and run:  bash ~/stack/apply-first-start.sh
+# The script validates the entries and distributes the data into personal files
+# (~/.stack-secrets.sh etc.). The form file itself can be deleted afterwards.
 #
-# ── ISP-прокси (proxy.market): host:port:login:password, срок подписки ──
+# ── ISP proxy (proxy.market): host:port:login:password, subscription expiry ──
 PROXY_HOST=
 PROXY_USER=
 PROXY_PASS=
-PROXY_EXPIRES=YYYY-MM-DD HH:MM +ZZZZ             # формат ГГГГ-ММ-ДД ЧЧ:ММ ±ЧЧММ; кавычки не обязательны
+PROXY_EXPIRES=YYYY-MM-DD HH:MM +ZZZZ             # format YYYY-MM-DD HH:MM ±HHMM; quotes optional
 #
-# ── Wolfram ID (для неинтерактивной активации лицензии; опционально) ──
+# ── Wolfram ID (for non-interactive license activation; optional) ──
 WOLFRAM_ID=
 WOLFRAM_PASS=
 #
-# ── git identity (для коммитов и PR) ──
+# ── git identity (for commits and PRs) ──
 GIT_NAME=
 GIT_EMAIL=
 #
-# ── Sudo без пароля для агента (опционально) ──
-# AGENT_SUDO=full    → NOPASSWD: ALL (удобно; ВСЁ, что запускается от тебя, получит root)
-# AGENT_SUDO=none    → без изменений (пароль запрашивается вручную; обновления CLT — сам)
-# Значение AGENT_SUDO=none/пусто = безопасный дефолт.
+# ── Passwordless sudo for the agent (optional) ──
+# AGENT_SUDO=full    → NOPASSWD: ALL (convenient; EVERYTHING run on your behalf gets root)
+# AGENT_SUDO=none    → no changes (password asked manually; CLT updates — you do them)
+# AGENT_SUDO=none/empty = the safe default.
 AGENT_SUDO=none

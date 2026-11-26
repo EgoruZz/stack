@@ -1,16 +1,19 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════════════
 #  Stack teardown — removes everything the stack installed/changed.
-#  Run:  bash $STACK_DIR/teardown.sh [--yes] [--deep] [--dry]
+#  Run:  bash scripts/teardown.sh [--yes] [--deep] [--dry]
 #    --yes   no confirmation prompts (for scripted runs)
 #    --deep  also uninstall brew packages the stack added
 #            (only ones absent from .brew-pre-manifest.txt — i.e. genuinely new)
 #    --dry   print every action without executing anything (safe audit)
 #  The stack folder itself is NOT deleted (git repo — the user decides).
+#  OpenCode itself is NEVER removed — the stack only uses it.
+#  MCP servers and skills are project-scoped (.opencode in each project),
+#  so step 1 (detach) removes them all; nothing of the stack is global.
 # ═══════════════════════════════════════════════════════════════
 set -uo pipefail
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ASSUME_YES=0; DEEP=0; DRY=0
 for a in "$@"; do
     case "$a" in

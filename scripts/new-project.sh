@@ -8,7 +8,7 @@
 
 set -euo pipefail
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REGISTRY="$STACK_DIR/projects.txt"
 AGENTS_SRC="$STACK_DIR/AGENTS.md"
 
@@ -51,7 +51,7 @@ else
 fi
 
 # Generate the OpenCode config (.opencode/opencode.json) — stack MCP/skills
-bash "$STACK_DIR/gen-opencode-config.sh" "$PROJECT_DIR"
+bash "$STACK_DIR/scripts/gen-opencode-config.sh" "$PROJECT_DIR"
 echo "🔧 OpenCode config generated (the stack activates in this project)"
 
 # Register in projects.txt
@@ -89,4 +89,4 @@ echo "  cd $PROJECT_DIR"
 echo "  opencode  # start the AI"
 echo ""
 echo "AGENTS.md sync:"
-echo "  bash $STACK_DIR/sync-agents.sh"
+echo "  bash $STACK_DIR/scripts/sync-agents.sh"

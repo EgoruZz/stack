@@ -4,13 +4,13 @@
 # updates only the apps whose version changed.
 #
 # Run in the USER'S TERMINAL (not from OpenCode — its sandbox
-# blocks hdiutil). Path: $STACK_DIR/craft-install.sh. DMGs are cached in
+# blocks hdiutil). Path: $STACK_DIR/scripts/craft-install.sh. DMGs are cached in
 # $STACK_DIR/craft-downloads/ (gitignored).
 # blocks hdiutil):
 #   bash $STACK_DIR/craft-downloads/install-craft-apps.sh [--force]
 set -uo pipefail
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$DIR"
 FORCE=${1:-}

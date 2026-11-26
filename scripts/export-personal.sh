@@ -14,7 +14,7 @@
 
 set -euo pipefail
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DEST="${1:-$HOME/stack-personal-backup-$(date +%F)}"
 
 if [ -e "$DEST" ] && [ -n "$(ls -A "$DEST" 2>/dev/null)" ]; then
@@ -45,5 +45,5 @@ echo "Restore on another machine (after setup.sh):"
 echo "  cp <folder>/projects.txt <folder>/first-start.txt \$STACK_DIR/"
 echo "  cp <folder>/.stack-secrets.sh ~/"
 echo "  cp -R <folder>/skills ~/   # if tldraw-offline was present"
-echo "  bash \$STACK_DIR/apply-first-start.sh"
-echo "  bash \$STACK_DIR/sync-agents.sh"
+echo "  bash \$STACK_DIR/scripts/apply-first-start.sh"
+echo "  bash \$STACK_DIR/scripts/sync-agents.sh"

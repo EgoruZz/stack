@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "============================================"
 echo "  Stack installation"
@@ -78,15 +78,15 @@ juliaup default release 2>/dev/null || echo "  Julia default already configured"
 # The stack requires zsh: without it .zshrc is never read at all.
 if command -v zsh &>/dev/null; then
     [ -f "$HOME/.zshrc" ] || touch "$HOME/.zshrc"
-    if ! grep -q "stack/proxy.sh" "$HOME/.zshrc" 2>/dev/null; then
+    if ! grep -q "stack/scripts/proxy.sh" "$HOME/.zshrc" 2>/dev/null; then
         # Unquoted heredoc: $STACK_DIR is substituted NOW with the real path
         # (a literal "$STACK_DIR" in .zshrc resolves to nothing in zsh and
         # breaks `source /proxy.sh` on every terminal start).
         cat >> "$HOME/.zshrc" << PROXYBLOCK
 
-# === Stack network (managed; details: $STACK_DIR/proxy.sh) ===
+# === Stack network (managed; details: $STACK_DIR/scripts/proxy.sh) ===
 export TZ="Asia/Singapore"
-source "$STACK_DIR/proxy.sh"
+source "$STACK_DIR/scripts/proxy.sh"
 # === End Stack network ===
 PROXYBLOCK
         echo "  .zshrc: added source proxy.sh (restart the terminal)"
@@ -253,7 +253,7 @@ for name in $CRAFT_REPOS; do
         echo "  $name-cli: already present"
     fi
 done
-echo "  GUI apps (WordCraft, GridCraft, DeckCraft, PdfCraft, FigCraft): bash $STACK_DIR/craft-install.sh — see README «Manual steps»"
+echo "  GUI apps (WordCraft, GridCraft, DeckCraft, PdfCraft, FigCraft): bash $STACK_DIR/scripts/craft-install.sh — see README «Manual steps»"
 echo ""
 
 # ═══════════════════════════════════════
@@ -319,7 +319,7 @@ echo ">>> 11/12 Generating the OpenCode config..."
 # .opencode/opencode.json of the stack folder. Projects get the same config
 # via sync-agents.sh and new-project.sh. The global ~/.config/opencode is used
 # only for client settings (permission), NOT for MCP/skills.
-bash "$STACK_DIR/gen-opencode-config.sh" "$STACK_DIR"
+bash "$STACK_DIR/scripts/gen-opencode-config.sh" "$STACK_DIR"
 
 # ═══════════════════════════════════════
 # 11b. GITHUB CLI + GLOBAL CLIENT CONFIG
@@ -370,7 +370,7 @@ fi
 
 echo ""
 echo ">>> 12/12 Stack check..."
-bash "$STACK_DIR/check-all.sh"
+bash "$STACK_DIR/scripts/check-all.sh"
 
 echo ""
 echo "============================================"
@@ -381,7 +381,7 @@ echo ""
 # First-start form: if the user filled it in beforehand — apply it right away
 if [ -f "$STACK_DIR/first-start.txt" ]; then
     echo ">>> Found a filled first-start form — applying..."
-    bash "$STACK_DIR/apply-first-start.sh" "$STACK_DIR/first-start.txt" || \
+    bash "$STACK_DIR/scripts/apply-first-start.sh" "$STACK_DIR/first-start.txt" || \
         echo "  ⚠️ The form was not applied (incomplete — fix and re-run)"
 fi
 
@@ -392,4 +392,4 @@ echo "  cd \"$STACK_DIR\" && opencode"
 echo ""
 echo "Start a session here and tell the agent to set up the stack — it walks"
 echo "through every step and asks for whatever it needs."
-echo "Re-check any time: bash \"$STACK_DIR/check-all.sh\""
+echo "Re-check any time: bash \"$STACK_DIR/scripts/check-all.sh\""

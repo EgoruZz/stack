@@ -13,7 +13,7 @@
 # ═══════════════════════════════════════════════════════════════
 set -uo pipefail
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PVAPP="$(ls -d /Applications/ParaView-*.app 2>/dev/null | head -1)"
 if [ -z "$PVAPP" ]; then
     echo "ParaView app not found in /Applications" >&2

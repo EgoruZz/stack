@@ -3,7 +3,7 @@
 # Run: cd $STACK_DIR && bash check-wolfram-license.sh
 # Note: uses the macOS-specific command date -j -f
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 echo "=== Wolfram license check ==="
 echo ""
 

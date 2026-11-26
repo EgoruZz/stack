@@ -2,7 +2,7 @@
 # Check that the whole stack works
 # Run: cd $STACK_DIR && bash check-all.sh
 
-STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export PATH="$HOME/.juliaup/bin:$PATH"
 
 echo "=== Stack check ==="
@@ -158,7 +158,7 @@ done
 if [ "$CRAFT_OK" -eq "$CRAFT_ALL" ] && [ "$CLI_OK" -eq "$CRAFT_ALL" ]; then
     echo "✅ 5/5 apps, 5/5 CLI"
 else
-    echo "⚠️ apps $CRAFT_OK/5, CLI $CLI_OK/5 — GUI: bash $STACK_DIR/craft-install.sh, CLI already at $STACK_DIR/craft-cli/"
+    echo "⚠️ apps $CRAFT_OK/5, CLI $CLI_OK/5 — GUI: bash $STACK_DIR/scripts/craft-install.sh, CLI already at $STACK_DIR/craft-cli/"
 fi
 
 # Skills store
@@ -203,7 +203,7 @@ PV_PATCHED=0
 if [ "$MCP_OK" -eq "$MCP_TOTAL" ] && [ "$PV_PATCHED" -eq 1 ]; then
     echo "✅ FastMCP importable in $MCP_OK/$MCP_TOTAL venvs; ParaView patched"
 else
-    echo "❌ FastMCP $MCP_OK/$MCP_TOTAL venvs; ParaView patches: $PV_PATCHED/1 — re-run: bash $STACK_DIR/setup.sh"
+    echo "❌ FastMCP $MCP_OK/$MCP_TOTAL venvs; ParaView patches: $PV_PATCHED/1 — re-run: bash $STACK_DIR/scripts/setup.sh"
 fi
 
 echo ""
