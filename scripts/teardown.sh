@@ -45,7 +45,7 @@ if [ -f "$STACK_DIR/projects.txt" ]; then
         p="${p/#\~/$HOME}"
         if [ -d "$p" ]; then
             if [ "$DRY" = "1" ]; then echo "[dry] would detach: $p"
-            else bash "$STACK_DIR/detach-project.sh" "$p" || echo "  ⚠️ failed: $p"; fi
+            else bash "$STACK_DIR/scripts/detach-project.sh" "$p" || echo "  ⚠️ failed: $p"; fi
         fi
     done < <(grep -v '^\s*$' "$STACK_DIR/projects.txt" 2>/dev/null)
     rmfile "$STACK_DIR/projects.txt"

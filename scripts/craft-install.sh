@@ -7,7 +7,7 @@
 # blocks hdiutil). Path: $STACK_DIR/scripts/craft-install.sh. DMGs are cached in
 # $STACK_DIR/craft-downloads/ (gitignored).
 # blocks hdiutil):
-#   bash $STACK_DIR/scripts/craft-downloads/install-craft-apps.sh [--force]
+#   bash $STACK_DIR/craft-downloads/install-craft-apps.sh [--force]
 set -uo pipefail
 
 STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
