@@ -11,33 +11,6 @@
 
 ---
 
-## Why
-
-One repo that turns a clean macOS into a full AI-driven workstation:
-
-- **Wolfram Language, Julia, Python (Manim, Jupyter), ParaView, LaTeX** for science and math
-- **Craft Apps** (Word / Excel / PowerPoint / PDF) for office documents
-- **tldraw, render-visual, Firecrawl** for whiteboards, diagrams and web research
-- **OpenCode** as the agent that runs it all — with per-project MCP configs, so nothing leaks globally
-- **One mental model**: the agent leads setup, updates and health checks; you only answer questions and confirm in the browser
-
-Everything is idempotent: run the same script on a fresh or an already-configured machine and it installs what is missing and updates what exists — never duplicating tools.
-
-## Repository structure
-
-| Path | What it is |
-|:---|:---|
-| `AGENTS.template.md` | Agent instructions source; `AGENTS.md` is a committed bootstrap for fresh clones, replaced by a local render on first setup |
-| `STACK.md` | Full tool reference for the user (keybinds, examples) |
-| `scripts/` | All stack scripts — setup, update, check, teardown, proxy, project management |
-| `skills/` | 8 standalone agent skills (source) |
-| `first-start.template.txt` | Form the agent fills in with you during first start |
-| `workflow.txt` | The owner's personal git flow |
-| `assets/` | Banner and art |
-| `aris-skills.txt`, `projects.template.txt` | Skill list and project registry template |
-
-Everything else (`skills-store/`, `craft-cli/`, cloned MCP repos, venvs) is generated and gitignored.
-
 ## Constructor
 
 Four steps. The rest the agent does with you, in chat.
@@ -48,16 +21,16 @@ Four steps. The rest the agent does with you, in chat.
 brew install anomalyco/tap/opencode-v2
 ```
 
-**2. Clone the stack**
+**2. Clone the stack anywhere**
 
 ```bash
-git clone https://github.com/custom-opencode/stack.git ~/git/custom-opencode/stack
+git clone https://github.com/custom-opencode/stack.git <path>
 ```
 
 **3. Start OpenCode from the stack folder**
 
 ```bash
-cd ~/git/custom-opencode/stack
+cd <path>
 opencode
 ```
 
@@ -67,22 +40,9 @@ opencode
 Set up the stack
 ```
 
-That's it. Even on a fresh clone the committed `AGENTS.md` is a bootstrap that tells the agent exactly what to do: read `AGENTS.template.md`, run the installation, ask you for the personal data (proxy, git identity, Wolfram ID — each optional, and it warns what stops working if you decline), fill the form, verify every component and attach your project folders. When it finishes, every row of its health check is ✅ — restart OpenCode in your project folder and work.
+That's it. Even on a fresh clone the committed `AGENTS.md` is a bootstrap that tells the agent exactly what to do: read `AGENTS.template.md`, run the installation, ask you for the personal data (proxy, git identity, Wolfram ID — each optional, and it warns what stops working if you decline), fill the form, verify every component and attach your project folders (`bash scripts/new-project.sh <any-folder>` — any folder, any depth, git not required). When it finishes, every row of its health check is ✅ — restart OpenCode in your project folder and work.
 
 You only ever do what only a human can do: type answers, click links, confirm in the browser.
-
-## Attaching projects
-
-The stack activates per-project, nothing global:
-
-```bash
-bash scripts/new-project.sh ~/work/my-project   # existing folder
-bash scripts/new-project.sh ~/projects/new-one  # creates it if missing
-```
-
-Each project gets an `AGENTS.md` with the stack section and a `.opencode/opencode.json` with the stack's MCP servers and skills (absolute paths). Open `opencode` in the project and the whole stack is there.
-
-**Moving the stack?** Re-run `bash scripts/sync-agents.sh` in its new location — it re-renders `AGENTS.md` and rewrites all project configs. `bash scripts/check-all.sh` reports any project whose config still points elsewhere or whose folder has vanished.
 
 ## Destructor
 

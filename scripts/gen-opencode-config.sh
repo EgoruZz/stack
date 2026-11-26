@@ -6,7 +6,7 @@
 # The global ~/.config/opencode is never used by the stack.
 #
 # Paths are written ABSOLUTE: the stack can live anywhere
-# ($STACK_DIR, ~/git/custom-opencode/stack, ...), and the config binds to
+# ($STACK_DIR, ~/any-folder/stack, ...), and the config binds to
 # its real location at generation time. If the stack moves —
 # paths are rewritten by regeneration: bash <stack>/sync-agents.sh
 # ({env:HOME} remains only for the user-level Wolfram directories).
