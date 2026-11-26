@@ -5,9 +5,9 @@
 # The script validates the entries and distributes the data into personal files
 # (~/.stack-secrets.sh etc.). The form file itself can be deleted afterwards.
 #
-# ── Proxy (optional): any format the user gives — host:port:login:password, # ──
+# ── Proxy (optional): any format the user gives — host:port:login:password, ──
 # ── a URL (http://login:pass@host:port), or a full line with expiry.       ──
-# ── Subscription expiry (optional), format YYYY-MM-DD HH:MM ±HHMM.        ──
+# ── Subscription expiry (optional), e.g. YYYY-MM-DD HH:MM ±HHMM.           ──
 PROXY_HOST=
 PROXY_USER=
 PROXY_PASS=

@@ -91,7 +91,7 @@ fi
 juliaup add release 2>/dev/null || echo "  Julia release already installed"
 juliaup default release 2>/dev/null || echo "  Julia default already configured"
 
-# Stack networking: .zshrc must source proxy.sh (routing through the ISP proxy).
+# Stack networking: .zshrc must source proxy.sh (proxy from the user's config).
 # Only this line is managed — the rest of the user's .zshrc is untouched.
 # The stack requires zsh: without it .zshrc is never read at all.
 if command -v zsh &>/dev/null; then
@@ -103,7 +103,6 @@ if command -v zsh &>/dev/null; then
         cat >> "$HOME/.zshrc" << PROXYBLOCK
 
 # === Stack network (managed; details: $STACK_DIR/scripts/proxy.sh) ===
-export TZ="Asia/Singapore"
 source "$STACK_DIR/scripts/proxy.sh"
 # === End Stack network ===
 PROXYBLOCK

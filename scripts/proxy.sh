@@ -69,9 +69,15 @@ _stack_proxy_export_env() {
 }
 
 _stack_proxy_expiry() {
-    local epoch now diff
-    epoch=$(date -j -f "%Y-%m-%d %H:%M %z" "$STACK_PROXY_EXPIRES" +%s 2>/dev/null) || {
-        echo "❌ STACK_PROXY_EXPIRES not recognized: '$STACK_PROXY_EXPIRES'"; return 1; }
+    local epoch now diff fmt
+    epoch=""
+    # Accept the canonical format first, then common human variants:
+    for fmt in "%Y-%m-%d %H:%M %z" "%Y-%m-%d %H:%M" "%Y-%m-%d" "%d.%m.%Y %H:%M" "%d.%m.%Y"; do
+        epoch=$(date -j -f "$fmt" "$STACK_PROXY_EXPIRES" +%s 2>/dev/null) && break
+    done
+    if [ -z "$epoch" ]; then
+        echo "❌ STACK_PROXY_EXPIRES not recognized: '$STACK_PROXY_EXPIRES' (e.g. 2026-12-22 13:30 +0300)"; return 1
+    fi
     now=$(date +%s); diff=$(( (epoch - now) / 86400 ))
     if [ "$diff" -lt 0 ]; then
         echo "❌ Proxy expired! Renew the subscription (then update PROXY_* in ~/.stack-secrets.sh via first-start.txt or scripts/apply-first-start.sh)"
