@@ -30,7 +30,9 @@ fi
 # Substitute the real stack path: AGENTS.template.md keeps {{STACK}} —
 # on sync every project (and the stack itself) gets the actual path.
 STACK_AGENTS="$(mktemp)"
-trap 'rm -f "$STACK_AGENTS"' EXIT
+REG_SNAPSHOT=""
+# One trap for both temp files (a second trap would overwrite this one)
+trap 'rm -f "$STACK_AGENTS" ${REG_SNAPSHOT:+"$REG_SNAPSHOT"}' EXIT
 sed "s|{{STACK}}|$STACK_DIR|g" "$STACK_TEMPLATE" > "$STACK_AGENTS"
 
 # Render AGENTS.md for sessions inside the stack itself (local render; the
@@ -84,7 +86,6 @@ if [ "${1:-}" = "--prune" ] || [ "${2:-}" = "--prune" ]; then
     if [ -f "$REGISTRY" ]; then
         PRUNED=0
         REG_SNAPSHOT=$(mktemp)
-        trap 'rm -f "$REG_SNAPSHOT"' EXIT
         cp "$REGISTRY" "$REG_SNAPSHOT"
         while IFS= read -r line; do
             [[ "$line" =~ ^[[:space:]]*# ]] && continue

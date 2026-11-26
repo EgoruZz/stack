@@ -175,7 +175,11 @@ if [ ! -d "$STACK_DIR/paraview-mcp-env" ]; then
 fi
 source "$STACK_DIR/paraview-mcp-env/bin/activate"
 pip install --upgrade pip
-pip install -r "$STACK_DIR/paraview-mcp/requirements.txt"
+if [ -f "$STACK_DIR/paraview-mcp/requirements.txt" ]; then
+    pip install -r "$STACK_DIR/paraview-mcp/requirements.txt"
+else
+    echo "  ⚠️ paraview-mcp/requirements.txt missing (upstream changed?) — re-clone"
+fi
 pip install "mcp[cli]<2" "anyio[asyncio]<5"
 deactivate
 echo "  paraview-mcp-env ready"
@@ -184,6 +188,9 @@ echo "  paraview-mcp-env ready"
 # 2) pvpython's bundled typing_extensions is too old for anyio — fresh copy in the repo dir
 sed -i '' 's/FastMCP("ParaView", system_prompt=default_prompt)/FastMCP("ParaView", instructions=default_prompt)/' \
     "$STACK_DIR/paraview-mcp/paraview_mcp_server.py" || true
+if grep -q 'system_prompt=default_prompt' "$STACK_DIR/paraview-mcp/paraview_mcp_server.py" 2>/dev/null; then
+    echo "  ⚠️ ParaView MCP patch not applied (upstream signature changed) — the server may fail; check paraview_mcp_server.py"
+fi
 PV_SITES="$("$STACK_DIR/paraview-mcp-env/bin/python" -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])' 2>/dev/null)"
 cp "${PV_SITES:-$STACK_DIR/paraview-mcp-env/lib/python3.12/site-packages}/typing_extensions.py" \
     "$STACK_DIR/paraview-mcp/typing_extensions.py" 2>/dev/null || true
@@ -263,7 +270,7 @@ for name in $CRAFT_REPOS; do
             | grep -o '"name": "[^"]*"' | cut -d'"' -f4 | grep -iE "$name-cli.*macos.*\.zip$" | head -1)
         [ -z "$ASSET" ] && ASSET="$name-cli-$ver-macos-universal.zip"
         TMPZIP="/tmp/$name-cli-$ver.zip"
-        curl -sL --max-time 600 -o "$TMPZIP" \
+        curl -sfL --max-time 600 -o "$TMPZIP" \
             "https://github.com/storytold/$name/releases/download/v$ver/$ASSET" \
         && rm -rf "$STACK_DIR/craft-cli/${ASSET%.zip}" \
         && unzip -q -o "$TMPZIP" -d "$STACK_DIR/craft-cli/" \

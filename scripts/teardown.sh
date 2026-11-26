@@ -97,10 +97,18 @@ for d in "$HOME/.claude/skills" "$HOME/.config/opencode/skills" \
     fi
 done
 
-# ── 5. OpenCode client config (only if it matches the stack template) ──
+# ── 5. OpenCode client config (only if it is stack-only: a valid JSON
+# whose top-level keys are nothing but permission/$schema) ──
 OC_CONF="$HOME/.config/opencode/opencode.jsonc"
-if [ -f "$OC_CONF" ] && /usr/bin/grep -q '"permission"' "$OC_CONF" 2>/dev/null \
-   && ! /usr/bin/grep -qv 'permission\|edit\|webfetch\|bash\|allow\|\$schema\|config.json' "$OC_CONF"; then
+if [ -f "$OC_CONF" ] && python3 -c "
+import json,sys
+try:
+    c=json.load(open('$OC_CONF'.replace('~','$HOME')))
+    json.dump({k:v for k,v in c.items() if k=='permission' or k.startswith('\$')}, open('/dev/null','w'))
+    sys.exit(0 if set(c)<= {'permission','\$schema'} else 1)
+except Exception:
+    sys.exit(1)
+" 2>/dev/null; then
     rmfile "$OC_CONF"
 else
     echo "ℹ️ $OC_CONF kept (not stack-only)"
@@ -130,10 +138,6 @@ else
         rmfile "$STACK_DIR/AGENTS.md"   # non-git copy — nothing to restore
     fi
 fi
-rmfile "$STACK_DIR/paraview-mcp/typing_extensions.py"
-rmfile "$STACK_DIR/paraview-mcp/pvserver.log"
-rmfile "$STACK_DIR/paraview-mcp-env"
-
 # ── 7. npm global CLIs ─────────────────────────────────────────
 for pkg in "@kitschpatrol/tldraw-cli" "firecrawl-cli"; do
     if npm ls -g "$pkg" >/dev/null 2>&1; then

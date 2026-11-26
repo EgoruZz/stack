@@ -68,8 +68,9 @@ done
 resolve_mcp_file() {
     local repo=$1 known=$2 pattern=$3
     local f="$STACK_DIR/$repo/$known"
-    [ -f "$f" ] && { echo "$f"; return; }
-    find "$STACK_DIR/$repo" -maxdepth 3 -name "$pattern" 2>/dev/null | head -1
+    [ -f "$f" ] && { echo "$f"; return 0; }
+    # tolerant to a missing clone (set -e) and to node_modules junk
+    ( find "$STACK_DIR/$repo" -maxdepth 3 -name "$pattern" -not -path '*/node_modules/*' 2>/dev/null || true ) | head -1
 }
 JULIA_SERVER=$(resolve_mcp_file julia-mcp server.py 'server.py')
 MANIM_SERVER=$(resolve_mcp_file manim-mcp src/manim_server.py '*server*.py')
@@ -77,9 +78,9 @@ TLDRAW_ENTRY=$(resolve_mcp_file tldraw-mcp dist/index.js 'index.js')
 [ -n "$JULIA_SERVER" ]  || echo "  ⚠️ julia-mcp server not found — julia MCP will fail until re-cloned"
 [ -n "$MANIM_SERVER" ]  || echo "  ⚠️ manim server not found — manim MCP will fail until re-cloned"
 [ -n "$TLDRAW_ENTRY" ]  || echo "  ⚠️ tldraw-mcp dist/index.js not found — tldraw MCP will fail until rebuilt"
-: "${JULIA_SERVER:=$STACK_DIR/julia-mcp/server.py}"
-: "${MANIM_SERVER:=$STACK_DIR/manim-mcp/src/manim_server.py}"
-: "${TLDRAW_ENTRY:=$STACK_DIR/tldraw-mcp/dist/index.js}"
+JULIA_SERVER="${JULIA_SERVER:-$STACK_DIR/julia-mcp/server.py}"
+MANIM_SERVER="${MANIM_SERVER:-$STACK_DIR/manim-mcp/src/manim_server.py}"
+TLDRAW_ENTRY="${TLDRAW_ENTRY:-$STACK_DIR/tldraw-mcp/dist/index.js}"
 
 cat > "$TARGET/.opencode/opencode.json" << 'CONF'
 {
@@ -166,8 +167,6 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
 CONF
 
 # Substitute the computed paths (quoted heredoc keeps {env:HOME} intact)
-PVAPP="$(ls -d /Applications/ParaView*.app 2>/dev/null | head -1)"
-PV_PYLIB="$(ls -d "$PVAPP/Contents/Libraries"/lib/python3.* 2>/dev/null | sort -V | tail -1)"
 BREWBIN="$(dirname "$(command -v brew 2>/dev/null)" 2>/dev/null)"
 [ -n "$BREWBIN" ] || BREWBIN="/opt/homebrew/bin"
 sed -i '' \
@@ -178,10 +177,6 @@ sed -i '' \
     -e "s|__JULIA_SERVER__|$JULIA_SERVER|g" \
     -e "s|__MANIM_SERVER__|$MANIM_SERVER|g" \
     -e "s|__TLDRAW_ENTRY__|$TLDRAW_ENTRY|g" \
-    -e "s|__PARAVIEW_PYTHON__|$PVAPP/Contents/Python|g" \
-    -e "s|__PARAVIEW_PYLIB__|${PV_PYLIB:-$PVAPP/Contents/Libraries/lib/python3.12}|g" \
-    -e "s|__PARAVIEW_LIBS__|$PVAPP/Contents/Libraries|g" \
-    -e "s|__PARAVIEW_FRAMEWORKS__|$PVAPP/Contents/Frameworks|g" \
     -e "s|__BREWBIN__|$BREWBIN|g" \
     "$TARGET/.opencode/opencode.json"
 

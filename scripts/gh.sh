@@ -6,8 +6,12 @@
 STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 source "$STACK_DIR/scripts/proxy.sh" status >/dev/null 2>&1 || true
-export http_proxy="$STACK_PROXY_HTTP" HTTP_PROXY="$STACK_PROXY_HTTP"
-export https_proxy="$STACK_PROXY_HTTP" HTTPS_PROXY="$STACK_PROXY_HTTP"
+# Route gh through the proxy only when a proxy is actually configured
+# (no user → no valid proxy URL; forcing it would break direct connections)
+if [ -n "${PROXY_USER:-}" ]; then
+    export http_proxy="$STACK_PROXY_HTTP" HTTP_PROXY="$STACK_PROXY_HTTP"
+    export https_proxy="$STACK_PROXY_HTTP" HTTPS_PROXY="$STACK_PROXY_HTTP"
+fi
 
 attempt=0
 while :; do

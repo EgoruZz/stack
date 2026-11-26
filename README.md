@@ -17,19 +17,14 @@ Four steps. The rest the agent does with you, in chat.
 
 **1. Install OpenCode**
 
-If Homebrew is installed (recommended — updates come with `brew upgrade`):
+Any way you find convenient — brew, the official installer script, npm — the stack supports all of them equally. See https://opencode.ai for the options:
 
 ```bash
-brew install anomalyco/tap/opencode-v2
+brew install anomalyco/tap/opencode-v2     # if you use Homebrew
+# or any other method from https://opencode.ai
 ```
 
-If you don't have Homebrew yet, install OpenCode without it (official installer, ~30 seconds):
-
-```bash
-curl -fsSL https://opencode.ai/install | bash
-```
-
-Both installs are equally supported by the stack — every script just calls `opencode`. Pick **one** install method and stay with it: a brew install is updated by `brew upgrade` (and by `update-all.sh`), a script install is updated by `opencode upgrade` (and by `update-all.sh`). They don't fight each other — `update-all.sh` detects which one you have.
+The stack itself never depends on the install method: every script just calls `opencode`, and `update-all.sh` updates it the way it was installed (brew → `brew upgrade`, script/npm → `opencode upgrade`). Pick one method and stay with it.
 
 **2. Clone the stack anywhere**
 

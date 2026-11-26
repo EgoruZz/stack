@@ -29,15 +29,27 @@ echo ""
 
 echo ">>> 2/15 Homebrew (stack packages only)..."
 brew update
-# OpenCode: update via brew only if it was installed via brew;
-# a curl/script install is updated by its own `opencode upgrade`.
+# OpenCode: update the way it was installed (no assumptions about the method):
+#   brew-installed → brew upgrade; npm-installed → npm update; otherwise
+#   the binary's own `opencode upgrade` covers script/cargo installs.
+OC_UPDATE=""
+OC_BREW_NAME=""
 if brew list --formula anomalyco/tap/opencode-v2 &>/dev/null; then
-    BREW_UPGRADE_PKGS="node python@3.12 gh ffmpeg ripgrep anomalyco/tap/opencode-v2"
-else
-    echo "  opencode: not a brew install — updating via 'opencode upgrade'"
-    opencode upgrade >/dev/null 2>&1 || echo "  opencode upgrade: skipped/failed (update manually)"
-    BREW_UPGRADE_PKGS="node python@3.12 gh ffmpeg ripgrep"
+    OC_UPDATE="brew"; OC_BREW_NAME="anomalyco/tap/opencode-v2"
+elif brew list --formula opencode &>/dev/null; then
+    OC_UPDATE="brew"; OC_BREW_NAME="opencode"
+elif npm ls -g opencode-ai opencode >/dev/null 2>&1; then
+    OC_UPDATE="npm"
+elif command -v opencode &>/dev/null; then
+    OC_UPDATE="self"
 fi
+BREW_UPGRADE_PKGS="node python@3.12 gh ffmpeg ripgrep"
+case "$OC_UPDATE" in
+    brew) echo "  opencode: updating via brew"; BREW_UPGRADE_PKGS="$BREW_UPGRADE_PKGS $OC_BREW_NAME" ;;
+    npm)  npm update -g opencode-ai opencode >/dev/null 2>&1 || echo "  opencode npm update: skipped" ;;
+    self) opencode upgrade >/dev/null 2>&1 || echo "  opencode upgrade: skipped/failed (update manually)" ;;
+    *)    BREW_UPGRADE_PKGS="$BREW_UPGRADE_PKGS anomalyco/tap/opencode-v2" ;;
+esac
 brew upgrade $BREW_UPGRADE_PKGS 2>/dev/null || echo "  brew: some packages updated"
 brew cleanup --prune=all --quiet 2>/dev/null
 echo ""
@@ -122,12 +134,16 @@ update_venv jupyter-env jupyterlab numpy matplotlib pandas sympy plotly ipywidge
 # ParaView MCP venv
 if [ -d "$STACK_DIR/paraview-mcp-env" ]; then
     source "$STACK_DIR/paraview-mcp-env/bin/activate"
-    pip install --upgrade --quiet -r "$STACK_DIR/paraview-mcp/requirements.txt" 2>/dev/null
+    pip install --upgrade --quiet -r "$STACK_DIR/paraview-mcp/requirements.txt" 2>/dev/null \
+        || echo "  ⚠️ requirements.txt missing/failed (upstream changed?) — re-clone paraview-mcp"
     pip install --quiet "mcp[cli]<2" "anyio[asyncio]<5" 2>/dev/null
     deactivate
     # Re-apply ParaView MCP patches (git pull restores upstream code)
     sed -i '' 's/FastMCP("ParaView", system_prompt=default_prompt)/FastMCP("ParaView", instructions=default_prompt)/' \
         "$STACK_DIR/paraview-mcp/paraview_mcp_server.py" 2>/dev/null || true
+    if grep -q 'system_prompt=default_prompt' "$STACK_DIR/paraview-mcp/paraview_mcp_server.py" 2>/dev/null; then
+        echo "  ⚠️ ParaView MCP patch not applied (upstream signature changed) — check paraview_mcp_server.py"
+    fi
     PV_SITES="$("$STACK_DIR/paraview-mcp-env/bin/python" -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])' 2>/dev/null)"
     cp "${PV_SITES:-$STACK_DIR/paraview-mcp-env/lib/python3.12/site-packages}/typing_extensions.py" \
         "$STACK_DIR/paraview-mcp/typing_extensions.py" 2>/dev/null || true
@@ -296,17 +312,19 @@ echo ">>> 12/15 Wolfram..."
 WOLFRAM_VER=$(wolframscript -code 'p = PacletInstall["Wolfram/AgentTools"]; Print[p["Version"]]' 2>/dev/null | head -1)
 if [ -n "$WOLFRAM_VER" ]; then
     echo "  AgentTools: $WOLFRAM_VER"
-    WLIC=$(wolframscript -code 'Print[$LicenseExpirationDate]' 2>/dev/null | grep -oE '\{[0-9, ]+\}' | head -1 | tr -d '{}' | tr ',' ' ')
-    WYEAR=$(echo $WLIC | awk '{print $1}'); WMONTH=$(echo $WLIC | awk '{print $2}'); WDAY=$(echo $WLIC | awk '{print $3}')
-    if [ -n "$WYEAR" ]; then
+    WLIC=$(wolframscript -code 'Print[DateString[$LicenseExpirationDate, {"Year","-","Month","-","Day"}]]' 2>/dev/null | grep -oE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+    WYEAR=${WLIC%%-*}; WMONTH=${WLIC#*-}; WMONTH=${WMONTH%%-*}; WDAY=${WLIC#*-}; WDAY=${WDAY#*-}
+    if [ -n "$WYEAR" ] && [ -n "$WMONTH" ] && [ -n "$WDAY" ]; then
         WEXP=$(date -j -f "%Y-%m-%d" "$WYEAR-$(printf '%02d' $WMONTH)-$(printf '%02d' $WDAY)" +%s 2>/dev/null)
-        WDAYS=$(( ($WEXP - $(date +%s)) / 86400 ))
-        if [ "$WDAYS" -lt 0 ]; then
-            echo "  ⚠️ Wolfram license EXPIRED — the MCP will not connect! Renew: https://www.wolfram.com/engine/ and run wolframscript -activate"
-        elif [ "$WDAYS" -lt 14 ]; then
-            echo "  ⚠️ Wolfram license: $WDAYS days — renew: https://www.wolfram.com/engine/"
-        else
-            echo "  Wolfram license: $WDAYS days"
+        if [ -n "$WEXP" ]; then
+            WDAYS=$(( ($WEXP - $(date +%s)) / 86400 ))
+            if [ "$WDAYS" -lt 0 ]; then
+                echo "  ⚠️ Wolfram license EXPIRED — the MCP will not connect! Renew: https://www.wolfram.com/engine/ and run wolframscript -activate"
+            elif [ "$WDAYS" -lt 14 ]; then
+                echo "  ⚠️ Wolfram license: $WDAYS days — renew: https://www.wolfram.com/engine/"
+            else
+                echo "  Wolfram license: $WDAYS days"
+            fi
         fi
     fi
 else
@@ -355,7 +373,7 @@ for repo in wordcraft gridcraft deckcraft pdfcraft figcraft; do
             | grep -o '"name": "[^"]*"' | cut -d'"' -f4 | grep -iE "$repo-cli.*macos.*\.zip$" | head -1)
         [ -z "$ASSET" ] && ASSET="$repo-cli-$CLIVER-macos-universal.zip"
         TMPZIP="/tmp/$repo-cli-$CLIVER.zip"
-        if curl -sL --max-time 600 -o "$TMPZIP" \
+        if curl -sfL --max-time 600 -o "$TMPZIP" \
             "https://github.com/storytold/$repo/releases/download/v$CLIVER/$ASSET"; then
             rm -rf "$STACK_DIR/craft-cli/${ASSET%.zip}"
             unzip -q -o "$TMPZIP" -d "$STACK_DIR/craft-cli/" \
