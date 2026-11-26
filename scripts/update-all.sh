@@ -155,7 +155,8 @@ fi
 # Julia MCP venv
 if [ -d "$STACK_DIR/julia-mcp-env" ]; then
     source "$STACK_DIR/julia-mcp-env/bin/activate"
-    pip install --upgrade --quiet "mcp[cli]" 2>/dev/null
+    # the <2 pin is mandatory: mcp 2.x renamed FastMCP and breaks the server
+    pip install --upgrade --quiet "mcp[cli]<2" "anyio[asyncio]<5" 2>/dev/null
     deactivate
     echo "  julia-mcp-env: updated"
 else
