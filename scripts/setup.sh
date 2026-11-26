@@ -184,7 +184,8 @@ echo "  paraview-mcp-env ready"
 # 2) pvpython's bundled typing_extensions is too old for anyio — fresh copy in the repo dir
 sed -i '' 's/FastMCP("ParaView", system_prompt=default_prompt)/FastMCP("ParaView", instructions=default_prompt)/' \
     "$STACK_DIR/paraview-mcp/paraview_mcp_server.py" || true
-cp "$STACK_DIR/paraview-mcp-env/lib/python3.12/site-packages/typing_extensions.py" \
+PV_SITES="$("$STACK_DIR/paraview-mcp-env/bin/python" -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])' 2>/dev/null)"
+cp "${PV_SITES:-$STACK_DIR/paraview-mcp-env/lib/python3.12/site-packages}/typing_extensions.py" \
     "$STACK_DIR/paraview-mcp/typing_extensions.py" 2>/dev/null || true
 
 # Julia MCP venv
@@ -256,13 +257,18 @@ for name in $CRAFT_REPOS; do
     [ -z "$ver" ] && { echo "  $name-cli: could not determine version, skipping"; continue; }
     BIN="$STACK_DIR/craft-cli/$name-cli"
     if [ ! -e "$BIN" ]; then
+        # Asset name from the release itself (survives artifact renames),
+        # template name only as fallback
+        ASSET=$(curl -s --max-time 20 "https://api.github.com/repos/storytold/$name/releases/latest" \
+            | grep -o '"name": "[^"]*"' | cut -d'"' -f4 | grep -iE "$name-cli.*macos.*\.zip$" | head -1)
+        [ -z "$ASSET" ] && ASSET="$name-cli-$ver-macos-universal.zip"
         TMPZIP="/tmp/$name-cli-$ver.zip"
         curl -sL --max-time 600 -o "$TMPZIP" \
-            "https://github.com/storytold/$name/releases/download/v$ver/$name-cli-$ver-macos-universal.zip" \
-        && rm -rf "$STACK_DIR/craft-cli/$name-cli-$ver-macos-universal" \
+            "https://github.com/storytold/$name/releases/download/v$ver/$ASSET" \
+        && rm -rf "$STACK_DIR/craft-cli/${ASSET%.zip}" \
         && unzip -q -o "$TMPZIP" -d "$STACK_DIR/craft-cli/" \
-        && ln -sfn "$name-cli-$ver-macos-universal/$name-cli" "$BIN" \
-        && chmod +x "$STACK_DIR/craft-cli/$name-cli-$ver-macos-universal/$name-cli" \
+        && ln -sfn "${ASSET%.zip}/$name-cli" "$BIN" \
+        && chmod +x "$STACK_DIR/craft-cli/${ASSET%.zip}/$name-cli" \
         && echo "  $name-cli: installed (v$ver)" \
         || echo "  $name-cli: download failed (download $name-cli-*.zip from github.com/storytold/$name/releases)"
         rm -f "$TMPZIP"

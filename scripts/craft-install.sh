@@ -76,6 +76,14 @@ for name in $APPS; do
         echo "── $name: installing v$VER"
     fi
     if [ ! -f "$DIR/$DMG" ]; then
+        # Asset name from the release itself (survives artifact renames);
+        # prefer universal, fall back to any macos DMG, then to the template name
+        DMG=$(curl -sL --max-time 30 "https://api.github.com/repos/storytold/$name/releases/latest" \
+            | grep -o '"name": "[^"]*"' | cut -d'"' -f4 | grep -iE '\.dmg$' \
+            | { grep -iE 'macos.*universal|universal.*macos' || true; } | head -1)
+        [ -z "$DMG" ] && DMG=$(curl -sL --max-time 30 "https://api.github.com/repos/storytold/$name/releases/latest" \
+            | grep -o '"name": "[^"]*"' | cut -d'"' -f4 | grep -iE 'macos.*\.dmg$' | head -1)
+        [ -z "$DMG" ] && DMG="$name-$VER-macos-universal.dmg"
         curl -sL --max-time 600 -o "$DIR/$DMG" \
             "https://github.com/storytold/$name/releases/download/v$VER/$DMG" \
             || { echo "   ❌ download failed"; continue; }

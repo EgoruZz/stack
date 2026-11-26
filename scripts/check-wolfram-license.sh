@@ -7,8 +7,14 @@ STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 echo "=== Wolfram license check ==="
 echo ""
 
-# Get the expiry date
-EXPIRY=$(wolframscript -code 'Print[$LicenseExpirationDate]' 2>/dev/null | grep -o '{[0-9, ]*}' | tr -d '{}' | tr ',' ' ')
+# Get the expiry date — formatted BY Wolfram itself (robust to upstream
+# output-format changes); fallback to the legacy {y,m,d} parse.
+EXPIRY=$(wolframscript -code 'Print[DateString[$LicenseExpirationDate, {"Year","-","Month","-","Day"}]]' 2>/dev/null | grep -oE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+if [ -z "$EXPIRY" ]; then
+    LEGACY=$(wolframscript -code 'Print[$LicenseExpirationDate]' 2>/dev/null | grep -o '{[0-9, ]*}' | tr -d '{}' | tr ',' ' ')
+    YEAR=$(echo $LEGACY | awk '{print $1}'); MONTH=$(echo $LEGACY | awk '{print $2}'); DAY=$(echo $LEGACY | awk '{print $3}')
+    EXPIRY="$YEAR-$(printf '%02d' "$MONTH")-$(printf '%02d' "$DAY")"
+fi
 
 if [ -z "$EXPIRY" ]; then
     echo "❌ Could not get license information"
@@ -18,14 +24,15 @@ if [ -z "$EXPIRY" ]; then
 fi
 
 # Extract the date components
-YEAR=$(echo $EXPIRY | awk '{print $1}')
-MONTH=$(echo $EXPIRY | awk '{print $2}')
-DAY=$(echo $EXPIRY | awk '{print $3}')
+YEAR=${EXPIRY%%-*}
+REST=${EXPIRY#*-}
+MONTH=${REST%%-*}
+DAY=${REST#*-}
 
 echo "Expiry date: $DAY.$MONTH.$YEAR"
 
 # Build the date for calculation
-EXPIRY_DATE=$(date -j -f "%Y-%m-%d" "$YEAR-$(printf '%02d' $MONTH)-$(printf '%02d' $DAY)" +%s 2>/dev/null)
+EXPIRY_DATE=$(date -j -f "%Y-%m-%d" "$EXPIRY" +%s 2>/dev/null)
 TODAY=$(date +%s)
 
 if [ -n "$EXPIRY_DATE" ] && [ -n "$TODAY" ]; then

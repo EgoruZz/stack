@@ -14,13 +14,19 @@
 set -uo pipefail
 
 STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PVAPP="$(ls -d /Applications/ParaView-*.app 2>/dev/null | head -1)"
+# ParaView app: glob covers both "ParaView-6.2.0.app" and plain "ParaView.app"
+PVAPP="$(ls -d /Applications/ParaView*.app 2>/dev/null | head -1)"
 if [ -z "$PVAPP" ]; then
     echo "ParaView app not found in /Applications" >&2
     exit 1
 fi
 
-export PYTHONPATH="$PVAPP/Contents/Python:$PVAPP/Contents/Libraries/lib/python3.12:$STACK_DIR/paraview-mcp-env/lib/python3.12/site-packages"
+# The app's bundled python version (python3.12 today, may change upstream):
+PV_PYLIB="$(ls -d "$PVAPP/Contents/Libraries"/lib/python3.* 2>/dev/null | sort -V | tail -1)"
+# venv site-packages: resolved via the venv python itself (survives python upgrades)
+PV_VENV_SITES="$("$STACK_DIR/paraview-mcp-env/bin/python" -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])' 2>/dev/null)"
+
+export PYTHONPATH="$PVAPP/Contents/Python:${PV_PYLIB:-$PVAPP/Contents/Libraries/lib/python3.12}:${PV_VENV_SITES:-$STACK_DIR/paraview-mcp-env/lib/python3.12/site-packages}"
 export DYLD_LIBRARY_PATH="$PVAPP/Contents/Libraries:$PVAPP/Contents/Frameworks"
 
 # Auto-start headless pvserver if nothing is LISTENING on 11111.
@@ -36,4 +42,9 @@ if ! lsof -nP -iTCP:11111 -sTCP:LISTEN >/dev/null 2>&1; then
     done
 fi
 
-exec "$STACK_DIR/paraview-mcp-env/bin/python" "$STACK_DIR/paraview-mcp/paraview_mcp_server.py"
+# Server file: prefer the known name, fall back to any *server*.py in the repo
+# (upstream renames should not kill the MCP)
+PV_SERVER="$STACK_DIR/paraview-mcp/paraview_mcp_server.py"
+[ -f "$PV_SERVER" ] || PV_SERVER="$(find "$STACK_DIR/paraview-mcp" -maxdepth 2 -name '*server*.py' 2>/dev/null | head -1)"
+[ -n "$PV_SERVER" ] || { echo "paraview_mcp_server.py not found in $STACK_DIR/paraview-mcp" >&2; exit 1; }
+exec "$STACK_DIR/paraview-mcp-env/bin/python" "$PV_SERVER"

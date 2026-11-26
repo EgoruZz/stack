@@ -119,7 +119,8 @@ if [ -d "$STACK_DIR/paraview-mcp-env" ]; then
     # Re-apply ParaView MCP patches (git pull restores upstream code)
     sed -i '' 's/FastMCP("ParaView", system_prompt=default_prompt)/FastMCP("ParaView", instructions=default_prompt)/' \
         "$STACK_DIR/paraview-mcp/paraview_mcp_server.py" 2>/dev/null || true
-    cp "$STACK_DIR/paraview-mcp-env/lib/python3.12/site-packages/typing_extensions.py" \
+    PV_SITES="$("$STACK_DIR/paraview-mcp-env/bin/python" -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])' 2>/dev/null)"
+    cp "${PV_SITES:-$STACK_DIR/paraview-mcp-env/lib/python3.12/site-packages}/typing_extensions.py" \
         "$STACK_DIR/paraview-mcp/typing_extensions.py" 2>/dev/null || true
     echo "  paraview-mcp-env: updated (patches applied)"
 else
@@ -339,13 +340,18 @@ for repo in wordcraft gridcraft deckcraft pdfcraft figcraft; do
         [ "$CURCLI" != "$CLIVER" ] && NEED_CLI=1
     fi
     if [ "$NEED_CLI" = "1" ] && [ -n "$CLIVER" ]; then
+        # Asset name from the release itself (survives artifact renames),
+        # template name only as fallback
+        ASSET=$(curl -s --max-time 20 "https://api.github.com/repos/storytold/$repo/releases/latest" \
+            | grep -o '"name": "[^"]*"' | cut -d'"' -f4 | grep -iE "$repo-cli.*macos.*\.zip$" | head -1)
+        [ -z "$ASSET" ] && ASSET="$repo-cli-$CLIVER-macos-universal.zip"
         TMPZIP="/tmp/$repo-cli-$CLIVER.zip"
         if curl -sL --max-time 600 -o "$TMPZIP" \
-            "https://github.com/storytold/$repo/releases/download/v$CLIVER/$repo-cli-$CLIVER-macos-universal.zip"; then
-            rm -rf "$STACK_DIR/craft-cli/$repo-cli-$CLIVER-macos-universal"
+            "https://github.com/storytold/$repo/releases/download/v$CLIVER/$ASSET"; then
+            rm -rf "$STACK_DIR/craft-cli/${ASSET%.zip}"
             unzip -q -o "$TMPZIP" -d "$STACK_DIR/craft-cli/" \
-                && ln -sfn "$repo-cli-$CLIVER-macos-universal/$repo-cli" "$CLIBIN" \
-                && chmod +x "$STACK_DIR/craft-cli/$repo-cli-$CLIVER-macos-universal/$repo-cli" \
+                && ln -sfn "${ASSET%.zip}/$repo-cli" "$CLIBIN" \
+                && chmod +x "$STACK_DIR/craft-cli/${ASSET%.zip}/$repo-cli" \
                 && echo "  $APP_NAME CLI: installed/updated to $CLIVER"
             rm -f "$TMPZIP"
         else

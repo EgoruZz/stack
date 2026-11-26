@@ -18,7 +18,7 @@ fi
 
 # ParaView
 echo -n "ParaView: "
-PVAPP=$(ls -d /Applications/ParaView-*.app 2>/dev/null | head -1)
+PVAPP=$(ls -d /Applications/ParaView*.app 2>/dev/null | head -1)
 if [ -n "$PVAPP" ] && [ -x "$PVAPP/Contents/bin/pvpython" ]; then
     PV_VER=$("$PVAPP/Contents/bin/pvpython" --version 2>/dev/null)
     if [ -n "$PV_VER" ]; then

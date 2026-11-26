@@ -8,7 +8,13 @@
 set -uo pipefail
 
 STACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TLDRAW_PUPPETEER="$(npm root -g 2>/dev/null)/@kitschpatrol/tldraw-cli/node_modules/puppeteer"
+NPM_ROOT="$(npm root -g 2>/dev/null)"
+# Puppeteer is usually nested inside tldraw-cli; if npm hoists or the
+# package layout changes — fall back to any puppeteer next to the CLI
+TLDRAW_PUPPETEER="$NPM_ROOT/@kitschpatrol/tldraw-cli/node_modules/puppeteer"
+if [ ! -d "$TLDRAW_PUPPETEER" ]; then
+    TLDRAW_PUPPETEER="$(find "$NPM_ROOT/@kitschpatrol" "$NPM_ROOT/puppeteer" -maxdepth 4 -type d -name puppeteer 2>/dev/null | head -1)"
+fi
 
 if [ ! -d "$TLDRAW_PUPPETEER" ]; then
     exit 1

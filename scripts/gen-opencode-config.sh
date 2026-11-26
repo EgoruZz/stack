@@ -62,6 +62,25 @@ while [ "$DIR" != "/" ]; do
 done
 [ -n "$WOLFRAM_BASE" ] || WOLFRAM_BASE="/Applications/Wolfram Engine.app/Contents/Resources"
 
+# ── MCP server entry points: known name first, discovery fallback
+# (upstream renames of server.py / manim_server.py / dist/index.js
+# should not produce a silently broken config)
+resolve_mcp_file() {
+    local repo=$1 known=$2 pattern=$3
+    local f="$STACK_DIR/$repo/$known"
+    [ -f "$f" ] && { echo "$f"; return; }
+    find "$STACK_DIR/$repo" -maxdepth 3 -name "$pattern" 2>/dev/null | head -1
+}
+JULIA_SERVER=$(resolve_mcp_file julia-mcp server.py 'server.py')
+MANIM_SERVER=$(resolve_mcp_file manim-mcp src/manim_server.py '*server*.py')
+TLDRAW_ENTRY=$(resolve_mcp_file tldraw-mcp dist/index.js 'index.js')
+[ -n "$JULIA_SERVER" ]  || echo "  ⚠️ julia-mcp server not found — julia MCP will fail until re-cloned"
+[ -n "$MANIM_SERVER" ]  || echo "  ⚠️ manim server not found — manim MCP will fail until re-cloned"
+[ -n "$TLDRAW_ENTRY" ]  || echo "  ⚠️ tldraw-mcp dist/index.js not found — tldraw MCP will fail until rebuilt"
+: "${JULIA_SERVER:=$STACK_DIR/julia-mcp/server.py}"
+: "${MANIM_SERVER:=$STACK_DIR/manim-mcp/src/manim_server.py}"
+: "${TLDRAW_ENTRY:=$STACK_DIR/tldraw-mcp/dist/index.js}"
+
 cat > "$TARGET/.opencode/opencode.json" << 'CONF'
 {
   "__SCHEMA__": "https://opencode.ai/config.json",
@@ -88,13 +107,13 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
     },
     "julia": {
       "type": "local",
-      "command": ["__STACK__/julia-mcp-env/bin/python", "__STACK__/julia-mcp/server.py"],
+      "command": ["__STACK__/julia-mcp-env/bin/python", "__JULIA_SERVER__"],
       "enabled": true,
       "timeout": 60000
     },
     "manim": {
       "type": "local",
-      "command": ["__STACK__/manim-env/bin/python", "__STACK__/manim-mcp/src/manim_server.py"],
+      "command": ["__STACK__/manim-env/bin/python", "__MANIM_SERVER__"],
       "environment": {"PATH": "__STACK__/manim-env/bin:__BREWBIN__:/usr/bin:/bin:/usr/sbin:/sbin"},
       "enabled": true,
       "timeout": 120000
@@ -107,7 +126,7 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
     },
     "tldraw": {
       "type": "local",
-      "command": ["node", "__STACK__/tldraw-mcp/dist/index.js"],
+      "command": ["node", "__TLDRAW_ENTRY__"],
       "enabled": true,
       "timeout": 60000
     },
@@ -147,8 +166,8 @@ cat > "$TARGET/.opencode/opencode.json" << 'CONF'
 CONF
 
 # Substitute the computed paths (quoted heredoc keeps {env:HOME} intact)
-PVAPP="$(ls -d /Applications/ParaView-*.app 2>/dev/null | head -1)"
-PVPYTHON="$PVAPP/Contents/bin/pvpython"
+PVAPP="$(ls -d /Applications/ParaView*.app 2>/dev/null | head -1)"
+PV_PYLIB="$(ls -d "$PVAPP/Contents/Libraries"/lib/python3.* 2>/dev/null | sort -V | tail -1)"
 BREWBIN="$(dirname "$(command -v brew 2>/dev/null)" 2>/dev/null)"
 [ -n "$BREWBIN" ] || BREWBIN="/opt/homebrew/bin"
 sed -i '' \
@@ -156,8 +175,11 @@ sed -i '' \
     -e "s|__SCHEMA__|\$schema|g" \
     -e "s|__WOLFRAM_BASE__|$WOLFRAM_BASE|g" \
     -e "s|__STACK__|$STACK_DIR|g" \
+    -e "s|__JULIA_SERVER__|$JULIA_SERVER|g" \
+    -e "s|__MANIM_SERVER__|$MANIM_SERVER|g" \
+    -e "s|__TLDRAW_ENTRY__|$TLDRAW_ENTRY|g" \
     -e "s|__PARAVIEW_PYTHON__|$PVAPP/Contents/Python|g" \
-    -e "s|__PARAVIEW_PYLIB__|$PVAPP/Contents/Libraries/lib/python3.12|g" \
+    -e "s|__PARAVIEW_PYLIB__|${PV_PYLIB:-$PVAPP/Contents/Libraries/lib/python3.12}|g" \
     -e "s|__PARAVIEW_LIBS__|$PVAPP/Contents/Libraries|g" \
     -e "s|__PARAVIEW_FRAMEWORKS__|$PVAPP/Contents/Frameworks|g" \
     -e "s|__BREWBIN__|$BREWBIN|g" \

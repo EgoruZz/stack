@@ -176,7 +176,9 @@ if [ "$DEEP" = "1" ]; then
         for f in $FORMULAE; do
             if command -v brew &>/dev/null && brew list --formula "$f" &>/dev/null \
                && ! grep -qx "$f" <(printf "%s\n" "$MANIFEST_CONTENT"); then
-                if confirm "brew uninstall $f (installed by the stack)?"; then
+                if [ "$DRY" = "1" ]; then
+                    echo "[dry] would brew uninstall: $f (installed by the stack)"
+                elif confirm "brew uninstall $f (installed by the stack)?"; then
                     run brew uninstall "$f" && echo "✅ brew removed: $f"
                 fi
             fi
@@ -184,7 +186,9 @@ if [ "$DEEP" = "1" ]; then
         for c in $CASKS; do
             if command -v brew &>/dev/null && brew list --cask "$c" &>/dev/null \
                && ! sed -n '/── casks:/,$p' <(printf "%s\n" "$MANIFEST_CONTENT") | grep -qx "$c"; then
-                if confirm "brew uninstall --cask $c (installed by the stack, sudo password may be asked)?"; then
+                if [ "$DRY" = "1" ]; then
+                    echo "[dry] would brew uninstall --cask: $c (installed by the stack, sudo password may be asked)"
+                elif confirm "brew uninstall --cask $c (installed by the stack, sudo password may be asked)?"; then
                     run brew uninstall --cask "$c" && echo "✅ brew cask removed: $c"
                 fi
             fi
@@ -196,7 +200,9 @@ fi
 
 # ── 11. Julia depot (~/.julia packages; juliaup itself via brew) ─
 if [ -d "$HOME/.julia" ]; then
-    if confirm "Remove the Julia package depot (~/.julia, ~1-2 GB)?"; then
+    if [ "$DRY" = "1" ]; then
+        echo "[dry] would remove: $HOME/.julia (Julia package depot, ~1-2 GB)"
+    elif confirm "Remove the Julia package depot (~/.julia, ~1-2 GB)?"; then
         run rm -rf "$HOME/.julia" && echo "✅ removed: ~/.julia"
     fi
 fi
