@@ -31,7 +31,7 @@ If `~/.stack-secrets.sh` does not exist, the stack is not configured yet. **You 
 6. Craft Apps GUI: `bash {{STACK}}/scripts/craft-install.sh` (DMG installs; if macOS asks for the password, the user enters it in their terminal — you run the script and report).
 7. tldraw Desktop (GUI canvas, https://office.tldraw.com): check whether `/Applications/tldraw.app` exists; if not, tell the user to download and install it from the site (browser step), then the `tldraw` MCP and the `tldraw-offline` skill work with it.
 8. Wolfram license: check `bash {{STACK}}/scripts/check-wolfram-license.sh`; if expired, try `wolframscript -activate` non-interactively with the WOLFRAM_ID/PASS from the form; if those are absent — the user signs in interactively in `wolframscript`.
-9. Firecrawl (optional): suggest `firecrawl login --browser` (user action, browser needed).
+9. Firecrawl (optional): ask the user for the API key (firecrawl.dev → dashboard) and run it yourself: `firecrawl login -k <key>`; if the user prefers not to paste the key, run `firecrawl login --browser` — the command runs in your terminal, the user only confirms in the browser. Verify with `firecrawl --status`.
 10. Projects: ask which folders should use the stack, then `bash {{STACK}}/scripts/new-project.sh <path>` for each (any folder, git not required).
 11. Finish: `bash {{STACK}}/scripts/check-all.sh` — every row must be ✅ — and tell the user to restart OpenCode in each project folder.
 
@@ -41,7 +41,7 @@ Interactive-by-design (only the user can do them): sudo password prompts, browse
 
 | File / folder | Purpose |
 |:---:|:---:|
-| `AGENTS.template.md` | Agent instructions source (a path placeholder is substituted on render); `AGENTS.md` is a local render, gitignored — edit the template only |
+| `AGENTS.template.md` | Agent instructions source (a path placeholder is substituted on render); `AGENTS.md` is a committed bootstrap for fresh clones, overwritten by a local render — edit the template only |
 | `README.md` | Human documentation |
 | `STACK.md` | Full tool reference (keybinds, examples) |
 | `workflow.txt` | The owner's personal git flow |

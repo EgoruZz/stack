@@ -114,7 +114,18 @@ for d in manim-env jupyter-env paraview-mcp-env julia-mcp-env \
     rmdir_ "$STACK_DIR/$d"
 done
 rmfile "$STACK_DIR/.opencode"
-rmfile "$STACK_DIR/AGENTS.md"
+# AGENTS.md is a tracked bootstrap file — restore it, never delete it
+# (also clear the skip-worktree flag the render had set, so git status is honest)
+if [ "$DRY" = "1" ]; then
+    echo "[dry] would restore AGENTS.md to the committed bootstrap"
+else
+    git -C "$STACK_DIR" update-index --no-skip-worktree AGENTS.md 2>/dev/null || true
+    if git -C "$STACK_DIR" checkout -- AGENTS.md 2>/dev/null; then
+        echo "✅ AGENTS.md restored to the committed bootstrap"
+    else
+        rmfile "$STACK_DIR/AGENTS.md"   # non-git copy — nothing to restore
+    fi
+fi
 rmfile "$STACK_DIR/paraview-mcp/typing_extensions.py"
 rmfile "$STACK_DIR/paraview-mcp/pvserver.log"
 rmfile "$STACK_DIR/paraview-mcp-env"
