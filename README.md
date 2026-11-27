@@ -2,11 +2,9 @@
   <img src="assets/painting.png" alt="Stack" width="100%">
 </p>
 
-<h1 align="center">Stack</h1>
-
-<p align="center">
+<p align="left">
   A local OpenCode stack for a macOS machine: research, math, rendering and office tools — installed, wired into projects and driven by the AI agent.<br>
-  <b><code>AGENTS.md</code> — instructions for the agent</b> · <b><code>STACK.md</code> — manual for the user</b>
+  🤖 <code>AGENTS.md</code> — instructions for the agent · 🙋‍♂️ <code>STACK.md</code> — manual for the user
 </p>
 
 ---
@@ -15,12 +13,7 @@
 
 **1. Install OpenCode**
 
-Any way you find convenient — brew, the official installer script, npm. See https://opencode.ai for the options:
-
-```bash
-brew install anomalyco/tap/opencode-v2     # if you use Homebrew
-# or any other method from https://opencode.ai
-```
+Download it to your terminal however you like — see https://opencode.ai/terminal
 
 **2. Clone the stack anywhere**
 
@@ -41,7 +34,7 @@ opencode
 Set up the stack
 ```
 
-You only ever do what only a human can do: type answers, click links, confirm in the browser.
+**5. You only ever do what only a human can do: type answers, click links, confirm in the browser.**
 
 ## Destructor
 
