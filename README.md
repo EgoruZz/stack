@@ -13,18 +13,14 @@
 
 ## Constructor
 
-Four steps. The rest the agent does with you, in chat.
-
 **1. Install OpenCode**
 
-Any way you find convenient — brew, the official installer script, npm — the stack supports all of them equally. See https://opencode.ai for the options:
+Any way you find convenient — brew, the official installer script, npm. See https://opencode.ai for the options:
 
 ```bash
 brew install anomalyco/tap/opencode-v2     # if you use Homebrew
 # or any other method from https://opencode.ai
 ```
-
-The stack itself never depends on the install method: every script just calls `opencode`, and `update-all.sh` updates it the way it was installed (brew → `brew upgrade`, script/npm → `opencode upgrade`). Pick one method and stay with it.
 
 **2. Clone the stack anywhere**
 
@@ -44,8 +40,6 @@ opencode
 ```
 Set up the stack
 ```
-
-That's it. Even on a fresh clone the committed `AGENTS.md` is a bootstrap that tells the agent exactly what to do: read `AGENTS.template.md`, ask you for the personal data first (proxy — in any format you have, git identity, Wolfram ID — each optional, and it warns what stops working if you decline), then run the installation so the downloads already go through your proxy, fill the form, verify every component and attach your project folders (`bash scripts/new-project.sh <any-folder>` — any folder, any depth, git not required). When it finishes, every row of its health check is ✅ — restart OpenCode in your project folder and work.
 
 You only ever do what only a human can do: type answers, click links, confirm in the browser.
 
