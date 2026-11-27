@@ -10,7 +10,7 @@ Thanks for wanting to improve the stack! Propose **anything** — bugs, ideas, c
 
 ## Contributor workflow
 
-`workflow.txt` in the repo is the **author's personal** git flow — you don't need it. Any flow that ends in a PR works:
+`workflow.txt` (the author's personal git flow) is not in the repo — you don't need it. Any flow that ends in a PR works:
 
 ```
 fork → branch (fix/… or feature/…) → commit → push → Pull Request

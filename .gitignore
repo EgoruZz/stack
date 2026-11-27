@@ -29,5 +29,9 @@ tldraw-mcp/
 tldraw-mcp/dist/
 tldraw-mcp/node_modules/
 WolframLanguageForJupyter/
+# Craft Apps GUI assets (source of the README banner — lives locally, not in the repo)
+assets/
+# Owner's personal git flow (local only)
+workflow.txt
 /painting.tldraw
 .brew-pre-manifest.txt

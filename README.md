@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="assets/painting.png" alt="Stack" width="100%">
-</p>
-
 <p align="left">
   🤖 <code>AGENTS.md</code> — instructions for the agent · 🙋‍♂️ <code>STACK.md</code> — manual for the user
 </p>

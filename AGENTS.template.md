@@ -48,7 +48,6 @@ Interactive-by-design (only the user can do them): sudo password prompts, browse
 | `AGENTS.template.md` | Agent instructions source (a path placeholder is substituted on render); `AGENTS.md` is a committed bootstrap for fresh clones, overwritten by a local render — edit the template only |
 | `README.md` | Human documentation |
 | `STACK.md` | Full tool reference (keybinds, examples) |
-| `workflow.txt` | The owner's personal git flow |
 | `scripts/` | All stack scripts (setup, update, check, teardown, projects, proxy, …) |
 | `.brew-pre-manifest.txt` | Pre-install snapshot of brew packages — teardown `--deep` uses it to know what the user had before; never delete it |
 | `first-start.template.txt` | First-start form template |

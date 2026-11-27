@@ -130,4 +130,4 @@ cd $STACK && bash check-all.sh    # health check — everything must be ✅
 3. **Secrets**: never in the repo — templates only; personal data in `~/.stack-secrets.sh` / `.zshrc` (chmod 600)
 4. **Path-agnostic**: scripts self-locate their root; no hardcoded `$HOME/stack` in code; project configs get absolute paths; `AGENTS.template.md` (with `{{STACK}}`) is the source, `AGENTS.md` is a committed bootstrap replaced by a generated local render
 5. **Consistent docs**: CLI/MCP/skills/step counters match across README, AGENTS.template.md, STACK.md
-6. **One PR = one logical change** (workflow.txt)
+6. **One PR = one logical change**
