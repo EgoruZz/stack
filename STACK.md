@@ -7,7 +7,7 @@
 - Free developer license. CLI: `wolframscript -code '...'`. MCP server: `Wolfram` (computation via AgentTools). Jupyter kernel: `wolframlanguage15`.
 - The agent: writes `.wl` files, runs wolframscript, calls the MCP. You: run `wolframscript` interactively, view notebooks in the Wolfram desktop apps.
 - License: renews every ~40 days at https://www.wolfram.com/engine/. Check: `wolframscript -code 'Print[$LicenseExpirationDate]'`; expiry tracker: `bash $STACK/check-wolfram-license.sh`. License data lives in `~/Library/Wolfram*` and survives resets. Expired → renew on the site → `wolframscript -activate` (interactive; non-interactive if `~/.stack-wolfram.conf` has WOLFRAM_ID/PASS).
-- Packages: `wolframscript -code 'PacletInstall["PackageName"]'`; custom packages in `$STACK/WolframLanguage/`. Docs: https://reference.wolfram.com/language/
+- Packages: `wolframscript -code 'PacletInstall["PackageName"]'`. Docs: https://reference.wolfram.com/language/
 
 ## 2. Manim
 

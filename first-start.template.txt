@@ -1,7 +1,7 @@
 # ═══════════════════════════════════════════════════════════════
 #  Stack first-start form
 # ═══════════════════════════════════════════════════════════════
-# Fill in the fields below and run:  bash ~/stack/apply-first-start.sh
+# Fill in the fields below and run:  bash <path>/scripts/apply-first-start.sh
 # The script validates the entries and distributes the data into personal files
 # (~/.stack-secrets.sh etc.). The form file itself can be deleted afterwards.
 #

@@ -57,7 +57,6 @@ Interactive-by-design (only the user can do them): sudo password prompts, browse
 | `skills/` | 8 standalone skills (source) |
 | `skills-store/` | Runtime store of 60 skills (gitignored, generated) |
 | `craft-cli/`, `craft-downloads/` | Craft headless CLIs + DMG cache (gitignored) |
-| `WolframLanguage/` | Custom Wolfram packages |
 | `paraview-mcp/ · manim-mcp/ · julia-mcp/ · tldraw-mcp/ · aris-research-repo/ · WolframLanguageForJupyter/` | Cloned external repos (gitignored) |
 
 ## Scripts (in `scripts/`)
@@ -91,7 +90,7 @@ Interactive-by-design (only the user can do them): sudo password prompts, browse
 - Activation creds: `~/.stack-wolfram.conf` (written by scripts/apply-first-start.sh); if absent — ask the user
 - Expired: renew on the site → try `wolframscript -activate` (interactive unless WOLFRAM_ID/PASS exist in the form)
 - Check: `wolframscript -code 'Print[$LicenseExpirationDate]'`
-- Custom packages: `{{STACK}}/WolframLanguage/`; Jupyter integration: `{{STACK}}/WolframLanguageForJupyter/`
+- Custom packages: none shipped; Jupyter integration: `{{STACK}}/WolframLanguageForJupyter/`
 
 ### Manim
 - **Manim** (community) — the primary renderer, headless; **ManimGL** (3Blue1Brown) — separate interactive GUI CLI, no MCP
