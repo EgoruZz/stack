@@ -3,7 +3,6 @@
 </p>
 
 <p align="left">
-  A local OpenCode stack for a macOS machine: research, math, rendering and office tools — installed, wired into projects and driven by the AI agent.<br>
   🤖 <code>AGENTS.md</code> — instructions for the agent · 🙋‍♂️ <code>STACK.md</code> — manual for the user
 </p>
 
@@ -13,7 +12,7 @@
 
 **1. Install OpenCode**
 
-Download it to your terminal however you like — see https://opencode.ai/terminal
+Download it to your terminal however you like — see <a href="https://opencode.ai/terminal" target="_blank" rel="noopener">opencode.ai/terminal</a>
 
 **2. Clone the stack anywhere**
 
