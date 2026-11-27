@@ -34,4 +34,5 @@ assets/
 # Owner's personal git flow (local only)
 workflow.txt
 /painting.tldraw
+/painting.tldraw
 .brew-pre-manifest.txt
